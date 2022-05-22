@@ -1,0 +1,49 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@inject NavigationManager Navigation
+@inject SignOutSessionStateManager SignOutManager
+<ul class="navbar-nav ms-auto">
+    <AuthorizeView>
+        <Authorized>
+            <li class="nav-item">
+                <a class="nav-link text-dark me-1" style="pointer-events: none" href="authentication/profile">Hello, @context.User.Identity?.Name!</a>
+            </li>
+             <li class="nav-item">
+                <a class="nav-link text-dark me-1" href="authentication/profile"><Syncfusion.Blazor.Buttons.SfIcon Name="Syncfusion.Blazor.Buttons.IconName.Settings" Title="Account Settings" Size="Syncfusion.Blazor.Buttons.IconSize.Large"></Syncfusion.Blazor.Buttons.SfIcon></a>
+            </li>
+            <li class="nav-item">
+                <button class="buttonstyle nav-link text-dark me-3" @onclick="BeginSignOut"><Syncfusion.Blazor.Buttons.SfIcon IconCss="oi oi-account-logout" Title="Log out" Size="Syncfusion.Blazor.Buttons.IconSize.Large"></Syncfusion.Blazor.Buttons.SfIcon></button>
+            </li>
+        </Authorized>
+        <NotAuthorized>
+            <li class="nav-item">
+                <a class="nav-link text-dark" href="authentication/register">Register</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link text-dark" href="authentication/login">Log in</a>
+            </li>
+        </NotAuthorized>
+    </AuthorizeView>
+</ul>
+<style>
+    .buttonstyle {
+        border: thin;
+        background-color: transparent;
+        padding-left: 15px;
+    }
+
+        .buttonstyle:focus {
+            outline: none
+        }
+
+</style>
+
+@code {
+    private async Task BeginSignOut(MouseEventArgs args)
+    {
+        await SignOutManager.SetSignOutState();
+        Navigation.NavigateTo("authentication/logout");
+    }
+}

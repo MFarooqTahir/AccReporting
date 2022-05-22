@@ -1,0 +1,22 @@
+﻿@page "/uploaddatabase"
+@using Syncfusion.Blazor
+@inject NavigationManager nav
+@using Syncfusion.Blazor.Inputs
+<h3>UploadDatabase</h3>
+<div id = "ControlRegion">
+<div class="col-lg-12 control-section">
+    <div class="control_wrapper">
+        <SfUploader ID="UploadFiles" AllowedExtensions=".txt" >
+            <UploaderAsyncSettings SaveUrl="@SaveUrl"></UploaderAsyncSettings>
+        </SfUploader>
+    </div>
+</div>
+</div>
+@code {
+    private string SaveUrl;
+    protected override void OnInitialized()
+    {
+        SaveUrl = nav.ToAbsoluteUri("api/upload/fileupload").AbsolutePath;
+    }
+
+}
