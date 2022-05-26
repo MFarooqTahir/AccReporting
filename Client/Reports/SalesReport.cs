@@ -69,15 +69,17 @@ namespace AccReporting.Client.Reports
                             });
                         });
                     });
-                    x.Row(x => newDataRow(x, "Company Name", ReportData.CompanyName));
                 });
+                column.Item().Element(x => newDataRow(x, "Company Name: ", ReportData.CompanyName));
                 column.Item().Element(ComposeTable);
             });
         }
 
         private void newDataRow(IContainer cont, string title, string val)
         {
-            row.ConstantItem(150).
+            cont.Row(row =>
+            {
+                row.ConstantItem(150).
                         Element(x =>
                         {
                             x.Column(col =>
@@ -85,12 +87,13 @@ namespace AccReporting.Client.Reports
                                 col.Item().Text(title).Bold();
                             });
                         });
-            row.RelativeItem().
-            Element(x =>
-            {
-                x.Column(col =>
+                row.RelativeItem().
+                Element(x =>
                 {
-                    col.Item().Text(val);
+                    x.Column(col =>
+                    {
+                        col.Item().Text(val);
+                    });
                 });
             });
         }
