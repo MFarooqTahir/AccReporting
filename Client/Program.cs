@@ -18,7 +18,14 @@ builder.Services.AddHttpClient("AccReporting.ServerAPI", client => client.BaseAd
 
 // Supply HttpClient instances that include access tokens when making requests to the server project
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("AccReporting.ServerAPI"));
+var client = builder.Services.BuildServiceProvider().GetRequiredService<HttpClient>();
+var fontcal = await client.GetByteArrayAsync("fonts/Calibri/Calibri.ttf");
+var fontcalb = await client.GetByteArrayAsync("fonts/Calibri/calibrib.ttf");
+var fontcall = await client.GetByteArrayAsync("fonts/Calibri/calibril.ttf");
 
+QuestPDF.Drawing.FontManager.RegisterFont(new MemoryStream(fontcal));
+QuestPDF.Drawing.FontManager.RegisterFont(new MemoryStream(fontcalb));
+QuestPDF.Drawing.FontManager.RegisterFont(new MemoryStream(fontcall));
 
 builder.Services.AddApiAuthorization();
 
