@@ -11,8 +11,8 @@ namespace AccReporting.Shared.DTOs
         public string Address { get; set; }
         public string cell { get; set; }
         public int InvNo { get; set; }
-        public DateTimeOffset Dated { get; set; }
-        public DateTimeOffset DueDate { get; set; }
+        public DateTime Dated { get; set; }
+        public DateTime DueDate { get; set; }
         public string RefNumber { get; set; }
         public string Driver { get; set; }
     }

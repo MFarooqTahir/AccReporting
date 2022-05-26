@@ -15,7 +15,7 @@ namespace AccReporting.Server.Controllers
 
         public uploadController(ILogger<uploadController> logger, DataService dataService)
         {
-            this._logger = logger;
+            _logger = logger;
             _dataService = dataService;
         }
 
