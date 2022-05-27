@@ -37,7 +37,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
 
-                     .AddRoles<IdentityRole>()
+    .AddRoles<IdentityRole>()
     //.AddClaimsPrincipalFactory<MyUserClaimsPrincipalFactory>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
