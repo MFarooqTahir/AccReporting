@@ -96,31 +96,48 @@ public class DataService
         return false;
     }
 
-    public async Task<SalesReportDto> GetSalesInvoiceData(int invNo, string Type)
+    public async Task<SalesReportDto> GetSalesInvoiceData(int invNo, string Type, CancellationToken ct)
     {
-        //using AccdbContext DbContext = GenContext.GetAcContext(ConnectionString);
-        //var tableRes = DbContext.InvDet.AsNoTracking()
-        //                .Where(x => x.InvNo == invNo && x.Type == Type)
-        //                .Select(x => new SalesReportModel())
-        //                .AsEnumerable();
-        //var parameters = new Dictionary<string, string> {
-        //    { "Total", "" },
-        //    { "NameAndAddress", "" },
-        //    { "CompanyName", "" },
-        //    { "Address", "" },
-        //    { "cell", "" },
-        //    { "InvNo", "" },
-        //    { "Dated", "" },
-        //    { "DueDate", "" },
-        //    { "RefNumber", "" },
-        //    { "Driver", "" }
-        //};
-
-        return new()
+        var ret = new SalesReportDto()
         {
             NameAndAddress = "Farooq, Korangi crossingFarooq, Korangi crossingFarooq, Korangi crossingFarooq, Korangi crossingFarooq, Korangi crossingFarooq, Korangi crossingFarooq, Korangi crossingFarooq, Korangi crossing",
             CompanyName = "ABC Company",
         };
+        var tableRes = _Db.InvDets.AsNoTracking()
+                        .Where(x => x.InvNo == invNo && x.Type == Type)
+                        .Select(x => new { x.Amount, x.Size, x.Rate, x.NetAmount, x.Packing })
+                        .AsAsyncEnumerable().WithCancellation(ct).ConfigureAwait(false);
+        var data = tableRes.GetAsyncEnumerator();
+
+
+
+        while (await data.MoveNextAsync())
+        {
+            var row = data.Current;
+            ret.tableData.Add(new()
+            {
+                Amount = row.Amount,
+                NetAmount = row.NetAmount,
+                Rate = row.Rate,
+
+            });
+        }
+        await data.DisposeAsync();
+
+        var parameters = new Dictionary<string, string> {
+            { "Total", "" },
+            { "NameAndAddress", "" },
+            { "CompanyName", "" },
+            { "Address", "" },
+            { "cell", "" },
+            { "InvNo", "" },
+            { "Dated", "" },
+            { "DueDate", "" },
+            { "RefNumber", "" },
+            { "Driver", "" }
+        };
+
+        return ret;
     }
 
     public async Task<bool> InsertAllDataBulk(string access)

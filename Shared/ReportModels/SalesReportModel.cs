@@ -24,10 +24,10 @@
         public string Brand { get; set; }
         public int Pcs { get; set; }
         public int Quantity { get; set; }
-        public float Rate { get; set; }
-        public float Amount { get; set; }
-        public float Discount { get; set; }
-        public float NetAmount { get; set; }
+        public double? Rate { get; set; }
+        public double? Amount { get; set; }
+        public double? Discount { get; set; }
+        public double? NetAmount { get; set; }
 
     }
 }

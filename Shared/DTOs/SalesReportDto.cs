@@ -4,7 +4,7 @@ namespace AccReporting.Shared.DTOs
 {
     public class SalesReportDto
     {
-        public IEnumerable<SalesReportModel> tableData { get; set; }
+        public IList<SalesReportModel> tableData { get; set; }
         public double Total { get; set; }
         public string NameAndAddress { get; set; }
         public string CompanyName { get; set; }
