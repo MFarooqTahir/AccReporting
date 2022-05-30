@@ -6,7 +6,7 @@
         {
 
         }
-        public SalesReportModel(int sno, string description, string brand, int pcs, int quantity, float rate, float amount, float discount, float netAmount)
+        public SalesReportModel(int sno, string description, string brand, int pcs, int quantity, float rate, float amount, float discount, float netAmount, string unit)
         {
             Sno = sno;
             Description = description;
@@ -17,13 +17,15 @@
             Amount = amount;
             Discount = discount;
             NetAmount = netAmount;
+            this.unit = unit;
         }
 
-        public int Sno { get; set; }
+        public int? Sno { get; set; }
         public string Description { get; set; }
         public string Brand { get; set; }
         public int Pcs { get; set; }
         public int Quantity { get; set; }
+        public string unit { get; set; }
         public double? Rate { get; set; }
         public double? Amount { get; set; }
         public double? Discount { get; set; }

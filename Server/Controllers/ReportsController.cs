@@ -21,14 +21,14 @@ namespace AccReporting.Server.Controllers
 
         [AllowAnonymous]
         [HttpGet("SalesReport")]
-        public async Task<SalesReportDto> SalesReport(int invNo, string type)
+        public async Task<SalesReportDto> SalesReport(int invNo, string type, CancellationToken ct)
         {
             try
             {
                 _logger.LogInformation("Getting sales report for invoice {invNo}", invNo);
                 await _dataService.SetDbName("Test");
                 _dataService.AccountNumber = "";
-                var res = await _dataService.GetSalesInvoiceData(invNo, type);
+                var res = await _dataService.GetSalesInvoiceData(invNo, type, ct);
                 _logger.LogInformation("Got sales report for invoice {invNo}", invNo);
                 return res;
             }

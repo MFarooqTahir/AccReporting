@@ -10,7 +10,7 @@
     private async Task OnClick(MouseEventArgs args)
     {
         
-        var x = await client.GetFromJsonAsync<SalesReportDto>("api/Reports/SalesReport?invNo=3&type=asd");
+        var x = await client.GetFromJsonAsync<SalesReportDto>("api/Reports/SalesReport?invNo=3&type=S");
         var doc = new SalesReport(x);
         await Js.InvokeVoidAsync("saveAsFile",
                         "SalesReport.pdf",

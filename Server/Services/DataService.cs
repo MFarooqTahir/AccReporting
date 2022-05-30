@@ -1,4 +1,6 @@
-﻿using AccReporting.Server.DbContexts;
+﻿using AccountsReportsWASM.Shared.ReportModels;
+
+using AccReporting.Server.DbContexts;
 using AccReporting.Shared;
 using AccReporting.Shared.DTOs;
 
@@ -103,39 +105,63 @@ public class DataService
             NameAndAddress = "Farooq, Korangi crossingFarooq, Korangi crossingFarooq, Korangi crossingFarooq, Korangi crossingFarooq, Korangi crossingFarooq, Korangi crossingFarooq, Korangi crossingFarooq, Korangi crossing",
             CompanyName = "ABC Company",
         };
-        var tableRes = _Db.InvDets.AsNoTracking()
-                        .Where(x => x.InvNo == invNo && x.Type == Type)
-                        .Select(x => new { x.Amount, x.Size, x.Rate, x.NetAmount, x.Packing })
-                        .AsAsyncEnumerable().WithCancellation(ct).ConfigureAwait(false);
-        var data = tableRes.GetAsyncEnumerator();
+        _Db.Database.SetCommandTimeout(TimeSpan.FromMinutes(3));
+        var dbR = _Db.InvDets.AsNoTracking()
+                        .Where(x => x.InvNo == invNo && x.Sp == Type);
+        var Pcode = await dbR.Select(x => x.Pcode).FirstOrDefaultAsync(ct);
 
-
-
-        while (await data.MoveNextAsync())
+        var dataSumm = await _Db.InvSumms.AsNoTracking()
+                      .Where(x => x.InvNo == invNo && x.Pcode == Pcode)
+                     .Select(x => new { x.Pname, x.RefNo, x.DueDate, x.InvDate })
+                     .FirstOrDefaultAsync(ct);
+        if (dataSumm is not null)
         {
-            var row = data.Current;
-            ret.tableData.Add(new()
+            ret.RefNumber = dataSumm.RefNo;
+            ret.Dated = dataSumm.InvDate;
+            ret.DueDate = dataSumm.DueDate;
+            ret.CompanyName = dataSumm.Pname;
+
+        }
+        var tableRes =
+            dbR.Select(x => new { x.Amount, x.Rate, x.NetAmount, x.Dper, x.Iname, Qty = (int)x.Qty, x.Unit })
+            .AsEnumerable();
+        ret.tableData = new();
+        ret.tableData.AddRange(tableRes.Select(
+            row => new SalesReportModel()
             {
                 Amount = row.Amount,
                 NetAmount = row.NetAmount,
                 Rate = row.Rate,
+                Quantity = row.Qty,
+                unit = row.Unit,
+                Description = row.Iname,
+                Discount = row.Dper
+            }));
 
-            });
-        }
-        await data.DisposeAsync();
+        //var tableRes =
+        //    dbR.Select(x => new { x.Amount, x.Rate, x.NetAmount, x.Dper, x.Iname, x.Qty, x.Unit })
+        //.AsAsyncEnumerable().WithCancellation(ct).ConfigureAwait(false);
+        //var data = tableRes.GetAsyncEnumerator();
 
-        var parameters = new Dictionary<string, string> {
-            { "Total", "" },
-            { "NameAndAddress", "" },
-            { "CompanyName", "" },
-            { "Address", "" },
-            { "cell", "" },
-            { "InvNo", "" },
-            { "Dated", "" },
-            { "DueDate", "" },
-            { "RefNumber", "" },
-            { "Driver", "" }
-        };
+
+
+        //while (await data.MoveNextAsync())
+        //{
+        //    var row = data.Current;
+        //    ret.Total += row.Amount ?? 0;
+        //    ret.tableData.Add(new()
+        //    {
+        //        Amount = row.Amount,
+        //        NetAmount = row.NetAmount,
+        //        Rate = row.Rate,
+        //        Quantity = int.Parse(row.Qty.ToString()),
+        //        unit = row.Unit,
+        //        Description = row.Iname,
+        //        Discount = row.Dper
+        //    });
+        //}
+        //await data.DisposeAsync();
+
 
         return ret;
     }

@@ -44,13 +44,27 @@ namespace AccReporting.Client.Reports
                             column.Item().Text(text =>
                             {
                                 text.Span("Issue date: ").SemiBold();
-                                text.Span(ReportData.Dated.ToString("dd/MM/yyyy"));
+                                if (ReportData.Dated is not null)
+                                {
+                                    text.Span((ReportData.Dated ?? DateTime.MinValue).ToString("dd/MM/yyyy"));
+                                }
+                                else
+                                {
+                                    text.Span("-");
+                                }
                             });
 
                             column.Item().Text(text =>
                             {
                                 text.Span("Due date: ").SemiBold();
-                                text.Span(ReportData.DueDate.ToString("dd/MM/yyyy"));
+                                if (ReportData.DueDate is not null)
+                                {
+                                    text.Span((ReportData.DueDate ?? DateTime.MinValue).ToString("dd/MM/yyyy"));
+                                }
+                                else
+                                {
+                                    text.Span("-");
+                                }
                             });
                         });
                         row.RelativeItem().AlignCenter().Text("Sales Report").ExtraBold().FontSize(30);
@@ -134,7 +148,7 @@ namespace AccReporting.Client.Reports
                 table.ColumnsDefinition(columns =>
                 {
                     columns.ConstantColumn(25);
-                    columns.RelativeColumn(1.8f);
+                    columns.RelativeColumn(2);
                     columns.RelativeColumn();
                     columns.RelativeColumn();
                     columns.RelativeColumn();
@@ -148,7 +162,7 @@ namespace AccReporting.Client.Reports
                     header.Cell().Element(CellStyle).Text("#").FontSize(10);
                     header.Cell().Element(CellStyle).Text("Description of Goods").FontSize(10);
                     header.Cell().Element(CellStyle).Text("Brand").FontSize(10);
-                    header.Cell().Element(CellStyle).Text("Cartons / PCS").FontSize(10);
+                    header.Cell().Element(CellStyle).Text("Cartons/PCS").FontSize(10);
                     header.Cell().Element(CellStyle).Text("Quantity").FontSize(10);
                     header.Cell().Element(CellStyle).Text("Rate").FontSize(10);
                     header.Cell().Element(CellStyle).Text("Amount").FontSize(10);
@@ -159,7 +173,7 @@ namespace AccReporting.Client.Reports
                     {
                         return container
                             .DefaultTextStyle(x => x.SemiBold())
-                            .PaddingVertical(5).BorderBottom(1).BorderColor(Colors.Black);
+                            .PaddingVertical(5).Border(1).BorderColor(Colors.Black);
                     }
                 });
                 int count = 0;
@@ -171,16 +185,16 @@ namespace AccReporting.Client.Reports
                         table.Cell().Element(CellStyle).Text(++count).FontSize(10);
                         table.Cell().Element(CellStyle).Text(item.Description).FontSize(10);
                         table.Cell().Element(CellStyle).Text(item.Brand).FontSize(10);
-                        table.Cell().Element(CellStyle).AlignRight().Text(item.Pcs).FontSize(10);
-                        table.Cell().Element(CellStyle).AlignRight().Text(item.Quantity).FontSize(10);
-                        table.Cell().Element(CellStyle).AlignRight().Text(item.Rate).FontSize(10);
-                        table.Cell().Element(CellStyle).AlignRight().Text(item.Amount).FontSize(10);
-                        table.Cell().Element(CellStyle).AlignRight().Text(item.Discount).FontSize(10);
-                        table.Cell().Element(CellStyle).AlignRight().Text(item.NetAmount).FontSize(10);
+                        table.Cell().Element(CellStyle).Text(item.Pcs).FontSize(10);
+                        table.Cell().Element(CellStyle).Text(item.Quantity).FontSize(10);
+                        table.Cell().Element(CellStyle).Text(item.Rate).FontSize(10);
+                        table.Cell().Element(CellStyle).Text(item.Amount).FontSize(10);
+                        table.Cell().Element(CellStyle).Text(item.Discount).FontSize(10);
+                        table.Cell().Element(CellStyle).Text(item.NetAmount).FontSize(10);
 
                         static IContainer CellStyle(IContainer container)
                         {
-                            return container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
+                            return container.Border(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
                         }
                     }
                 }
