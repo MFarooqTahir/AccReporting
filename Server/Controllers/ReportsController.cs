@@ -1,12 +1,16 @@
-﻿using AccReporting.Server.Services;
-using AccReporting.Shared.DTOs;
+﻿using AccReporting.Server.Reports;
+using AccReporting.Server.Services;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using QuestPDF.Fluent;
+
+using System.Diagnostics;
+
 namespace AccReporting.Server.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class ReportsController : ControllerBase
     {
@@ -21,7 +25,7 @@ namespace AccReporting.Server.Controllers
 
         [AllowAnonymous]
         [HttpGet("SalesReport")]
-        public async Task<SalesReportDto> SalesReport(int invNo, string type, CancellationToken ct)
+        public async Task<IActionResult> SalesReport(int invNo, string type, CancellationToken ct)
         {
             try
             {
@@ -29,12 +33,15 @@ namespace AccReporting.Server.Controllers
                 await _dataService.SetDbName("Test");
                 _dataService.AccountNumber = "";
                 var res = await _dataService.GetSalesInvoiceData(invNo, type, ct);
+                var Report = new SalesReport(res);
                 _logger.LogInformation("Got sales report for invoice {invNo}", invNo);
-                return res;
+                return File(Report.GeneratePdf(), "application/pdf");
             }
             catch (Exception ex)
             {
-                return null;
+                string ID = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+                _logger.LogError(ex, $"Error getting sales report for invoice {invNo}, request from {ID}");
+                return Redirect("/Error");
             }
         }
     }

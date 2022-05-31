@@ -102,7 +102,6 @@ public class DataService
     {
         var ret = new SalesReportDto()
         {
-            NameAndAddress = "Farooq, Korangi crossingFarooq, Korangi crossingFarooq, Korangi crossingFarooq, Korangi crossingFarooq, Korangi crossingFarooq, Korangi crossingFarooq, Korangi crossingFarooq, Korangi crossing",
             CompanyName = "ABC Company",
         };
         _Db.Database.SetCommandTimeout(TimeSpan.FromMinutes(3));
@@ -112,18 +111,18 @@ public class DataService
 
         var dataSumm = await _Db.InvSumms.AsNoTracking()
                       .Where(x => x.InvNo == invNo && x.Pcode == Pcode)
-                     .Select(x => new { x.Pname, x.RefNo, x.DueDate, x.InvDate })
+                     .Select(x => new { x.Pname, x.RefNo, x.DueDate, x.InvDate, x.InvNo })
                      .FirstOrDefaultAsync(ct);
         if (dataSumm is not null)
         {
             ret.RefNumber = dataSumm.RefNo;
             ret.Dated = dataSumm.InvDate;
             ret.DueDate = dataSumm.DueDate;
-            ret.CompanyName = dataSumm.Pname;
-
+            ret.NameAndAddress = dataSumm.Pname;
+            ret.InvNo = dataSumm.InvNo ?? 0;
         }
         var tableRes =
-            dbR.Select(x => new { x.Amount, x.Rate, x.NetAmount, x.Dper, x.Iname, Qty = (int)x.Qty, x.Unit })
+            dbR.Select(x => new { x.Amount, x.Rate, x.NetAmount, x.Dper, x.Iname, Qty = (int)(x.Qty ?? 0), x.Unit })
             .AsEnumerable();
         ret.tableData = new();
         ret.tableData.AddRange(tableRes.Select(
@@ -137,32 +136,6 @@ public class DataService
                 Description = row.Iname,
                 Discount = row.Dper
             }));
-
-        //var tableRes =
-        //    dbR.Select(x => new { x.Amount, x.Rate, x.NetAmount, x.Dper, x.Iname, x.Qty, x.Unit })
-        //.AsAsyncEnumerable().WithCancellation(ct).ConfigureAwait(false);
-        //var data = tableRes.GetAsyncEnumerator();
-
-
-
-        //while (await data.MoveNextAsync())
-        //{
-        //    var row = data.Current;
-        //    ret.Total += row.Amount ?? 0;
-        //    ret.tableData.Add(new()
-        //    {
-        //        Amount = row.Amount,
-        //        NetAmount = row.NetAmount,
-        //        Rate = row.Rate,
-        //        Quantity = int.Parse(row.Qty.ToString()),
-        //        unit = row.Unit,
-        //        Description = row.Iname,
-        //        Discount = row.Dper
-        //    });
-        //}
-        //await data.DisposeAsync();
-
-
         return ret;
     }
 

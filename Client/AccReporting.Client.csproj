@@ -12,25 +12,37 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.5" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="6.0.5" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
-    <PackageReference Include="QuestPDF" Version="2022.5.0" />
-    <PackageReference Include="SkiaSharp.Views.Blazor" Version="2.88.0" />
 	    <PackageReference Include="Syncfusion.Blazor.Grid" Version="20.1.0.47" />
     <PackageReference Include="Syncfusion.Blazor.ProgressBar" Version="20.1.0.47" />
     <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="20.1.0.47" />
     <PackageReference Include="Syncfusion.Blazor.Lists" Version="20.1.0.47" />
-    <PackageReference Include="Syncfusion.Blazor.Popups" Version="20.1.0.47" />
+    <PackageReference Include="Syncfusion.Blazor.Popups" Version="20.1.0.47">
+      <TreatAsUsed>true</TreatAsUsed>
+    </PackageReference>
     <PackageReference Include="Syncfusion.Blazor.Layouts" Version="20.1.0.47" />
-    <PackageReference Include="Syncfusion.Blazor.Inputs" Version="20.1.0.47" />
+    <PackageReference Include="Syncfusion.Blazor.Inputs" Version="20.1.0.47">
+      <TreatAsUsed>true</TreatAsUsed>
+    </PackageReference>
     <PackageReference Include="Syncfusion.Blazor.Cards" Version="20.1.0.47" />
-    <PackageReference Include="Syncfusion.Blazor.Buttons" Version="20.1.0.47" />
-    <PackageReference Include="Syncfusion.Blazor.Navigations" Version="20.1.0.47" />
+    <PackageReference Include="Syncfusion.Blazor.Buttons" Version="20.1.0.47">
+      <TreatAsUsed>true</TreatAsUsed>
+    </PackageReference>
+    <PackageReference Include="Syncfusion.Blazor.Navigations" Version="20.1.0.47">
+      <TreatAsUsed>true</TreatAsUsed>
+    </PackageReference>
     <PackageReference Include="Syncfusion.Blazor.SplitButtons" Version="20.1.0.47" />
-    <PackageReference Include="Syncfusion.Blazor.Spinner" Version="20.1.0.47" />
-    <PackageReference Include="Syncfusion.Blazor.Themes" Version="20.1.0.47" />
+    <PackageReference Include="Syncfusion.Blazor.Spinner" Version="20.1.0.47">
+      <TreatAsUsed>true</TreatAsUsed>
+    </PackageReference>
+    <PackageReference Include="Syncfusion.Blazor.Themes" Version="20.1.0.47">
+      <TreatAsUsed>true</TreatAsUsed>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Shared\AccReporting.Shared.csproj" />
+    <ProjectReference Include="..\Shared\AccReporting.Shared.csproj">
+      <TreatAsUsed>true</TreatAsUsed>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>

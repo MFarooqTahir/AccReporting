@@ -10,17 +10,6 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddSyncfusionBlazor();
-
-using (var client = new HttpClient() { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) })
-{
-    var fontcal = await client.GetByteArrayAsync("fonts/Calibri/Calibri.ttf");
-    var fontcalb = await client.GetByteArrayAsync("fonts/Calibri/calibrib.ttf");
-    var fontcall = await client.GetByteArrayAsync("fonts/Calibri/calibril.ttf");
-
-    QuestPDF.Drawing.FontManager.RegisterFont(new MemoryStream(fontcal));
-    QuestPDF.Drawing.FontManager.RegisterFont(new MemoryStream(fontcalb));
-    QuestPDF.Drawing.FontManager.RegisterFont(new MemoryStream(fontcall));
-}
 //Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(builder.Configuration.GetValue<string>("SyncfusionLicenseKey"));
 
 builder.Services.AddHttpClient("AccReporting.ServerAPI", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))

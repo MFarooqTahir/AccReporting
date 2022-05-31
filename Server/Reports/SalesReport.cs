@@ -5,7 +5,7 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
-namespace AccReporting.Client.Reports
+namespace AccReporting.Server.Reports
 {
     public class SalesReport : IDocument
     {
@@ -159,21 +159,21 @@ namespace AccReporting.Client.Reports
                 });
                 table.Header(header =>
                 {
-                    header.Cell().Element(CellStyle).Text("#").FontSize(10);
-                    header.Cell().Element(CellStyle).Text("Description of Goods").FontSize(10);
-                    header.Cell().Element(CellStyle).Text("Brand").FontSize(10);
-                    header.Cell().Element(CellStyle).Text("Cartons/PCS").FontSize(10);
-                    header.Cell().Element(CellStyle).Text("Quantity").FontSize(10);
-                    header.Cell().Element(CellStyle).Text("Rate").FontSize(10);
-                    header.Cell().Element(CellStyle).Text("Amount").FontSize(10);
-                    header.Cell().Element(CellStyle).Text("Disc%").FontSize(10);
-                    header.Cell().Element(CellStyle).Text("Net Amount").FontSize(10);
+                    header.Cell().Element(CellStyle).AlignCenter().Text("#").FontSize(10);
+                    header.Cell().Element(CellStyle).AlignCenter().Text("Description of Goods").FontSize(10);
+                    header.Cell().Element(CellStyle).AlignCenter().Text("Brand").FontSize(10);
+                    header.Cell().Element(CellStyle).AlignCenter().Text("Cartons/PCS").FontSize(10);
+                    header.Cell().Element(CellStyle).AlignCenter().Text("Quantity").FontSize(10);
+                    header.Cell().Element(CellStyle).AlignCenter().Text("Rate").FontSize(10);
+                    header.Cell().Element(CellStyle).AlignCenter().Text("Amount").FontSize(10);
+                    header.Cell().Element(CellStyle).AlignCenter().Text("Disc%").FontSize(10);
+                    header.Cell().Element(CellStyle).AlignCenter().Text("Net Amount").FontSize(10);
 
                     static IContainer CellStyle(IContainer container)
                     {
                         return container
                             .DefaultTextStyle(x => x.SemiBold())
-                            .PaddingVertical(5).Border(1).BorderColor(Colors.Black);
+                            .PaddingVertical(5).BorderBottom(1).BorderColor(Colors.Black);
                     }
                 });
                 int count = 0;
@@ -182,15 +182,15 @@ namespace AccReporting.Client.Reports
                 {
                     foreach (var item in ReportData.tableData)
                     {
-                        table.Cell().Element(CellStyle).Text(++count).FontSize(10);
-                        table.Cell().Element(CellStyle).Text(item.Description).FontSize(10);
-                        table.Cell().Element(CellStyle).Text(item.Brand).FontSize(10);
-                        table.Cell().Element(CellStyle).Text(item.Pcs).FontSize(10);
-                        table.Cell().Element(CellStyle).Text(item.Quantity).FontSize(10);
-                        table.Cell().Element(CellStyle).Text(item.Rate).FontSize(10);
-                        table.Cell().Element(CellStyle).Text(item.Amount).FontSize(10);
-                        table.Cell().Element(CellStyle).Text(item.Discount).FontSize(10);
-                        table.Cell().Element(CellStyle).Text(item.NetAmount).FontSize(10);
+                        table.Cell().Element(CellStyle).AlignCenter().Text(++count).FontSize(10);
+                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Description).FontSize(10);
+                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Brand).FontSize(10);
+                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Pcs).FontSize(10);
+                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Quantity).FontSize(10);
+                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Rate).FontSize(10);
+                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Amount).FontSize(10);
+                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Discount).FontSize(10);
+                        table.Cell().Element(CellStyle).AlignCenter().Text(item.NetAmount).FontSize(10);
 
                         static IContainer CellStyle(IContainer container)
                         {

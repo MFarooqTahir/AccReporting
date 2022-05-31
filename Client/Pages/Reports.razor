@@ -1,21 +1,42 @@
 ﻿@page "/Reports"
-@using AccReporting.Client.Reports
-@using AccReporting.Shared.DTOs
-@using QuestPDF.Fluent
-@inject IJSRuntime Js
-@inject HttpClient client
 <h3>Reports</h3>
-<Syncfusion.Blazor.Buttons.SfButton @onclick="@OnClick">Get Sample Sales Report</Syncfusion.Blazor.Buttons.SfButton>
-@code {
-    private async Task OnClick(MouseEventArgs args)
-    {
+<div class="row row-cols-1 row-cols-md-3 g-4 .d-none .d-sm-block">
+  <div class="col">
+    <div class="card h-100">
+        <div class="card-header">Sales Report</div>
+      <div class="card-body">
+        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+<a href="Reports/SalesReport?invNo=3&type=S" target="_blank" class="btn btn-primary">Get Sample Sales Report</a>
         
-        var x = await client.GetFromJsonAsync<SalesReportDto>("api/Reports/SalesReport?invNo=3&type=S");
-        var doc = new SalesReport(x);
-        await Js.InvokeVoidAsync("saveAsFile",
-                        "SalesReport.pdf",
-                        Convert.ToBase64String(doc.GeneratePdf())
-                        );        
-    }
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">Card title</h5>
+        <p class="card-text">This is a short card.</p>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">Card title</h5>
+        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content.</p>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">Card title</h5>
+        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+      </div>
+    </div>
+  </div>
+</div>
+@code {
+  
     
 }
