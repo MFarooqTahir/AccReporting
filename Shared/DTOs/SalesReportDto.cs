@@ -1,5 +1,7 @@
 ﻿using AccountsReportsWASM.Shared.ReportModels;
 
+using System.ComponentModel.DataAnnotations;
+
 namespace AccReporting.Shared.DTOs
 {
     public class SalesReportDto
@@ -15,5 +17,14 @@ namespace AccReporting.Shared.DTOs
         public DateTime? DueDate { get; set; }
         public string RefNumber { get; set; }
         public string Driver { get; set; }
+    }
+
+    public class SalesReportInput
+    {
+        [Required(ErrorMessage = "Invocie number not given"), Range(1, int.MaxValue, ErrorMessage = "Invocie number out of range")]
+        public int InvNo { get; set; }
+
+        [Required(ErrorMessage = "Type not given")]
+        public string Type { get; set; }
     }
 }

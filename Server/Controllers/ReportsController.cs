@@ -8,6 +8,8 @@ using QuestPDF.Fluent;
 
 using System.Diagnostics;
 
+using Throw;
+
 namespace AccReporting.Server.Controllers
 {
     [Route("[controller]")]
@@ -29,6 +31,9 @@ namespace AccReporting.Server.Controllers
         {
             try
             {
+                invNo.Throw()
+                    .IfNegative();
+                type.Throw().IfNullOrWhiteSpace(x => x);
                 _logger.LogInformation("Getting sales report for invoice {invNo}", invNo);
                 await _dataService.SetDbName("Test");
                 _dataService.AccountNumber = "";

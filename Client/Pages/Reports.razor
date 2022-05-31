@@ -1,42 +1,40 @@
 ﻿@page "/Reports"
+@using AccReporting.Shared.DTOs
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Inputs
+@inject IJSRuntime JS
 <h3>Reports</h3>
 <div class="row row-cols-1 row-cols-md-3 g-4 .d-none .d-sm-block">
-  <div class="col">
-    <div class="card h-100">
-        <div class="card-header">Sales Report</div>
-      <div class="card-body">
-        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-<a href="Reports/SalesReport?invNo=3&type=S" target="_blank" class="btn btn-primary">Get Sample Sales Report</a>
-        
-      </div>
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-header">Sales Report</div>
+            <div class="card-body">
+                <EditForm Model="@model" OnValidSubmit="@onvalid">
+                    <DataAnnotationsValidator />
+                    <div class="form-group">
+                        <label for="InvNo">Inv No:</label>
+                        <SfNumericTextBox Format="" ID="InvNo" @bind-Value="model.InvNo"></SfNumericTextBox>
+                        <ValidationMessage For="@(() => model.InvNo)"></ValidationMessage>
+                    </div>
+                    <div class="form-group">
+                        <label for="Type">Type:</label>
+                        <SfTextBox ID="Type" @bind-Value="model.Type"></SfTextBox>
+                        <ValidationMessage For="@(() => model.Type)"></ValidationMessage>
+                    </div>
+                    <SfButton class="mt-3 bg-success"><span class="mb-1">Download as PDF</span></SfButton>
+                </EditForm>
+                
+
+            </div>
+        </div>
     </div>
-  </div>
-  <div class="col">
-    <div class="card h-100">
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">This is a short card.</p>
-      </div>
-    </div>
-  </div>
-  <div class="col">
-    <div class="card h-100">
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content.</p>
-      </div>
-    </div>
-  </div>
-  <div class="col">
-    <div class="card h-100">
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-      </div>
-    </div>
-  </div>
+
 </div>
 @code {
-  
-    
+    private SalesReportInput model { get; set; } = new();
+    private async Task onvalid(EditContext context)
+    {
+        var modelInp=context.Model as SalesReportInput;
+        await JS.InvokeVoidAsync("open", $"Reports/SalesReport?invNo={modelInp.InvNo}&type={modelInp.Type}", "_blank");
+    }
 }
