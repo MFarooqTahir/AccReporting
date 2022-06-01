@@ -6,8 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 
 using QuestPDF.Fluent;
 
-using System.Diagnostics;
-
 using Throw;
 
 namespace AccReporting.Server.Controllers
@@ -31,21 +29,31 @@ namespace AccReporting.Server.Controllers
         {
             try
             {
+                IDictionary<string, string> types = new Dictionary<string, string>()
+                {
+                    {"Sale","S" },{"Estimate","E" },{"Purchase","P" },{"Return","R"}
+                };
+                string InpType = types[type];
                 invNo.Throw()
-                    .IfNegative();
-                type.Throw().IfNullOrWhiteSpace(x => x);
+                            .IfNegative();
+                type.Throw()
+                    .IfNullOrWhiteSpace(x => x);
+
                 _logger.LogInformation("Getting sales report for invoice {invNo}", invNo);
-                await _dataService.SetDbName("Test");
-                _dataService.AccountNumber = "";
-                var res = await _dataService.GetSalesInvoiceData(invNo, type, ct);
+                await _dataService.SetDbName("Test", ct);
+                _dataService.AccountNumber = "2.1.4.154";
+                var res = await _dataService.GetSalesInvoiceData(invNo, InpType, ct);
+                if (res?.InvNo != invNo)
+                {
+                    return NotFound($"Error: Invoice number {invNo} not found");
+                }
                 var Report = new SalesReport(res);
                 _logger.LogInformation("Got sales report for invoice {invNo}", invNo);
                 return File(Report.GeneratePdf(), "application/pdf");
             }
             catch (Exception ex)
             {
-                string ID = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
-                _logger.LogError(ex, $"Error getting sales report for invoice {invNo}, request from {ID}");
+                _logger.LogError(ex, $"Error getting sales report for invoice {invNo}, request from {User.Identity.Name}");
                 return Redirect("/Error");
             }
         }

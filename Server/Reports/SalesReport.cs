@@ -9,11 +9,7 @@ namespace AccReporting.Server.Reports
 {
     public class SalesReport : IDocument
     {
-        public SalesReportDto ReportData { get; set; }
-
-        public SalesReport()
-        {
-        }
+        public SalesReportDto? ReportData { get; set; }
 
         public SalesReport(SalesReportDto reportData)
         {
@@ -39,12 +35,12 @@ namespace AccReporting.Server.Reports
                     {
                         row.ConstantItem(150).Column(column =>
                         {
-                            column.Item().Text($"Invoice #{ReportData.InvNo}").Style(titleStyle);
+                            column.Item().Text($"Invoice #{ReportData?.InvNo}").Style(titleStyle);
 
                             column.Item().Text(text =>
                             {
                                 text.Span("Issue date: ").SemiBold();
-                                if (ReportData.Dated is not null)
+                                if (ReportData?.Dated is not null)
                                 {
                                     text.Span((ReportData.Dated ?? DateTime.MinValue).ToString("dd/MM/yyyy"));
                                 }
@@ -57,7 +53,7 @@ namespace AccReporting.Server.Reports
                             column.Item().Text(text =>
                             {
                                 text.Span("Due date: ").SemiBold();
-                                if (ReportData.DueDate is not null)
+                                if (ReportData?.DueDate is not null)
                                 {
                                     text.Span((ReportData.DueDate ?? DateTime.MinValue).ToString("dd/MM/yyyy"));
                                 }
@@ -91,20 +87,20 @@ namespace AccReporting.Server.Reports
             container.PaddingVertical(20).Column(column =>
             {
                 column.Spacing(5);
-                column.Item().Element(x => NewHeadingRow(x, ReportData.CompanyName));
-                column.Item().Element(x => NewHeadingRow(x, ReportData.Address));
-                column.Item().Element(x => NewHeadingRow(x, ReportData.cell));
+                column.Item().Element(x => NewHeadingRow(x, ReportData?.CompanyName));
+                column.Item().Element(x => NewHeadingRow(x, ReportData?.Address));
+                column.Item().Element(x => NewHeadingRow(x, ReportData?.cell));
 
-                column.Item().Element(x => newDataRow(x, "Ref. #: ", ReportData.RefNumber));
-                column.Item().Element(x => newDataRow(x, "Driver/Veh.: ", ReportData.Driver));
-                column.Item().Element(x => newDataRow(x, "Buyer: ", ReportData.NameAndAddress));
+                column.Item().Element(x => NewDataRow(x, "Ref. #: ", ReportData?.RefNumber));
+                column.Item().Element(x => NewDataRow(x, "Driver/Veh.: ", ReportData?.Driver));
+                column.Item().Element(x => NewDataRow(x, "Payment: ", ReportData?.Payment));
                 column.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Grey.Medium);
                 column.Item().Element(ComposeTable);
-                column.Item().AlignRight().Text("Grand Total: " + ReportData.Total).Bold().FontSize(15);
+                column.Item().AlignRight().Text("Grand Total: " + ReportData?.Total).Bold().FontSize(15);
             });
         }
 
-        private void newDataRow(IContainer cont, string title, string val)
+        private static void NewDataRow(IContainer cont, string title, string val)
         {
             cont.Row(row =>
             {
@@ -126,7 +122,7 @@ namespace AccReporting.Server.Reports
                 });
             });
         }
-        private void NewHeadingRow(IContainer cont, string val)
+        private static void NewHeadingRow(IContainer cont, string val)
         {
             cont.Row(row =>
             {
@@ -142,44 +138,46 @@ namespace AccReporting.Server.Reports
         }
         private void ComposeTable(IContainer container)
         {
-            container.Table(table =>
+            if (ReportData.tableData is not null)
             {
-                // step 1
-                table.ColumnsDefinition(columns =>
+                container.Table(table =>
                 {
-                    columns.ConstantColumn(25);
-                    columns.RelativeColumn(2);
-                    columns.RelativeColumn();
-                    columns.RelativeColumn();
-                    columns.RelativeColumn();
-                    columns.RelativeColumn();
-                    columns.RelativeColumn();
-                    columns.RelativeColumn();
-                    columns.RelativeColumn();
-                });
-                table.Header(header =>
-                {
-                    header.Cell().Element(CellStyle).AlignCenter().Text("#").FontSize(10);
-                    header.Cell().Element(CellStyle).AlignCenter().Text("Description of Goods").FontSize(10);
-                    header.Cell().Element(CellStyle).AlignCenter().Text("Brand").FontSize(10);
-                    header.Cell().Element(CellStyle).AlignCenter().Text("Cartons/PCS").FontSize(10);
-                    header.Cell().Element(CellStyle).AlignCenter().Text("Quantity").FontSize(10);
-                    header.Cell().Element(CellStyle).AlignCenter().Text("Rate").FontSize(10);
-                    header.Cell().Element(CellStyle).AlignCenter().Text("Amount").FontSize(10);
-                    header.Cell().Element(CellStyle).AlignCenter().Text("Disc%").FontSize(10);
-                    header.Cell().Element(CellStyle).AlignCenter().Text("Net Amount").FontSize(10);
 
-                    static IContainer CellStyle(IContainer container)
+                    table.ColumnsDefinition(columns =>
                     {
-                        return container
-                            .DefaultTextStyle(x => x.SemiBold())
-                            .PaddingVertical(5).BorderBottom(1).BorderColor(Colors.Black);
-                    }
-                });
-                int count = 0;
+                        columns.ConstantColumn(25);
+                        columns.RelativeColumn(2);
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                    });
 
-                if (ReportData.tableData is not null)
-                {
+                    table.Header(header =>
+                    {
+                        header.Cell().Element(CellStyle).AlignCenter().Text("#").FontSize(10);
+                        header.Cell().Element(CellStyle).AlignCenter().Text("Description of Goods").FontSize(10);
+                        header.Cell().Element(CellStyle).AlignCenter().Text("Brand").FontSize(10);
+                        header.Cell().Element(CellStyle).AlignCenter().Text("Cartons/PCS").FontSize(10);
+                        header.Cell().Element(CellStyle).AlignCenter().Text("Quantity").FontSize(10);
+                        header.Cell().Element(CellStyle).AlignCenter().Text("Rate").FontSize(10);
+                        header.Cell().Element(CellStyle).AlignCenter().Text("Amount").FontSize(10);
+                        header.Cell().Element(CellStyle).AlignCenter().Text("Disc%").FontSize(10);
+                        header.Cell().Element(CellStyle).AlignCenter().Text("Net Amount").FontSize(10);
+
+                        static IContainer CellStyle(IContainer container)
+                        {
+                            return container
+                                .DefaultTextStyle(x => x.SemiBold())
+                                .PaddingVertical(5).BorderBottom(1).BorderColor(Colors.Black);
+                        }
+                    });
+                    int count = 0;
+
+
                     foreach (var item in ReportData.tableData)
                     {
                         table.Cell().Element(CellStyle).AlignCenter().Text(++count).FontSize(10);
@@ -197,8 +195,9 @@ namespace AccReporting.Server.Reports
                             return container.Border(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
                         }
                     }
-                }
-            });
+
+                });
+            }
         }
 
         public DocumentMetadata GetMetadata() => DocumentMetadata.Default;

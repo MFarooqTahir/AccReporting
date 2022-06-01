@@ -1,40 +1,78 @@
 ﻿@page "/Reports"
 @using AccReporting.Shared.DTOs
 @using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.DropDowns
 @using Syncfusion.Blazor.Inputs
 @inject IJSRuntime JS
-<h3>Reports</h3>
-<div class="row row-cols-1 row-cols-md-3 g-4 .d-none .d-sm-block">
-    <div class="col">
+<div class="d-block align-content-center w-100">
+    <h3>Reports</h3>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @*<div class="col">
         <div class="card h-100">
-            <div class="card-header">Sales Report</div>
-            <div class="card-body">
-                <EditForm Model="@model" OnValidSubmit="@onvalid">
-                    <DataAnnotationsValidator />
-                    <div class="form-group">
-                        <label for="InvNo">Inv No:</label>
-                        <SfNumericTextBox Format="" ID="InvNo" @bind-Value="model.InvNo"></SfNumericTextBox>
-                        <ValidationMessage For="@(() => model.InvNo)"></ValidationMessage>
-                    </div>
-                    <div class="form-group">
-                        <label for="Type">Type:</label>
-                        <SfTextBox ID="Type" @bind-Value="model.Type"></SfTextBox>
-                        <ValidationMessage For="@(() => model.Type)"></ValidationMessage>
-                    </div>
-                    <SfButton class="mt-3 bg-success"><span class="mb-1">Download as PDF</span></SfButton>
-                </EditForm>
-                
-
-            </div>
+        <div class="card-header">Sales Report</div>
+        <div class="card-body">
+        <EditForm Model="@model" OnValidSubmit="@onvalid">
+        <DataAnnotationsValidator />
+        <div class="form-group">
+        <label for="InvNo">Inv No:</label>
+        <SfNumericTextBox Format="" ID="InvNo" Placeholder="Invoice Number" @bind-Value="model.InvNo"></SfNumericTextBox>
+        <ValidationMessage For="@(() => model.InvNo)"></ValidationMessage>
         </div>
-    </div>
+        <div class="form-group">
+        <div class="form-group">
+        <label for="country">Type:</label>
+        <SfComboBox ID="country" Placeholder="Type of invoice" @bind-Value="@model.Type" DataSource="@types">
+        </SfComboBox>
+        <ValidationMessage For="@(() => model.Type)"></ValidationMessage>
+        </div>
+        </div>
+        <SfButton class="mt-3 bg-success"><span class="mb-1">Download as PDF</span></SfButton>
+        </EditForm>
 
+
+        </div>
+        </div>
+        </div>*@
+        <div class="col">
+            <SfCard>
+                <CardHeader>Sales Report</CardHeader>
+                <CardContent>
+                    
+                                    <EditForm Model="@model" OnValidSubmit="@onvalid">
+                                        <DataAnnotationsValidator />
+                                        <div class="form-group">
+                                            <label for="InvNo">Inv No:</label>
+                                            <SfNumericTextBox ShowSpinButton="false" Format="" ID="InvNo" Placeholder="Invoice Number" @bind-Value="model.InvNo"></SfNumericTextBox>
+                                            <ValidationMessage For="@(() => model.InvNo)"></ValidationMessage>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="form-group">
+                                                <label for="country">Type:</label>
+                                                <SfComboBox ID="country" Placeholder="Type of invoice" @bind-Value="@model.Type" DataSource="@types">
+                                                </SfComboBox>
+                                                <ValidationMessage For="@(() => model.Type)"></ValidationMessage>
+                                            </div>
+                                        </div>
+                                        <SfButton class="mt-3 bg-success"><span class="mb-1">Download as PDF</span></SfButton>
+                                    </EditForm>
+                              
+
+                </CardContent>
+            </SfCard>
+        </div>
+
+    </div>
 </div>
 @code {
     private SalesReportInput model { get; set; } = new();
+    public List<string> types = new List<string>
+    {
+       "Sale","Estimate","Purchase","Return",
+    };
     private async Task onvalid(EditContext context)
     {
-        var modelInp=context.Model as SalesReportInput;
-        await JS.InvokeVoidAsync("open", $"Reports/SalesReport?invNo={modelInp.InvNo}&type={modelInp.Type}", "_blank");
+        var modelInp = context.Model as SalesReportInput;
+        await JS.InvokeVoidAsync("open", $"Reports/SalesReport?invNo={model.InvNo}&type={model.Type}", "_blank");
     }
 }

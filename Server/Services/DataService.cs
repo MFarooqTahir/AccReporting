@@ -50,7 +50,7 @@ public class DataService
         _config = config;
     }
 
-    public async Task SetDbName(string dbName)
+    public async Task SetDbName(string dbName, CancellationToken ct)
     {
         if (string.Equals(dbName, _DbName, StringComparison.OrdinalIgnoreCase))
         {
@@ -58,10 +58,10 @@ public class DataService
         }
         _DbName = dbName;
         ConnectionString = "";
-        await EnsureDbConenction();
+        await EnsureDbConenction(ct);
     }
 
-    private async Task EnsureDbConenction()
+    private async Task EnsureDbConenction(CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(_DbName))
         {
@@ -72,20 +72,18 @@ public class DataService
             throw new DbEmptyException("No connection string set");
         }
         string db = _Db.Database.GetDbConnection().Database;
-        if (db != _DbName || !await _Db.Database.CanConnectAsync())
+        if (db != _DbName || !await _Db.Database.CanConnectAsync(ct))
         {
             _Db.Database.SetConnectionString(ConnectionString);
         }
     }
 
-    private bool SetCache<T>(string key, T value)
+    private void SetCache<T>(string key, T value)
     {
         if (_cache is not null)
         {
             _cache.Set(CachePrefix + key, value);
-            return true;
         }
-        return false;
     }
 
     private bool GetCache<T>(string key, out T Result)
@@ -97,50 +95,71 @@ public class DataService
         }
         return false;
     }
-
-    public async Task<SalesReportDto> GetSalesInvoiceData(int invNo, string Type, CancellationToken ct)
+    private void ClearDbCache()
     {
-        var ret = new SalesReportDto()
+        var keysList = _cache.GetKeysForDb(CachePrefix);
+        if (keysList is not null && keysList.Any())
         {
-            CompanyName = "ABC Company",
-        };
-        _Db.Database.SetCommandTimeout(TimeSpan.FromMinutes(3));
-        var dbR = _Db.InvDets.AsNoTracking()
-                        .Where(x => x.InvNo == invNo && x.Sp == Type);
-        var Pcode = await dbR.Select(x => x.Pcode).FirstOrDefaultAsync(ct);
 
-        var dataSumm = await _Db.InvSumms.AsNoTracking()
-                      .Where(x => x.InvNo == invNo && x.Pcode == Pcode)
-                     .Select(x => new { x.Pname, x.RefNo, x.DueDate, x.InvDate, x.InvNo })
-                     .FirstOrDefaultAsync(ct);
-        if (dataSumm is not null)
-        {
-            ret.RefNumber = dataSumm.RefNo;
-            ret.Dated = dataSumm.InvDate;
-            ret.DueDate = dataSumm.DueDate;
-            ret.NameAndAddress = dataSumm.Pname;
-            ret.InvNo = dataSumm.InvNo ?? 0;
+            foreach (var key in keysList)
+                _cache.Remove(key);
+
         }
-        var tableRes =
-            dbR.Select(x => new { x.Amount, x.Rate, x.NetAmount, x.Dper, x.Iname, Qty = (int)(x.Qty ?? 0), x.Unit })
-            .AsEnumerable();
-        ret.tableData = new();
-        ret.tableData.AddRange(tableRes.Select(
-            row => new SalesReportModel()
+    }
+    public async Task<SalesReportDto?> GetSalesInvoiceData(int invNo, string Type, CancellationToken ct)
+    {
+        string reportKey = "SR" + invNo + Type;
+        var successful = GetCache(reportKey, out SalesReportDto? ret);
+        if (!successful)
+        {
+            ret = new SalesReportDto()
             {
-                Amount = row.Amount,
-                NetAmount = row.NetAmount,
-                Rate = row.Rate,
-                Quantity = row.Qty,
-                unit = row.Unit,
-                Description = row.Iname,
-                Discount = row.Dper
-            }));
+                CompanyName = "ABC Company",
+            };
+            _Db.Database.SetCommandTimeout(TimeSpan.FromMinutes(3));
+
+            var dataSumm = await _Db.InvSumms.AsNoTracking()
+                          .Where(x => x.InvNo == invNo && x.Pcode == AccountNumber)
+                         .Select(x => new { x.Payment, x.RefNo, x.DueDate, x.InvDate, x.InvNo })
+                         .FirstOrDefaultAsync(ct);
+            if (dataSumm is not null)
+            {
+
+                ret.RefNumber = dataSumm.RefNo;
+                ret.Dated = dataSumm.InvDate;
+                ret.DueDate = dataSumm.DueDate;
+                ret.Payment = dataSumm.Payment;
+                ret.InvNo = dataSumm.InvNo ?? 0;
+            }
+            if (ret.InvNo == 0)
+            {
+                return ret;
+            }
+            var tableRes =
+               await _Db.InvDets.AsNoTracking()
+                            .Where(x => x.Pcode == AccountNumber && x.InvNo == invNo && x.Sp == Type)
+                            .Select(x => new { x.Amount, x.Rate, x.NetAmount, x.Dper, x.Iname, Qty = (int)(x.Qty ?? 0), x.Unit })
+                .AsNoTracking().ToListAsync(ct);
+            ret.tableData = new();
+            ret.tableData.AddRange(tableRes.Select(
+                row => new SalesReportModel()
+                {
+                    Amount = row.Amount,
+                    NetAmount = row.NetAmount,
+                    Rate = row.Rate,
+                    Quantity = row.Qty,
+                    unit = row.Unit,
+                    Description = row.Iname,
+                    Discount = row.Dper
+                }));
+            SetCache(reportKey, ret);
+        }
         return ret;
     }
 
-    public async Task<bool> InsertAllDataBulk(string access)
+    public async Task<bool> InsertAllDataBulk(string access, CancellationToken ct)
     {
+
         try
         {
             List<Acfile> AcFileInsert = new();
@@ -181,25 +200,27 @@ public class DataService
             });
             try
             {
-                await EnsureDbConenction();
-                await _Db.Database.EnsureCreatedAsync();
-                using (var trans = await _Db.Database.BeginTransactionAsync().ConfigureAwait(false))
+                await EnsureDbConenction(ct);
+                await _Db.Database.EnsureCreatedAsync(ct);
+                using (var trans = await _Db.Database.BeginTransactionAsync(ct).ConfigureAwait(false))
                 {
                     try
                     {
-                        await _Db.BulkInsertAsync(AcFileInsert).ConfigureAwait(false);
-                        await _Db.BulkInsertAsync(InvDetInsert).ConfigureAwait(false);
-                        await _Db.BulkInsertAsync(InventoryInsert).ConfigureAwait(false);
-                        await _Db.BulkInsertAsync(InvSummInsert).ConfigureAwait(false);
-                        await _Db.BulkInsertAsync(TransInsert).ConfigureAwait(false);
-                        await trans.CommitAsync().ConfigureAwait(false);
+                        await _Db.BulkInsertAsync(AcFileInsert, cancellationToken: ct).ConfigureAwait(false);
+                        await _Db.BulkInsertAsync(InvDetInsert, cancellationToken: ct).ConfigureAwait(false);
+                        await _Db.BulkInsertAsync(InventoryInsert, cancellationToken: ct).ConfigureAwait(false);
+                        await _Db.BulkInsertAsync(InvSummInsert, cancellationToken: ct).ConfigureAwait(false);
+                        await _Db.BulkInsertAsync(TransInsert, cancellationToken: ct).ConfigureAwait(false);
+                        await trans.CommitAsync(ct).ConfigureAwait(false);
+                        ClearDbCache();
+
                     }
                     catch (Exception ex)
                     {
 #if DEBUG
                         Debug.WriteLine(ex.Message + " " + ex.InnerException + " " + ex.StackTrace);
 #endif
-                        await trans.RollbackAsync().ConfigureAwait(false);
+                        await trans.RollbackAsync(ct).ConfigureAwait(false);
                         return false;
                     }
                 }
@@ -222,111 +243,4 @@ public class DataService
             return false;
         }
     }
-
-    //    public async Task<bool> InsertAllDataBulkFor(string access)
-    //    {
-    //        try
-    //        {
-    //            List<Acfile> AcFileInsert = new();
-    //            List<InvDet> InvDetInsert = new();
-    //            List<Inventory> InventoryInsert = new();
-    //            List<InvSumm> InvSummInsert = new();
-    //            List<Trans> TransInsert = new();
-    //            //Parallel.ForEach(access.Split("---START---", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), SplitEntries =>
-    //            //{
-    //            foreach (string? SplitEntries in access.Split("---START---", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-    //            {
-    //                string[]? entries = SplitEntries.Split(new string[] { "\r\n", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);//.Where(x => !(x.Contains("DROP", StringComparison.InvariantCultureIgnoreCase) && x.Contains("DELETE FROM", StringComparison.InvariantCultureIgnoreCase) && x.Contains("UPDATE", StringComparison.InvariantCultureIgnoreCase)));
-    //                string? first = entries[0];
-    //                entries = entries[1..];
-    //                List<string[]> newEnt = new();
-    //                for (int i = 0; i < entries.Length; i++)
-    //                {
-    //                    newEnt.Add(entries[i].Split("|"));
-    //                }
-    //                switch (first)
-    //                {
-    //                    case "ACFILE":
-    //                        for (int i = 0; i < newEnt.Count; i++)
-    //                        {
-    //                            AcFileInsert.Add(new(newEnt[i]));
-    //                        }
-    //                        break;
-
-    //                    case "INVDET":
-    //                        for (int i = 0; i < newEnt.Count; i++)
-    //                        {
-    //                            InvDetInsert.Add(new(newEnt[i]));
-    //                        }
-    //                        break;
-
-    //                    case "INVENTORY":
-    //                        for (int i = 0; i < newEnt.Count; i++)
-    //                        {
-    //                            InventoryInsert.Add(new(newEnt[i]));
-    //                        }
-    //                        break;
-
-    //                    case "INVSUMM":
-    //                        for (int i = 0; i < newEnt.Count; i++)
-    //                        {
-    //                            InvSummInsert.Add(new(newEnt[i]));
-    //                        }
-    //                        break;
-
-    //                    case "TRANS":
-    //                        for (int i = 0; i < newEnt.Count; i++)
-    //                        {
-    //                            TransInsert.Add(new(newEnt[i]));
-    //                        }
-    //                        break;
-    //                }
-    //            }
-    //            //});
-    //            try
-    //            {
-    //                await EnsureDbConenction();
-
-    //                await _Db.Database.EnsureDeletedAsync().ConfigureAwait(false);
-    //                await _Db.Database.MigrateAsync().ConfigureAwait(false);
-    //                using (Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction? trans = await _Db.Database.BeginTransactionAsync().ConfigureAwait(false))
-    //                {
-    //                    try
-    //                    {
-    //                        await _Db.BulkInsertAsync(AcFileInsert).ConfigureAwait(false);
-    //                        await _Db.BulkInsertAsync(InvDetInsert).ConfigureAwait(false);
-    //                        await _Db.BulkInsertAsync(InventoryInsert).ConfigureAwait(false);
-    //                        await _Db.BulkInsertAsync(InvSummInsert).ConfigureAwait(false);
-    //                        await _Db.BulkInsertAsync(TransInsert).ConfigureAwait(false);
-    //                        //await DbContext.BulkInsertAsync(InventoryList).ConfigureAwait(false);
-    //                        //await DbContext.BulkInsertAsync(InvSummList).ConfigureAwait(false);
-    //                        await trans.CommitAsync().ConfigureAwait(false);
-    //                    }
-    //                    catch (Exception ex)
-    //                    {
-    //#if DEBUG
-    //                        Debug.WriteLine(ex.Message + " " + ex.InnerException + " " + ex.StackTrace);
-    //#endif
-    //                        await trans.RollbackAsync().ConfigureAwait(false);
-    //                        return false;
-    //                    }
-    //                }
-    //                return true;
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //#if DEBUG
-    //                Debug.WriteLine(ex.Message + " " + ex.InnerException + " " + ex.StackTrace);
-    //#endif
-    //                return false;
-    //            }
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //#if DEBUG
-    //            Debug.WriteLine(ex.Message + " " + ex.InnerException + " " + ex.StackTrace);
-    //#endif
-    //            return false;
-    //        }
-    //    }
 }

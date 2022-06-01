@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -38,18 +38,24 @@
     <PackageReference Include="Syncfusion.Blazor.Themes" Version="20.1.0.47">
       <TreatAsUsed>true</TreatAsUsed>
     </PackageReference>
-  </ItemGroup>
+      <PackageReference Include="Syncfusion.Blazor.Spinner" Version="20.1.0.47" />
+    <PackageReference Include="Syncfusion.Blazor.Themes" Version="20.1.0.47" />
+</ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Shared\AccReporting.Shared.csproj">
       <TreatAsUsed>true</TreatAsUsed>
     </ProjectReference>
-  </ItemGroup>
+      <PackageReference Include="Syncfusion.Blazor.Spinner" Version="20.1.0.47" />
+    <PackageReference Include="Syncfusion.Blazor.Themes" Version="20.1.0.47" />
+</ItemGroup>
 
   <ItemGroup>
     <Folder Include="Data\" />
     <Folder Include="wwwroot\Icons\" />
-  </ItemGroup>
+      <PackageReference Include="Syncfusion.Blazor.Spinner" Version="20.1.0.47" />
+    <PackageReference Include="Syncfusion.Blazor.Themes" Version="20.1.0.47" />
+</ItemGroup>
   
   
 

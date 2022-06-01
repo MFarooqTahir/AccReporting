@@ -20,7 +20,7 @@ namespace AccReporting.Server.Controllers
         }
 
         [HttpPost("fileupload")]
-        public async Task<ActionResult> fileupload()
+        public async Task<ActionResult> fileupload(CancellationToken ct)
         {
             try
             {
@@ -33,8 +33,8 @@ namespace AccReporting.Server.Controllers
                     text = Encoding.Default.GetString(fileBytes);
                 }
                 _logger.LogInformation("File uploaded");
-                await _dataService.SetDbName("Test");
-                var res = await _dataService.InsertAllDataBulk(text);
+                await _dataService.SetDbName("Test", ct);
+                var res = await _dataService.InsertAllDataBulk(text, ct);
                 _logger.LogInformation("Data Inserted");
                 return Ok(res);
             }

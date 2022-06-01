@@ -8,7 +8,7 @@ namespace AccReporting.Shared.DTOs
     {
         public List<SalesReportModel> tableData { get; set; }
         public double Total { get; set; }
-        public string NameAndAddress { get; set; }
+        public string Payment { get; set; }
         public string CompanyName { get; set; }
         public string Address { get; set; }
         public string cell { get; set; }
@@ -21,10 +21,10 @@ namespace AccReporting.Shared.DTOs
 
     public class SalesReportInput
     {
-        [Required(ErrorMessage = "Invocie number not given"), Range(1, int.MaxValue, ErrorMessage = "Invocie number out of range")]
-        public int InvNo { get; set; }
+        [Required(ErrorMessage = "Invoice number not given"), Range(1, int.MaxValue, ErrorMessage = "Invoice number out of range")]
+        public int? InvNo { get; set; }
 
         [Required(ErrorMessage = "Type not given")]
-        public string Type { get; set; }
+        public string? Type { get; set; }
     }
 }
