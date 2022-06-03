@@ -38,7 +38,8 @@ namespace AccReporting.Server.Controllers
 
                 string InpType = types[type];
                 invNo.Throw()
-                            .IfNegative();
+                            .IfNegative()
+                            .IfDefault();
                 type.Throw()
                     .IfNullOrWhiteSpace(x => x);
 
