@@ -9,6 +9,7 @@ namespace AccReporting.Shared.DTOs
         public List<SalesReportModel> tableData { get; set; }
         public double Total { get; set; }
         public string Payment { get; set; }
+        public string Type { get; set; }
         public string CompanyName { get; set; }
         public string Address { get; set; }
         public string cell { get; set; }

@@ -1,4 +1,5 @@
-﻿using AccReporting.Server.Reports;
+﻿using AccReporting.Server.Data;
+using AccReporting.Server.Reports;
 using AccReporting.Server.Services;
 
 using Microsoft.AspNetCore.Authorization;
@@ -14,13 +15,18 @@ namespace AccReporting.Server.Controllers
     [ApiController]
     public class ReportsController : ControllerBase
     {
+        private readonly ApplicationDbContext _authDb;
         private readonly ILogger<ReportsController> _logger;
         private readonly DataService _dataService;
-
-        public ReportsController(DataService dataService, ILogger<ReportsController> logger)
+        private readonly IDictionary<string, string> types = new Dictionary<string, string>()
+                {
+                    {"Sale","S" },{"Estimate","E" },{"Purchase","P" },{"Return","R"}
+                };
+        public ReportsController(DataService dataService, ILogger<ReportsController> logger, ApplicationDbContext authDb)
         {
             _dataService = dataService;
             _logger = logger;
+            _authDb = authDb;
         }
 
         [AllowAnonymous]
@@ -29,10 +35,7 @@ namespace AccReporting.Server.Controllers
         {
             try
             {
-                IDictionary<string, string> types = new Dictionary<string, string>()
-                {
-                    {"Sale","S" },{"Estimate","E" },{"Purchase","P" },{"Return","R"}
-                };
+
                 string InpType = types[type];
                 invNo.Throw()
                             .IfNegative();
@@ -41,12 +44,14 @@ namespace AccReporting.Server.Controllers
 
                 _logger.LogInformation("Getting sales report for invoice {invNo}", invNo);
                 await _dataService.SetDbName("Test", ct);
-                _dataService.AccountNumber = "2.1.4.154";
-                var res = await _dataService.GetSalesInvoiceData(invNo, InpType, ct);
+                var res = await _dataService.GetSalesInvoiceData(invNo, InpType, "2.1.4.154", ct);
                 if (res?.InvNo != invNo)
                 {
                     return NotFound($"Error: Invoice number {invNo} not found");
                 }
+                res.Type = type;
+                res.cell = "0345-5551092";
+                res.Address = "Allah wala town, Korangi crossing";
                 var Report = new SalesReport(res);
                 _logger.LogInformation("Got sales report for invoice {invNo}", invNo);
                 return File(Report.GeneratePdf(), "application/pdf");

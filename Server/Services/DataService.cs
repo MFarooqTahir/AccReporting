@@ -20,7 +20,6 @@ public class DataService
     private readonly IMemoryCache? _cache;
     private readonly AccountInfoDbContext _Db;
     private readonly IConfiguration _config;
-    public string AccountNumber { get; set; }
     private string _ConnectionString = "";
 
     private string ConnectionString
@@ -106,20 +105,21 @@ public class DataService
 
         }
     }
-    public async Task<SalesReportDto?> GetSalesInvoiceData(int invNo, string Type, CancellationToken ct)
+    public async Task<SalesReportDto?> GetSalesInvoiceData(int invNo, string Type, string AcNumber, CancellationToken ct)
     {
-        string reportKey = "SR" + invNo + Type;
+        string reportKey = "SR-" + invNo + "-" + Type + "-" + AcNumber;
         var successful = GetCache(reportKey, out SalesReportDto? ret);
         if (!successful)
         {
             ret = new SalesReportDto()
             {
                 CompanyName = "ABC Company",
+                Type = Type,
             };
             _Db.Database.SetCommandTimeout(TimeSpan.FromMinutes(3));
 
             var dataSumm = await _Db.InvSumms.AsNoTracking()
-                          .Where(x => x.InvNo == invNo && x.Pcode == AccountNumber)
+                          .Where(x => x.InvNo == invNo && x.Pcode == AcNumber)
                          .Select(x => new { x.Payment, x.RefNo, x.DueDate, x.InvDate, x.InvNo })
                          .FirstOrDefaultAsync(ct);
             if (dataSumm is not null)
@@ -137,7 +137,7 @@ public class DataService
             }
             var tableRes =
                await _Db.InvDets.AsNoTracking()
-                            .Where(x => x.Pcode == AccountNumber && x.InvNo == invNo && x.Sp == Type)
+                            .Where(x => x.Pcode == AcNumber && x.InvNo == invNo && x.Sp == Type)
                             .Select(x => new { x.Amount, x.Rate, x.NetAmount, x.Dper, x.Iname, Qty = (int)(x.Qty ?? 0), x.Unit })
                 .AsNoTracking().ToListAsync(ct);
             ret.tableData = new();

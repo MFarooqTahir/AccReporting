@@ -5,14 +5,20 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
+using System.Globalization;
+
 namespace AccReporting.Server.Reports
 {
     public class SalesReport : IDocument
     {
         public SalesReportDto? ReportData { get; set; }
+        private CultureInfo Curr = new CultureInfo("hi-IN");
+        private NumberFormatInfo numberFormat { get; set; }
 
         public SalesReport(SalesReportDto reportData)
         {
+            numberFormat = Curr.NumberFormat;
+            numberFormat.CurrencySymbol = "Rs.";
             ReportData = reportData;
         }
 
@@ -36,6 +42,7 @@ namespace AccReporting.Server.Reports
                         row.ConstantItem(150).Column(column =>
                         {
                             column.Item().Text($"Invoice #{ReportData?.InvNo}").Style(titleStyle);
+                            column.Item().Text($"Type: {ReportData?.Type}").SemiBold();
 
                             column.Item().Text(text =>
                             {
@@ -88,15 +95,15 @@ namespace AccReporting.Server.Reports
             {
                 column.Spacing(5);
                 column.Item().Element(x => NewHeadingRow(x, ReportData?.CompanyName));
-                column.Item().Element(x => NewHeadingRow(x, ReportData?.Address));
-                column.Item().Element(x => NewHeadingRow(x, ReportData?.cell));
-
+                column.Item().Element(x => NewSmallHeadingRow(x, ReportData?.Address));
+                column.Item().Element(x => NewSmallHeadingRow(x, ReportData?.cell));
+                column.Item().LineHorizontal(1).LineColor(Colors.Grey.Medium);
                 column.Item().Element(x => NewDataRow(x, "Ref. #: ", ReportData?.RefNumber));
                 column.Item().Element(x => NewDataRow(x, "Driver/Veh.: ", ReportData?.Driver));
                 column.Item().Element(x => NewDataRow(x, "Payment: ", ReportData?.Payment));
                 column.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Grey.Medium);
                 column.Item().Element(ComposeTable);
-                column.Item().AlignRight().Text("Grand Total: " + ReportData?.Total).Bold().FontSize(15);
+                column.Item().AlignRight().Text("Grand Total: " + ReportData?.Total.ToString("C2", numberFormat)).Bold().FontSize(12);
             });
         }
 
@@ -132,6 +139,20 @@ namespace AccReporting.Server.Reports
                     x.AlignCenter().Column(col =>
                     {
                         col.Item().Text(val).FontSize(20).ExtraBold();
+                    });
+                });
+            });
+        }
+        private static void NewSmallHeadingRow(IContainer cont, string val)
+        {
+            cont.Row(row =>
+            {
+                row.RelativeItem().
+                Element(x =>
+                {
+                    x.AlignCenter().Column(col =>
+                    {
+                        col.Item().Text(val).FontSize(12);
                     });
                 });
             });
@@ -189,7 +210,7 @@ namespace AccReporting.Server.Reports
                         table.Cell().Element(CellStyle).AlignCenter().Text(item.Amount).FontSize(10);
                         table.Cell().Element(CellStyle).AlignCenter().Text(item.Discount).FontSize(10);
                         table.Cell().Element(CellStyle).AlignCenter().Text(item.NetAmount).FontSize(10);
-
+                        ReportData.Total += item.Amount ?? 0;
                         static IContainer CellStyle(IContainer container)
                         {
                             return container.Border(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
