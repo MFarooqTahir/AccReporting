@@ -13,6 +13,8 @@ using Microsoft.Extensions.Caching.Memory;
 using System.Data;
 using System.Diagnostics;
 
+using static AccReporting.Shared.DTOs.InvSummGridModel;
+
 namespace AccReporting.Server.Services;
 
 public class DataService
@@ -62,24 +64,51 @@ public class DataService
 
     public async Task<IEnumerable<InvSummGridModel?>?> GetInvSummGridAsync(string AcCode, int PageNumber, int PageSize, CancellationToken ct)
     {
-        var data = await GetInvSummsAsync(ct);
-        if (data is not null)
+        bool paged = PageSize > 0 || PageNumber > 0;
+        if (paged)
         {
-            var retQuery = data.Where(x => x.Pcode == AcCode);
-            if (PageSize > 0 || PageNumber > 0)
+            var data = await GetInvSummsAsync(ct);
+            if (data is not null)
             {
+                var retQuery = data.Where(x => x.Pcode == AcCode);
+
                 retQuery = data.Skip(PageNumber * PageSize).Take(PageSize).ToList();
+
+                var invs = retQuery.Select(x => x.InvNo);
+
+                var amt = (await GetInvDetAsync(ct))
+                   .Where(x => invs.Contains(x.InvNo))
+                    .GroupBy(x => new { x.InvNo, x.Sp })
+                 .ToDictionary(x => x.Key.InvNo ?? 0, x => new dba(x.Key.Sp, x.Sum(y => y.Amount)));
+
+                var ret = retQuery.Select(x => new InvSummGridModel(x, amt)).ToList();
+
+                return ret;
             }
+        }
+        else
+        {
+            string key = $"SRG-{AcCode}";
+            var suc = GetCache(key, out IEnumerable<InvSummGridModel> ret);
+            if (!suc)
+            {
+                var data = await GetInvSummsAsync(ct);
+                if (data is not null)
+                {
+                    var retQuery = data.Where(x => x.Pcode == AcCode);
 
-            var invs = retQuery.Select(x => x.InvNo);
+                    var invs = retQuery.Select(x => x.InvNo);
 
-            var amt = (await GetInvDetAsync(ct))
-                .Where(x => invs.Contains(x.InvNo))
-                .GroupBy(x => x.InvNo)
-                .ToDictionary(x => x.Key ?? 0, x => x.Sum(y => y.Amount));
-            var ret = retQuery.Select(x => new InvSummGridModel(x, amt)).ToList();
+                    var amt = (await GetInvDetAsync(ct))
+                       .Where(x => invs.Contains(x.InvNo))
+                        .GroupBy(x => new { x.InvNo, x.Sp })
+                    .ToDictionary(x => x.Key.InvNo ?? 0, x => new dba(x.Key.Sp, x.Sum(y => y.Amount)));
 
-            return ret;
+                    ret = retQuery.Select(x => new InvSummGridModel(x, amt)).ToList();
+                    SetCache(key, ret);
+                    return ret;
+                }
+            }
         }
         return null;
     }

@@ -80,6 +80,8 @@
     }
     private async Task ClickedSalesReport()
     {
+        var response = await Http.GetAsync("/api/SalesReport");
+        var sc = await response.Content.ReadAsStringAsync();
         SalesReportList = await Http.GetFromJsonAsync<IEnumerable<InvSummGridModel>>("/Reports/InvSummaryListPaged?page=0&pageSize=25").ConfigureAwait(false);
         StateHasChanged();
     }
