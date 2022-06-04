@@ -60,51 +60,28 @@ public class DataService
         await EnsureDbConenction(ct);
     }
 
-    private async Task EnsureDbConenction(CancellationToken ct)
+    public async Task<IEnumerable<InvSummGridModel?>?> GetInvSummGridAsync(string AcCode, int PageNumber, int PageSize, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(_DbName))
+        var data = await GetInvSummsAsync(ct);
+        if (data is not null)
         {
-            throw new DbEmptyException("No database name set");
+            var retQuery = data;
+            if (PageSize != 0 && PageNumber != 0) { data.Skip(PageNumber * PageSize).Take(PageSize).Where(x => x.Pcode == AcCode); }
+
+            var invs = retQuery.Select(x => x.InvNo);
+
+            var amt = (await GetInvDetAsync(ct))
+                .Where(x => invs.Contains(x.InvNo))
+                .GroupBy(x => x.InvNo)
+                .Select(x => new { Key = x.Key ?? 0, Amount = x.Sum(y => y.Amount) })
+                .ToDictionary(x => x.Key, x => x.Amount);
+            var ret = retQuery.Select(x => new InvSummGridModel(x, amt[x.InvNo ?? 0])).AsEnumerable();
+
+            return ret;
         }
-        if (string.IsNullOrWhiteSpace(ConnectionString))
-        {
-            throw new DbEmptyException("No connection string set");
-        }
-        string db = _Db.Database.GetDbConnection().Database;
-        if (db != _DbName || !await _Db.Database.CanConnectAsync(ct))
-        {
-            _Db.Database.SetConnectionString(ConnectionString);
-        }
+        return null;
     }
 
-    private void SetCache<T>(string key, T value)
-    {
-        if (_cache is not null)
-        {
-            _cache.Set(CachePrefix + key, value);
-        }
-    }
-
-    private bool GetCache<T>(string key, out T Result)
-    {
-        Result = default!;
-        if (_cache is not null)
-        {
-            return _cache.TryGetValue(CachePrefix + key, out Result);
-        }
-        return false;
-    }
-    private void ClearDbCache()
-    {
-        var keysList = _cache.GetKeysForDb(CachePrefix);
-        if (keysList is not null && keysList.Any())
-        {
-
-            foreach (var key in keysList)
-                _cache.Remove(key);
-
-        }
-    }
     public async Task<SalesReportDto?> GetSalesInvoiceData(int invNo, string Type, string AcNumber, CancellationToken ct)
     {
         string reportKey = "SR-" + invNo + "-" + Type + "-" + AcNumber;
@@ -116,15 +93,14 @@ public class DataService
                 CompanyName = "ABC Company",
                 Type = Type,
             };
-            _Db.Database.SetCommandTimeout(TimeSpan.FromMinutes(3));
+            //_Db.Database.SetCommandTimeout(TimeSpan.FromMinutes(3));
 
-            var dataSumm = await _Db.InvSumms.AsNoTracking()
+            var dataSumm = (await GetInvSummsAsync(ct).ConfigureAwait(false))
                           .Where(x => x.InvNo == invNo && x.Pcode == AcNumber)
                          .Select(x => new { x.Payment, x.RefNo, x.DueDate, x.InvDate, x.InvNo })
-                         .FirstOrDefaultAsync(ct);
+                         .FirstOrDefault();
             if (dataSumm is not null)
             {
-
                 ret.RefNumber = dataSumm.RefNo;
                 ret.Dated = dataSumm.InvDate;
                 ret.DueDate = dataSumm.DueDate;
@@ -135,23 +111,23 @@ public class DataService
             {
                 return ret;
             }
-            var tableRes =
-               await _Db.InvDets.AsNoTracking()
+            ret.tableData ??= new();
+            ret.tableData.AddRange(
+                            (await GetInvDetAsync(ct).ConfigureAwait(false))
                             .Where(x => x.Pcode == AcNumber && x.InvNo == invNo && x.Sp == Type)
-                            .Select(x => new { x.Amount, x.Rate, x.NetAmount, x.Dper, x.Iname, Qty = (int)(x.Qty ?? 0), x.Unit })
-                .AsNoTracking().ToListAsync(ct);
-            ret.tableData = new();
-            ret.tableData.AddRange(tableRes.Select(
-                row => new SalesReportModel()
-                {
-                    Amount = row.Amount,
-                    NetAmount = row.NetAmount,
-                    Rate = row.Rate,
-                    Quantity = row.Qty,
-                    unit = row.Unit,
-                    Description = row.Iname,
-                    Discount = row.Dper
-                }));
+                            .Select(
+                                    row => new SalesReportModel()
+                                    {
+                                        Amount = row.Amount,
+                                        NetAmount = row.NetAmount,
+                                        Rate = row.Rate,
+                                        Quantity = (int)(row.Qty ?? 0.0),
+                                        unit = row.Unit,
+                                        Description = row.Iname,
+                                        Discount = row.Dper
+                                    }
+                            )
+                            );
             SetCache(reportKey, ret);
         }
         return ret;
@@ -159,7 +135,6 @@ public class DataService
 
     public async Task<bool> InsertAllDataBulk(string access, CancellationToken ct)
     {
-
         try
         {
             List<Acfile> AcFileInsert = new();
@@ -213,7 +188,11 @@ public class DataService
                         await _Db.BulkInsertAsync(TransInsert, cancellationToken: ct).ConfigureAwait(false);
                         await trans.CommitAsync(ct).ConfigureAwait(false);
                         ClearDbCache();
-
+                        SetAcFile(AcFileInsert);
+                        SetInventory(InventoryInsert);
+                        SetTrans(TransInsert);
+                        SetInvSumm(InvSummInsert);
+                        SetInvDet(InvDetInsert);
                     }
                     catch (Exception ex)
                     {
@@ -241,6 +220,121 @@ public class DataService
             Debug.WriteLine(ex.Message + " " + ex.InnerException + " " + ex.StackTrace);
 #endif
             return false;
+        }
+    }
+
+    private void SetInvSumm(IEnumerable<InvSumm> Data) => _cache.Set(CachePrefix + "-InvSumm", Data);
+
+    private async Task<IEnumerable<InvSumm>> GetInvSummsAsync(CancellationToken ct)
+    {
+        var res = _cache.TryGetValue(CachePrefix + "-InvSumm", out IEnumerable<InvSumm> Data);
+        if (!res)
+        {
+            await EnsureDbConenction(ct);
+            Data = await _Db.InvSumms.AsNoTracking().ToListAsync(ct).ConfigureAwait(false);
+            SetInvSumm(Data);
+        }
+        return Data;
+    }
+
+    private void SetAcFile(IEnumerable<Acfile> Data) => _cache.Set(CachePrefix + "-AcFile", Data);
+
+    private async Task<IEnumerable<Acfile>> GetAcFileAsync(CancellationToken ct)
+    {
+        var res = _cache.TryGetValue(CachePrefix + "-AcFile", out IEnumerable<Acfile> Data);
+        if (!res)
+        {
+            await EnsureDbConenction(ct);
+            Data = await _Db.Acfiles.AsNoTracking().ToListAsync(ct).ConfigureAwait(false);
+            SetAcFile(Data);
+        }
+        return Data;
+    }
+
+    private void SetInventory(IEnumerable<Inventory> Data) => _cache.Set(CachePrefix + "-Inventory", Data);
+
+    private async Task<IEnumerable<Inventory>> GetInventory(CancellationToken ct)
+    {
+        var res = _cache.TryGetValue(CachePrefix + "-Inventory", out IEnumerable<Inventory> Data);
+        if (!res)
+        {
+            await EnsureDbConenction(ct);
+            Data = await _Db.Inventories.AsNoTracking().ToListAsync(ct).ConfigureAwait(false);
+            SetInventory(Data);
+        }
+        return Data;
+    }
+
+    private void SetInvDet(IEnumerable<InvDet> Data) => _cache.Set(CachePrefix + "-InvDet", Data);
+
+    private async Task<IEnumerable<InvDet>> GetInvDetAsync(CancellationToken ct)
+    {
+        var res = _cache.TryGetValue(CachePrefix + "-InvDet", out IEnumerable<InvDet> Data);
+        if (!res)
+        {
+            await EnsureDbConenction(ct);
+            Data = await _Db.InvDets.AsNoTracking().ToListAsync(ct).ConfigureAwait(false);
+            SetInvDet(Data);
+        }
+        return Data;
+    }
+
+    private void SetTrans(IEnumerable<Trans> Data) => _cache.Set(CachePrefix + "-Trans", Data);
+
+    private async Task<IEnumerable<Trans>> GetTransAsync(CancellationToken ct)
+    {
+        var res = _cache.TryGetValue(CachePrefix + "-Trans", out IEnumerable<Trans> Data);
+        if (!res)
+        {
+            await EnsureDbConenction(ct);
+            Data = await _Db.Trans.AsNoTracking().ToListAsync(ct).ConfigureAwait(false);
+            SetTrans(Data);
+        }
+        return Data;
+    }
+
+    private async Task EnsureDbConenction(CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(_DbName))
+        {
+            throw new DbEmptyException("No database name set");
+        }
+        if (string.IsNullOrWhiteSpace(ConnectionString))
+        {
+            throw new DbEmptyException("No connection string set");
+        }
+        string db = _Db.Database.GetDbConnection().Database;
+        if (db != _DbName || !await _Db.Database.CanConnectAsync(ct))
+        {
+            _Db.Database.SetConnectionString(ConnectionString);
+        }
+    }
+
+    private void SetCache<T>(string key, T value)
+    {
+        if (_cache is not null)
+        {
+            _cache.Set(CachePrefix + key, value);
+        }
+    }
+
+    private bool GetCache<T>(string key, out T Result)
+    {
+        Result = default!;
+        if (_cache is not null)
+        {
+            return _cache.TryGetValue(CachePrefix + key, out Result);
+        }
+        return false;
+    }
+
+    private void ClearDbCache()
+    {
+        var keysList = _cache.GetKeysForDb(CachePrefix);
+        if (keysList is not null && keysList.Any())
+        {
+            foreach (var key in keysList)
+                _cache.Remove(key);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AccReporting.Server.Data;
 using AccReporting.Server.Reports;
 using AccReporting.Server.Services;
+using AccReporting.Shared.DTOs;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,7 @@ using Throw;
 
 namespace AccReporting.Server.Controllers
 {
+    [Authorize]
     [Route("[controller]")]
     [ApiController]
     public class ReportsController : ControllerBase
@@ -18,10 +20,12 @@ namespace AccReporting.Server.Controllers
         private readonly ApplicationDbContext _authDb;
         private readonly ILogger<ReportsController> _logger;
         private readonly DataService _dataService;
+
         private readonly IDictionary<string, string> types = new Dictionary<string, string>()
                 {
                     {"Sale","S" },{"Estimate","E" },{"Purchase","P" },{"Return","R"}
                 };
+
         public ReportsController(DataService dataService, ILogger<ReportsController> logger, ApplicationDbContext authDb)
         {
             _dataService = dataService;
@@ -30,12 +34,27 @@ namespace AccReporting.Server.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet("InvSummaryListPaged")]
+        public async Task<IEnumerable<InvSummGridModel>> InvSummaryListPaged(int page, CancellationToken ct, int pageSize = 25)
+        {
+            await _dataService.SetDbName("Test", ct);
+            return await _dataService.GetInvSummGridAsync("2.1.4.154", page, pageSize, ct);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("InvSummaryList")]
+        public async Task<IEnumerable<InvSummGridModel>> InvSummaryList(CancellationToken ct)
+        {
+            await _dataService.SetDbName("Test", ct);
+            return await _dataService.GetInvSummGridAsync("2.1.4.154", 0, 0, ct);
+        }
+
+        [AllowAnonymous]
         [HttpGet("SalesReport")]
         public async Task<IActionResult> SalesReport(int invNo, string type, CancellationToken ct)
         {
             try
             {
-
                 string InpType = types[type];
                 invNo.Throw()
                             .IfNegative()

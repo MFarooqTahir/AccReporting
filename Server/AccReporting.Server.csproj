@@ -21,6 +21,7 @@
     <PackageReference Include="Throw" Version="1.2.0" />
       <PackageReference Include="Syncfusion.Blazor.Spinner" Version="20.1.0.47" />
     <PackageReference Include="Syncfusion.Blazor.Themes" Version="20.1.0.47" />
+    <PackageReference Include="Syncfusion.Blazor.Navigations" Version="20.1.0.47" />
 </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +29,7 @@
     <ProjectReference Include="..\Shared\AccReporting.Shared.csproj" />
       <PackageReference Include="Syncfusion.Blazor.Spinner" Version="20.1.0.47" />
     <PackageReference Include="Syncfusion.Blazor.Themes" Version="20.1.0.47" />
+    <PackageReference Include="Syncfusion.Blazor.Navigations" Version="20.1.0.47" />
 </ItemGroup>
 
   <ItemGroup>
@@ -43,12 +45,14 @@
 	    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.5" />
       <PackageReference Include="Syncfusion.Blazor.Spinner" Version="20.1.0.47" />
     <PackageReference Include="Syncfusion.Blazor.Themes" Version="20.1.0.47" />
+    <PackageReference Include="Syncfusion.Blazor.Navigations" Version="20.1.0.47" />
 </ItemGroup>
 
   <ItemGroup>
     <Folder Include="OptimizedModels\" />
       <PackageReference Include="Syncfusion.Blazor.Spinner" Version="20.1.0.47" />
     <PackageReference Include="Syncfusion.Blazor.Themes" Version="20.1.0.47" />
+    <PackageReference Include="Syncfusion.Blazor.Navigations" Version="20.1.0.47" />
 </ItemGroup>
 
 </Project>

@@ -40,6 +40,7 @@
     </PackageReference>
       <PackageReference Include="Syncfusion.Blazor.Spinner" Version="20.1.0.47" />
     <PackageReference Include="Syncfusion.Blazor.Themes" Version="20.1.0.47" />
+    <PackageReference Include="Syncfusion.Blazor.Navigations" Version="20.1.0.47" />
 </ItemGroup>
 
   <ItemGroup>
@@ -48,6 +49,7 @@
     </ProjectReference>
       <PackageReference Include="Syncfusion.Blazor.Spinner" Version="20.1.0.47" />
     <PackageReference Include="Syncfusion.Blazor.Themes" Version="20.1.0.47" />
+    <PackageReference Include="Syncfusion.Blazor.Navigations" Version="20.1.0.47" />
 </ItemGroup>
 
   <ItemGroup>
@@ -55,6 +57,7 @@
     <Folder Include="wwwroot\Icons\" />
       <PackageReference Include="Syncfusion.Blazor.Spinner" Version="20.1.0.47" />
     <PackageReference Include="Syncfusion.Blazor.Themes" Version="20.1.0.47" />
+    <PackageReference Include="Syncfusion.Blazor.Navigations" Version="20.1.0.47" />
 </ItemGroup>
   
   
