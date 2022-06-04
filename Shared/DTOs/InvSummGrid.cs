@@ -4,14 +4,15 @@ namespace AccReporting.Shared.DTOs
 {
     public class InvSummGridModel
     {
-        public InvSummGridModel(InvSumm inv, double? amount)
+        public InvSummGridModel(InvSumm inv, IDictionary<int, double?> amount)
         {
-            InvNo = inv.InvNo;
+            invNo = inv.InvNo;
             Type = inv.Type;
-            Amount = amount ?? 0;
+            amount.TryGetValue(inv.InvNo ?? 0, out var amt);
+            Amount = amt ?? 0;
         }
 
-        public int? InvNo { get; set; }
+        public int? invNo { get; set; }
         public string Type { get; set; }
         public double Amount { get; set; }
     }

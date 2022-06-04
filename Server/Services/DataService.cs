@@ -65,17 +65,19 @@ public class DataService
         var data = await GetInvSummsAsync(ct);
         if (data is not null)
         {
-            var retQuery = data;
-            if (PageSize != 0 && PageNumber != 0) { data.Skip(PageNumber * PageSize).Take(PageSize).Where(x => x.Pcode == AcCode); }
+            var retQuery = data.Where(x => x.Pcode == AcCode);
+            if (PageSize > 0 || PageNumber > 0)
+            {
+                retQuery = data.Skip(PageNumber * PageSize).Take(PageSize).ToList();
+            }
 
             var invs = retQuery.Select(x => x.InvNo);
 
             var amt = (await GetInvDetAsync(ct))
                 .Where(x => invs.Contains(x.InvNo))
                 .GroupBy(x => x.InvNo)
-                .Select(x => new { Key = x.Key ?? 0, Amount = x.Sum(y => y.Amount) })
-                .ToDictionary(x => x.Key, x => x.Amount);
-            var ret = retQuery.Select(x => new InvSummGridModel(x, amt[x.InvNo ?? 0])).AsEnumerable();
+                .ToDictionary(x => x.Key ?? 0, x => x.Sum(y => y.Amount));
+            var ret = retQuery.Select(x => new InvSummGridModel(x, amt)).ToList();
 
             return ret;
         }
@@ -156,7 +158,7 @@ public class DataService
                         break;
 
                     case "INVDET":
-                        InvDetInsert.AddRange(newEnt.Select(x => new InvDet(x)));
+                        InvDetInsert.AddRange(newEnt.Where(x => !string.IsNullOrWhiteSpace(x[0])).Select(x => new InvDet(x)));
                         break;
 
                     case "INVENTORY":
@@ -164,7 +166,7 @@ public class DataService
                         break;
 
                     case "INVSUMM":
-                        InvSummInsert.AddRange(newEnt.Select(x => new InvSumm(x)));
+                        InvSummInsert.AddRange(newEnt.Where(x => !string.IsNullOrWhiteSpace(x[1])).Select(x => new InvSumm(x)));
                         break;
 
                     case "TRANS":

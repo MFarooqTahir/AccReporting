@@ -11,23 +11,20 @@
 @inject IJSRuntime JS
 <div class="d-block align-content-center w-100">
     <h3 class="text-center">Reports</h3>
-    <SfTab HeaderPlacement="HeaderPosition.Top" LoadOn="ContentLoad.Dynamic" OverflowMode="@OverflowMode.Scrollable">
+    <SfTab @ref="@Tab" SelectedItemChanged="@OnSelectionChanged" HeaderPlacement="HeaderPosition.Top" LoadOn="ContentLoad.Dynamic" OverflowMode="@OverflowMode.Scrollable">
         <TabItems>
+            <TabItem  Content="Place here your content">
+                @*Replace your required tab1 boby content here *@
+                <ChildContent>
+                    <TabHeader Text="Header1"></TabHeader> @*Replace your required header1 text here *@
+                </ChildContent>
+            </TabItem>
             <TabItem>
                 <ChildContent>
                     <TabHeader Text="Sales Report"></TabHeader> @*Replace your required header1 text here *@
                 </ChildContent>
                 <ContentTemplate>
-                    <SfGrid @ref="@DataGrid" TValue="InvSummGridModel" ID="Grid" DataSource="@SalesReportList" AllowPaging="true" AllowFiltering="true" AllowResizing="true" AllowGrouping="true" AllowExcelExport="true" AllowPdfExport="true" AllowSorting="true" Toolbar="@(new List<string>() {"ExcelExport","PdfExport","CsvExport", "Search"})">
-                        <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.FilterBar"></GridFilterSettings>
-                        <GridPageSettings PageSizes="true"></GridPageSettings>
-                        <GridEvents OnToolbarClick="@GridToolbarClick" TValue="InvSummGridModel"></GridEvents>
-                        <GridColumns>
-                            <GridColumn Field=@nameof(InvSummGridModel.InvNo) HeaderText="InvNo" AllowEditing="false" IsPrimaryKey="true" Width="150"></GridColumn>
-                            <GridColumn Field=@nameof(InvSummGridModel.Type) HeaderText="Type" AllowEditing="false" Width="150"></GridColumn>
-                            <GridColumn Field=@nameof(InvSummGridModel.Amount) HeaderText="Amount" AllowEditing="false" Width="150"></GridColumn>
-                        </GridColumns>
-                    </SfGrid>
+                    
                 </ContentTemplate>
             </TabItem>
             <TabItem Content="Place here your content">
@@ -44,40 +41,11 @@
             </TabItem>
         </TabItems>
     </SfTab>
-    @*<div class="row row-cols-1 row-cols-md-3 g-4">
-    <div class="col">
-    <SfCard>
-    <CardHeader>Sales Report</CardHeader>
-    <CardContent>
-
-    <EditForm Model="@model" OnValidSubmit="@onvalid">
-    <DataAnnotationsValidator />
-    <div class="form-group">
-    <label for="InvNo">Inv No:</label>
-    <SfNumericTextBox ShowSpinButton="false" Format="" ID="InvNo" Placeholder="Invoice Number" @bind-Value="model.InvNo"></SfNumericTextBox>
-    <ValidationMessage For="@(() => model.InvNo)"></ValidationMessage>
-    </div>
-    <div class="form-group">
-    <div class="form-group">
-    <label for="country">Type:</label>
-    <SfComboBox ID="country" Placeholder="Type of invoice" @bind-Value="@model.Type" DataSource="@types">
-    </SfComboBox>
-    <ValidationMessage For="@(() => model.Type)"></ValidationMessage>
-    </div>
-    </div>
-    <SfButton class="mt-3 bg-success"><span class="mb-1">View PDF</span></SfButton>
-    </EditForm>
-
-
-    </CardContent>
-    </SfCard>
-    </div>
-
-    </div>*@
 </div>
 @code {
     IEnumerable<InvSummGridModel> SalesReportList;
     SfGrid<InvSummGridModel> DataGrid { get; set; }
+    SfTab Tab { get; set; }
     /// <summary>
     /// Event for Toolbar click for Grid Exporting
     /// </summary>
@@ -99,11 +67,21 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await ClickedSalesReport();
+            await ClickedSalesReport();
+        
+    }
+    private async Task<int> OnSelectionChanged()
+    {
+        int curr = Tab.SelectedItem;
+        if (curr == 1)
+        {
+        }
+        return curr;
     }
     private async Task ClickedSalesReport()
     {
-        SalesReportList = await Http.GetFromJsonAsync<IEnumerable<InvSummGridModel>>("api/Report/InvSummaryList").ConfigureAwait(false);
+        SalesReportList = await Http.GetFromJsonAsync<IEnumerable<InvSummGridModel>>("/Reports/InvSummaryListPaged?page=0&pageSize=25").ConfigureAwait(false);
+        StateHasChanged();
     }
     private SalesReportInput model { get; set; } = new();
     public List<string> types = new List<string>
