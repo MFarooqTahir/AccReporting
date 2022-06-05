@@ -34,20 +34,11 @@ namespace AccReporting.Server.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("InvSummaryListPaged")]
-        public async Task<IEnumerable<InvSummGridModel>> InvSummaryListPaged(int page, CancellationToken ct, int pageSize = 25)
+        [HttpGet("InvSummaryList")]
+        public async Task<IEnumerable<InvSummGridModel>> InvSummaryListPaged(CancellationToken ct, int page = 0, int pageSize = 0)
         {
             await _dataService.SetDbName("Test", ct);
             var ret = await _dataService.GetInvSummGridAsync("2.1.4.154", page, pageSize, ct);
-            return ret;
-        }
-
-        [AllowAnonymous]
-        [HttpGet("InvSummaryList")]
-        public async Task<IEnumerable<InvSummGridModel>> InvSummaryList(CancellationToken ct)
-        {
-            await _dataService.SetDbName("Test", ct);
-            var ret = await _dataService.GetInvSummGridAsync("2.1.4.154", 0, 0, ct);
             return ret;
         }
 

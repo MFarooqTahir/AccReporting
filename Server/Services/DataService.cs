@@ -13,8 +13,6 @@ using Microsoft.Extensions.Caching.Memory;
 using System.Data;
 using System.Diagnostics;
 
-using static AccReporting.Shared.DTOs.InvSummGridModel;
-
 namespace AccReporting.Server.Services;
 
 public class DataService
@@ -64,53 +62,22 @@ public class DataService
 
     public async Task<IEnumerable<InvSummGridModel?>?> GetInvSummGridAsync(string AcCode, int PageNumber, int PageSize, CancellationToken ct)
     {
-        bool paged = PageSize > 0 || PageNumber > 0;
-        if (paged)
+        string key = $"SRG-{AcCode}";
+        var suc = GetCache(key, out IEnumerable<InvSummGridModel> ret);
+        if (!suc)
         {
-            var data = await GetInvSummsAsync(ct);
-            if (data is not null)
-            {
-                var retQuery = data.Where(x => x.Pcode == AcCode);
+            ret = (await GetInvDetAsync(ct))
+                .Where(x => x.Pcode == AcCode)
+             .GroupBy(x => new { x.InvNo, x.Sp })
+             .Select(x => new InvSummGridModel(x.Key.InvNo, x.Key.Sp, x.Sum(z => z.Amount)));
 
-                retQuery = data.Skip(PageNumber * PageSize).Take(PageSize).ToList();
-
-                var invs = retQuery.Select(x => x.InvNo);
-
-                var amt = (await GetInvDetAsync(ct))
-                   .Where(x => invs.Contains(x.InvNo))
-                    .GroupBy(x => new { x.InvNo, x.Sp })
-                 .ToDictionary(x => x.Key.InvNo ?? 0, x => new dba(x.Key.Sp, x.Sum(y => y.Amount)));
-
-                var ret = retQuery.Select(x => new InvSummGridModel(x, amt)).ToList();
-
-                return ret;
-            }
+            SetCache(key, ret);
         }
-        else
+        if (PageSize > 0 || PageNumber > 0)
         {
-            string key = $"SRG-{AcCode}";
-            var suc = GetCache(key, out IEnumerable<InvSummGridModel> ret);
-            if (!suc)
-            {
-                var data = await GetInvSummsAsync(ct);
-                if (data is not null)
-                {
-                    var retQuery = data.Where(x => x.Pcode == AcCode);
-
-                    var invs = retQuery.Select(x => x.InvNo);
-
-                    var amt = (await GetInvDetAsync(ct))
-                       .Where(x => invs.Contains(x.InvNo))
-                        .GroupBy(x => new { x.InvNo, x.Sp })
-                    .ToDictionary(x => x.Key.InvNo ?? 0, x => new dba(x.Key.Sp, x.Sum(y => y.Amount)));
-
-                    ret = retQuery.Select(x => new InvSummGridModel(x, amt)).ToList();
-                    SetCache(key, ret);
-                    return ret;
-                }
-            }
+            ret = ret.Skip(PageNumber * PageSize).Take(PageSize);
         }
-        return null;
+        return ret;
     }
 
     public async Task<SalesReportDto?> GetSalesInvoiceData(int invNo, string Type, string AcNumber, CancellationToken ct)
@@ -176,8 +143,6 @@ public class DataService
             string[]? splitData = access.Split("---START---", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             Parallel.ForEach(splitData, SplitEntries =>
             {
-                //foreach (var SplitEntries in splitData)
-                //{
                 string[]? entries = SplitEntries.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);//.Where(x => !(x.Contains("DROP", StringComparison.InvariantCultureIgnoreCase) && x.Contains("DELETE FROM", StringComparison.InvariantCultureIgnoreCase) && x.Contains("UPDATE", StringComparison.InvariantCultureIgnoreCase)));
                 IEnumerable<string[]>? newEnt = entries.Skip(1).Select(x => x.Split("|"));
                 switch (entries[0].ToUpperInvariant())
@@ -202,7 +167,6 @@ public class DataService
                         TransInsert.AddRange(newEnt.Select(x => new Trans(x)));
                         break;
                 }
-                //}
             });
             try
             {

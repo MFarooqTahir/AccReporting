@@ -3,11 +3,13 @@
 @inject HttpClient Http
     <h3 class="text-center">SalesReport</h3>
     @if(SalesReportList is not null){
-    <SfGrid @ref="@defaultGrid" TValue="InvSummGridModel" ID="Grid" DataSource="@SalesReportList" AllowPaging="true" AllowFiltering="true" AllowResizing="true" AllowGrouping="true" AllowExcelExport="true" AllowPdfExport="true" AllowSorting="true" Toolbar="@(new List<string>() {"ExcelExport","PdfExport","CsvExport", "Search"})">
+    <SfGrid @ref="@defaultGrid" TValue="InvSummGridModel" ID="Grid" DataSource="@SalesReportList" AllowPaging="true" AllowSelection="true" AllowFiltering="true" AllowResizing="true" AllowGrouping="true" AllowPdfExport="true" AllowSorting="true" Toolbar="@(new List<string>() {"PdfExport", "Search"})">
         <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.FilterBar"></GridFilterSettings>
         <GridEvents OnToolbarClick="@GridToolbarClick" TValue="InvSummGridModel"></GridEvents>
+        <GridSelectionSettings CheckboxMode="CheckboxSelectionType.Default" Mode="SelectionMode.Row" CheckboxOnly="true"></GridSelectionSettings>
         <GridColumns>
-            <GridColumn Field=@nameof(InvSummGridModel.InvNo) HeaderText="InvNo" AllowEditing="false" IsPrimaryKey="true" Width="150"></GridColumn>
+            <GridColumn Field=@nameof(InvSummGridModel.InvNo) HeaderText="InvNo" AllowEditing="false" IsPrimaryKey="true" Width="80">
+            </GridColumn>
             <GridColumn Field=@nameof(InvSummGridModel.Type) HeaderText="Type" AllowEditing="false" Width="150"></GridColumn>
             <GridColumn Field=@nameof(InvSummGridModel.Amount) HeaderText="Amount" AllowEditing="false" Width="150"></GridColumn>
         </GridColumns>
@@ -19,25 +21,6 @@
     }
 
 @code {  
-    SfGrid<InvSummGridModel> DataGrid { get; set; }
-    /// <summary>
-    /// Event for Toolbar click for Grid Exporting
-    /// </summary>
-    public void GridToolbarClick1(Syncfusion.Blazor.Navigations.ClickEventArgs args)
-    {
-    	if (args.Item.Id == "Grid1_excelexport")
-        {
-            this.DataGrid.ExcelExport();
-        }
-    	if (args.Item.Id == "Grid1_pdfexport")
-        {
-            this.DataGrid.PdfExport();
-        }
-    	if (args.Item.Id == "Grid1_csvexport")
-        {
-            this.DataGrid.CsvExport();
-        }
-    }
     
 
     IEnumerable<InvSummGridModel> SalesReportList;
@@ -75,7 +58,7 @@
     {
         //var response = await Http.GetAsync("/Reports/InvSummaryListPaged?page=0&pageSize=25");
         //var str = await response.Content.ReadAsStringAsync();
-        SalesReportList = await Http.GetFromJsonAsync<IEnumerable<InvSummGridModel>>($"/Reports/InvSummaryListPaged?page=0&pageSize={defaultGrid?.PageSettings?.PageSize??10}").ConfigureAwait(false);
+        SalesReportList = await Http.GetFromJsonAsync<IEnumerable<InvSummGridModel>>($"/Reports/InvSummaryList").ConfigureAwait(false);
         StateHasChanged();
     }
     private SalesReportInput model { get; set; } = new();
@@ -83,10 +66,10 @@
     {
        "Sale","Estimate","Purchase","Return",
     };
-    private async Task onvalid(EditContext context)
+    private async Task<Object> onvalid()
     {
-        var modelInp = context.Model as SalesReportInput;
         await JS.InvokeVoidAsync("open", $"Reports/SalesReport?invNo={model.InvNo}&type={model.Type}", "_blank");
+        return null;
     }
 }
 
