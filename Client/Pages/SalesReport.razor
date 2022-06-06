@@ -1,30 +1,45 @@
 ﻿@page "/SalesReport"
 @inject IJSRuntime JS
 @inject HttpClient Http
-    <h3 class="text-center">SalesReport</h3>
-    @if(SalesReportList is not null){
-    <SfGrid @ref="@defaultGrid" TValue="InvSummGridModel" ID="Grid" DataSource="@SalesReportList" AllowPaging="true" AllowSelection="true" AllowFiltering="true" AllowResizing="true" AllowGrouping="true" AllowPdfExport="true" AllowSorting="true" Toolbar="@(new List<string>() {"PdfExport", "Search"})">
-        <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.FilterBar"></GridFilterSettings>
-        <GridEvents OnToolbarClick="@GridToolbarClick" TValue="InvSummGridModel"></GridEvents>
-        <GridSelectionSettings CheckboxMode="CheckboxSelectionType.Default" Mode="SelectionMode.Row" CheckboxOnly="true"></GridSelectionSettings>
-        <GridColumns>
-            <GridColumn Field=@nameof(InvSummGridModel.InvNo) HeaderText="InvNo" AllowEditing="false" IsPrimaryKey="true" Width="80">
-            </GridColumn>
-            <GridColumn Field=@nameof(InvSummGridModel.Type) HeaderText="Type" AllowEditing="false" Width="150"></GridColumn>
-            <GridColumn Field=@nameof(InvSummGridModel.Amount) HeaderText="Amount" AllowEditing="false" Width="150"></GridColumn>
-        </GridColumns>
-    </SfGrid>
-   
-    }
-    else{
-    <SfSpinner Label="Loading..." Visible="true"></SfSpinner>        
-    }
+<AuthorizeView>
+    <Authorized>
 
-@code {  
-    
+        <h3 class="text-center">SalesReport</h3>
+        @if (SalesReportList is not null)
+        {
+            <SfGrid @ref="@defaultGrid" TValue="InvSummGridModel" ID="Grid" DataSource="@SalesReportList" AllowPaging="true" AllowSelection="true" AllowFiltering="true" AllowResizing="true" AllowGrouping="true" AllowPdfExport="true" AllowSorting="true" Toolbar="@(new List<string>() {"Search"})">
+                <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.FilterBar"></GridFilterSettings>
+                <GridEvents OnToolbarClick="@GridToolbarClick" TValue="InvSummGridModel"></GridEvents>
+                <GridSelectionSettings CheckboxMode="CheckboxSelectionType.Default" Mode="SelectionMode.Row" CheckboxOnly="true"></GridSelectionSettings>
+                <GridColumns>
+                    <GridColumn Type="ColumnType.None" HeaderText="Report Pdf" AllowFiltering="false" AllowSorting="false" Width="30">
+                        <Template Context="ctx">
+                            @{
+                                var curr = ctx as InvSummGridModel;
+                                <a class="btn bg-transparent" href=@($"Reports/SalesReport?invNo={curr.InvNo}&type={curr.Type}") target="_blank"><Syncfusion.Blazor.Buttons.SfIcon IconCss="color:white" Size="Syncfusion.Blazor.Buttons.IconSize.Large" Name="Syncfusion.Blazor.Buttons.IconName.ExportPdf"></Syncfusion.Blazor.Buttons.SfIcon></a>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field=@nameof(InvSummGridModel.InvNo) HeaderText="InvNo" AllowEditing="false" IsPrimaryKey="true" Width="80">
+                    </GridColumn>
+                    <GridColumn Field=@nameof(InvSummGridModel.Type) HeaderText="Type" AllowEditing="false" Width="150"></GridColumn>
+                    <GridColumn Field=@nameof(InvSummGridModel.Amount) HeaderText="Amount" AllowEditing="false" Width="150"></GridColumn>
+                </GridColumns>
+            </SfGrid>
+
+        }
+        else
+        {
+            <SfSpinner Label="Loading..." Visible="true"></SfSpinner>
+        }
+
+    </Authorized>
+</AuthorizeView>
+@code {
+
 
     IEnumerable<InvSummGridModel> SalesReportList;
-    public SfGrid<InvSummGridModel> defaultGrid=new();
+    public SfGrid<InvSummGridModel> defaultGrid = new();
     public int pageNo { get; set; }
     public int totalPages { get; set; }
     public bool DisableBackIcon = false;
