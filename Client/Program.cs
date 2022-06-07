@@ -6,8 +6,14 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 using Syncfusion.Blazor;
 
+using System.Globalization;
 using System.Net.Http.Headers;
 
+
+var culture = new CultureInfo("hi-IN");
+culture.NumberFormat.CurrencySymbol = "Rs.";
+CultureInfo.DefaultThreadCurrentCulture = culture;
+CultureInfo.DefaultThreadCurrentUICulture = culture;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");

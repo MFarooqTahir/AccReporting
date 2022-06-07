@@ -11,8 +11,14 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
 
+using System.Globalization;
+
 var builder = WebApplication
     .CreateBuilder(args);
+var culture = new CultureInfo("hi-IN");
+culture.NumberFormat.CurrencySymbol = "Rs.";
+CultureInfo.DefaultThreadCurrentCulture = culture;
+CultureInfo.DefaultThreadCurrentUICulture = culture;
 
 builder.Host.UseSerilog((ctx, lc) => lc
     .WriteTo.Console()

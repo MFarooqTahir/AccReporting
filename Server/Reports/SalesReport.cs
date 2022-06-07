@@ -12,13 +12,9 @@ namespace AccReporting.Server.Reports
     public class SalesReport : IDocument
     {
         public SalesReportDto? ReportData { get; set; }
-        private CultureInfo Curr = new CultureInfo("hi-IN");
-        private NumberFormatInfo numberFormat { get; set; }
 
         public SalesReport(SalesReportDto reportData)
         {
-            numberFormat = Curr.NumberFormat;
-            numberFormat.CurrencySymbol = "Rs.";
             ReportData = reportData;
         }
 
@@ -103,7 +99,7 @@ namespace AccReporting.Server.Reports
                 column.Item().Element(x => NewDataRow(x, "Payment: ", ReportData?.Payment));
                 column.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Grey.Medium);
                 column.Item().Element(ComposeTable);
-                column.Item().AlignRight().Text("Grand Total: " + ReportData?.Total.ToString("C2", numberFormat)).Bold().FontSize(12);
+                column.Item().AlignRight().Text("Grand Total: " + ReportData?.Total.ToString("C2")).Bold().FontSize(12);
             });
         }
 
