@@ -69,7 +69,7 @@ public class DataService
             ret = (await GetInvDetAsync(ct))
                 .Where(x => x.Pcode == AcCode)
              .GroupBy(x => new { x.InvNo, x.Sp })
-             .Select(x => new InvSummGridModel(x.Key.InvNo, x.Key.Sp, x.Sum(z => z.Amount)));
+             .Select(x => new InvSummGridModel(x.Key.InvNo, x.Key.Sp, x.Sum(z => z.Amount), x.Sum(z => z.NetAmount)));
 
             SetCache(key, ret);
         }

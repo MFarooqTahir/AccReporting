@@ -8,7 +8,7 @@
        @{
     var RenderingMode = RowDirection.Vertical;
 }
-                <SfSpinner Label="Loading,Please wait..." Visible="@(SalesReportList is null)"></SfSpinner>
+                <SfSpinner Label="Loading..." Visible="@(SalesReportList is null)"></SfSpinner>
         
              <h3 class="text-center">SalesReport</h3>
             <SfGrid RowRenderingMode="@RenderingMode" @ref="@defaultGrid" TValue="InvSummGridModel" AllowTextWrap="true" ID="Grid" DataSource="@SalesReportList" AllowPaging="true" AllowSelection="true" AllowFiltering="true" AllowResizing="true" AllowGrouping="true" AllowPdfExport="true" AllowSorting="true">
@@ -36,7 +36,18 @@
                             }
                         </Template>
                     </GridColumn>
+                    <GridColumn HeaderText="Discount %" Width="95" AllowEditing="false">
+                        <Template Context="ctx">
+                            @{
+                                var curr = ctx as InvSummGridModel;
+                                                <span>@($"{(1-(curr.NetAmount/curr.Amount))*100:F2} %")</span>
+                            }
+                        </Template>
+                    </GridColumn>
                     <GridColumn Field=@nameof(InvSummGridModel.Amount) HeaderText="Amount" Format="C2" Width="180" AllowEditing="false" MinWidth="120">
+
+                    </GridColumn>
+                     <GridColumn Field=@nameof(InvSummGridModel.NetAmount) HeaderText="After Discount" Format="C2" Width="180" AllowEditing="false" MinWidth="120">
 
                     </GridColumn>
                 </GridColumns>
