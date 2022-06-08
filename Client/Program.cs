@@ -9,11 +9,6 @@ using Syncfusion.Blazor;
 using System.Globalization;
 using System.Net.Http.Headers;
 
-
-var culture = new CultureInfo("hi-IN");
-culture.NumberFormat.CurrencySymbol = "Rs.";
-CultureInfo.DefaultThreadCurrentCulture = culture;
-CultureInfo.DefaultThreadCurrentUICulture = culture;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
@@ -28,5 +23,8 @@ builder.Services.AddHttpClient("AccReporting.ServerAPI", client => client.BaseAd
 // Supply HttpClient instances that include access tokens when making requests to the server project
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("AccReporting.ServerAPI"));
 builder.Services.AddApiAuthorization();
-
+var culture = new CultureInfo("hi-IN");
+culture.NumberFormat.CurrencySymbol = "Rs.";
+CultureInfo.DefaultThreadCurrentCulture = culture;
+CultureInfo.DefaultThreadCurrentUICulture = culture;
 await builder.Build().RunAsync();

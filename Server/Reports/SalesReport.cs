@@ -5,8 +5,6 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
-using System.Globalization;
-
 namespace AccReporting.Server.Reports
 {
     public class SalesReport : IDocument
@@ -31,8 +29,6 @@ namespace AccReporting.Server.Reports
                     var titleStyle = TextStyle.Default.FontSize(20).SemiBold();
                     container.Column(column1 =>
                     {
-
-
                         column1.Item().Row(row =>
                     {
                         row.ConstantItem(150).Column(column =>
@@ -69,7 +65,6 @@ namespace AccReporting.Server.Reports
                         row.RelativeItem().AlignCenter().Text("Sales Report").ExtraBold().FontSize(30);
                         row.ConstantItem(50);
                         row.ConstantItem(100).Height(50).Placeholder();
-
                     });
                         column1.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Grey.Medium);
                     });
@@ -99,7 +94,12 @@ namespace AccReporting.Server.Reports
                 column.Item().Element(x => NewDataRow(x, "Payment: ", ReportData?.Payment));
                 column.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Grey.Medium);
                 column.Item().Element(ComposeTable);
-                column.Item().AlignRight().Text("Grand Total: " + ReportData?.Total.ToString("C2")).Bold().FontSize(12);
+                double netTotal = (ReportData?.tableData.Sum(x => x.NetAmount)) ?? 0;
+                double Total = (ReportData?.tableData.Sum(x => x.Amount)) ?? 0;
+                double dis = ((1 - (netTotal / Total)) * 100);
+                column.Item().AlignRight().Text($"Discount: {dis:F2} %").FontSize(12);
+                column.Item().AlignRight().Text("Total Amount: " + Total.ToString("C2")).FontSize(12);
+                column.Item().AlignRight().Text("Total After Discount: " + netTotal.ToString("C2")).Bold().FontSize(12);
             });
         }
 
@@ -125,6 +125,7 @@ namespace AccReporting.Server.Reports
                 });
             });
         }
+
         private static void NewHeadingRow(IContainer cont, string val)
         {
             cont.Row(row =>
@@ -139,6 +140,7 @@ namespace AccReporting.Server.Reports
                 });
             });
         }
+
         private static void NewSmallHeadingRow(IContainer cont, string val)
         {
             cont.Row(row =>
@@ -153,13 +155,13 @@ namespace AccReporting.Server.Reports
                 });
             });
         }
+
         private void ComposeTable(IContainer container)
         {
             if (ReportData.tableData is not null)
             {
                 container.Table(table =>
                 {
-
                     table.ColumnsDefinition(columns =>
                     {
                         columns.ConstantColumn(25);
@@ -194,7 +196,6 @@ namespace AccReporting.Server.Reports
                     });
                     int count = 0;
 
-
                     foreach (var item in ReportData.tableData)
                     {
                         table.Cell().Element(CellStyle).AlignCenter().Text(++count).FontSize(10);
@@ -204,15 +205,13 @@ namespace AccReporting.Server.Reports
                         table.Cell().Element(CellStyle).AlignCenter().Text(item.Quantity).FontSize(10);
                         table.Cell().Element(CellStyle).AlignCenter().Text(item.Rate).FontSize(10);
                         table.Cell().Element(CellStyle).AlignCenter().Text(item.Amount).FontSize(10);
-                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Discount).FontSize(10);
+                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Discount + " %").FontSize(10);
                         table.Cell().Element(CellStyle).AlignCenter().Text(item.NetAmount).FontSize(10);
-                        ReportData.Total += item.Amount ?? 0;
                         static IContainer CellStyle(IContainer container)
                         {
                             return container.Border(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
                         }
                     }
-
                 });
             }
         }
