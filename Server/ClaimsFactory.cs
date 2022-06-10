@@ -27,8 +27,11 @@ namespace AccReporting.Server
 
             var identity = await base.GenerateClaimsAsync(user);
             //Get the data from EF core
+            identity.AddClaims(
+           new[] {
+            new Claim(ClaimTypes.Locality, "xddd")
+           });
 
-            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id));
             return identity;
         }
     }

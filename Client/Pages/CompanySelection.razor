@@ -1,15 +1,32 @@
 ﻿@page "/Company"
-<h3>Company Selection</h3>
+@inject ILocalStorageService LocalStorage
+@inject HttpClient client
 
-@if(CompAccount is not null)
-{
-   <p>Hello</p> 
-}
-else
-{
-    <p>Not Hello</p>
-}
+<AuthorizeView>
+    <Authorized>
+        <h3>Company Selection</h3>
+
+        @if (CompAccount is not null)
+        {
+            <p>Hello</p>
+        }
+        else
+        {
+            <p>Not Hello</p>
+        }
+    </Authorized>
+</AuthorizeView>
 @code {
-    [CascadingParameter]
-    CompanyAccount CompAccount{ get; set; }
+    CompanyAccount CompAccount { get; set; }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var res = await client.GetAsync("/api/Account/GetCurrentSelectedCompany");
+        if (res.IsSuccessStatusCode && await res.Content.ReadAsStreamAsync() is Stream company)
+        {
+            if (company.Length > 0)
+            {
+                CompAccount = await System.Text.Json.JsonSerializer.DeserializeAsync<CompanyAccount>(company);
+            }
+        }
+    }
 }

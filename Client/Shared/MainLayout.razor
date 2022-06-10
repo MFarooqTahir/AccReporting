@@ -31,9 +31,7 @@
     </nav>
 
     <div class="content px-4">
-        <CascadingValue TValue="CompanyAccount" Value="CurrentCompany">
             @Body
-        </CascadingValue>
     </div>
 </div>
 @code
@@ -41,23 +39,7 @@
     [CascadingParameter]
     private Task<AuthenticationState> AuthenticationStateTask { get; set; } = null!;
 
-    public CompanyAccount? CurrentCompany { get; set; }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        var isAuthenticated = (await AuthenticationStateTask).User.Identity.IsAuthenticated;
-
-        if (isAuthenticated && CurrentCompany is null)
-        {
-            var res = await client.GetAsync("/api/Account/GetCurrentSelectedCompany");
-            if (res.IsSuccessStatusCode && await res.Content.ReadAsStreamAsync() is Stream company)
-            {
-                if(company.Length>0){
-                CurrentCompany = await System.Text.Json.JsonSerializer.DeserializeAsync<CompanyAccount>(company);
-            }
-            }
-        }
-    }
+ 
     SfSidebar Sidebar;
     public bool SidebarToggle = false;
     public bool SidebarToggleFixed = false;

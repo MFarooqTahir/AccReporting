@@ -35,6 +35,7 @@ namespace AccReporting.Server.Controllers
                 var resx = _context.CompanyAccounts.AsNoTracking();
 
                 var id = User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value;
+                //var lo = User.Claims.First(a => a.Type == ClaimTypes.Locality).Value;
                 var ret = await resx.FirstOrDefaultAsync(x => x.UserID == id && x.IsSelected == true, ct);
                 _logger.LogInformation("Got account");
 
