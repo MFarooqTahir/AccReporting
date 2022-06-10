@@ -7,12 +7,12 @@ using System.Security.Claims;
 
 namespace AccReporting.Server
 {
-    public class MyUserClaimsPrincipalFactory : UserClaimsPrincipalFactory<IdentityUser>
+    public class MyUserClaimsPrincipalFactory : UserClaimsPrincipalFactory<ApplicationUser>
     {
         private ApplicationDbContext _appliationDbContext;
 
         public MyUserClaimsPrincipalFactory(
-        UserManager<IdentityUser> userManager,
+        UserManager<ApplicationUser> userManager,
         IOptions<IdentityOptions> optionsAccessor,
         ApplicationDbContext applicationDbContext)
             : base(userManager, optionsAccessor)
@@ -20,7 +20,7 @@ namespace AccReporting.Server
             _appliationDbContext = applicationDbContext;
         }
 
-        protected override async Task<ClaimsIdentity> GenerateClaimsAsync(IdentityUser user)
+        protected override async Task<ClaimsIdentity> GenerateClaimsAsync(ApplicationUser user)
         {
             //get the data from dbcontext
             //var Iuser = _appliationDbContext.Users.Where(x => x.EmailConfirmed).FirstOrDefault();
@@ -28,7 +28,7 @@ namespace AccReporting.Server
             var identity = await base.GenerateClaimsAsync(user);
             //Get the data from EF core
 
-            //identity.AddClaim(new Claim(Claim, Iuser.Email));
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id));
             return identity;
         }
     }

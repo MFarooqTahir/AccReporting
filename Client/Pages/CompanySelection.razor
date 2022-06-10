@@ -1,0 +1,15 @@
+﻿@page "/Company"
+<h3>Company Selection</h3>
+
+@if(CompAccount is not null)
+{
+   <p>Hello</p> 
+}
+else
+{
+    <p>Not Hello</p>
+}
+@code {
+    [CascadingParameter]
+    CompanyAccount CompAccount{ get; set; }
+}

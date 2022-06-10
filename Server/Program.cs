@@ -1,4 +1,5 @@
 global using AccReporting.Shared.ContextModels;
+using AccReporting.Server;
 using AccReporting.Server.Data;
 using AccReporting.Server.DbContexts;
 using AccReporting.Server.OptimizedModels;
@@ -43,7 +44,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
-    //.AddClaimsPrincipalFactory<MyUserClaimsPrincipalFactory>()
+    .AddClaimsPrincipalFactory<MyUserClaimsPrincipalFactory>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddIdentityServer()

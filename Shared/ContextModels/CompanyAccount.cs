@@ -16,7 +16,7 @@ namespace AccReporting.Shared.ContextModels
         public string? AcNumber { get; set; }
 
         [DefaultValue(false)]
-        public bool? IsSelected { get; set; }
+        public bool IsSelected { get; set; }
 
         [ForeignKey(nameof(User))]
         public string UserID { get; set; }

@@ -55,6 +55,13 @@ namespace AccReporting.Server.OptimizedModels
                 nullable: true);
             companyID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
+            var isSelected = runtimeEntityType.AddProperty(
+                "IsSelected",
+                typeof(bool),
+                propertyInfo: typeof(CompanyAccount).GetProperty("IsSelected", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(CompanyAccount).GetField("<IsSelected>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            isSelected.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
+
             var userID = runtimeEntityType.AddProperty(
                 "UserID",
                 typeof(string),

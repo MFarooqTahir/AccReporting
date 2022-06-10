@@ -33,7 +33,6 @@ namespace AccReporting.Server.Controllers
             _authDb = authDb;
         }
 
-        [AllowAnonymous]
         [HttpGet("InvSummaryList")]
         public async Task<IEnumerable<InvSummGridModel>> InvSummaryListPaged(CancellationToken ct, int page = 0, int pageSize = 0)
         {
@@ -42,7 +41,6 @@ namespace AccReporting.Server.Controllers
             return ret;
         }
 
-        [AllowAnonymous]
         [HttpGet("SalesReport")]
         public async Task<IActionResult> SalesReport(int invNo, string type, CancellationToken ct)
         {

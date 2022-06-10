@@ -1,11 +1,13 @@
 ﻿using AccReporting.Server.Services;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using System.Text;
 
 namespace AccReporting.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class uploadController : ControllerBase

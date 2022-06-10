@@ -67,7 +67,7 @@ public class DataService
         if (!suc)
         {
             ret = (await GetInvDetAsync(ct))
-                .Where(x => x.Pcode == AcCode)
+                .Where(x => x.Pcode == AcCode && (new[] { "S", "E", "P", "R" }).Contains(x.Sp))
              .GroupBy(x => new { x.InvNo, x.Sp })
              .Select(x => new InvSummGridModel(x.Key.InvNo, x.Key.Sp, x.Sum(z => z.Amount), x.Sum(z => z.NetAmount)));
 

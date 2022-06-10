@@ -20,7 +20,7 @@ namespace AccReporting.Server.Data
             base.OnModelCreating(builder);
 
             builder.Entity<IdentityRole>().HasData(new IdentityRole { Name = "User", NormalizedName = "USER", Id = Guid.NewGuid().ToString(), ConcurrencyStamp = Guid.NewGuid().ToString() });
-            builder.Entity<IdentityRole>().HasData(new IdentityRole { Name = "CompanyAdmin", NormalizedName = "COMPANYADMIN", Id = Guid.NewGuid().ToString(), ConcurrencyStamp = Guid.NewGuid().ToString() });
+            //builder.Entity<IdentityRole>().HasData(new IdentityRole { Name = "CompanyAdmin", NormalizedName = "COMPANYADMIN", Id = Guid.NewGuid().ToString(), ConcurrencyStamp = Guid.NewGuid().ToString() });
             builder.Entity<IdentityRole>().HasData(new IdentityRole { Name = "Admin", NormalizedName = "ADMIN", Id = Guid.NewGuid().ToString(), ConcurrencyStamp = Guid.NewGuid().ToString() });
         }
 
