@@ -33,11 +33,13 @@ namespace AccReporting.Server.Controllers
             _dataService = dataService;
         }
 
+        [AllowAnonymous]
         [HttpPost("fileupload")]
         public async Task fileupload(IList<IFormFile> UploadFiles, CancellationToken ct)
         {
             try
             {
+                var id = User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value;
                 string text = string.Empty;
                 var file = UploadFiles[0];
                 using (var ms = new MemoryStream())
