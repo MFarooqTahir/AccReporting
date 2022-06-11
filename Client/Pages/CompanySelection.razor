@@ -1,32 +1,148 @@
 ﻿@page "/Company"
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Lists
 @inject ILocalStorageService LocalStorage
 @inject HttpClient client
-
+@inject NavigationManager nav
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.SplitButtons
 <AuthorizeView>
     <Authorized>
-        <h3>Company Selection</h3>
+        <div class="row align-items-center">
+            <div class="col">
+            </div>
+            <div class="col">
+                <h3>Company Selection</h3>
+            </div>
+            <div class="col align-items-end">
+                @if (CurrentAccount?.Role=="Admin")
+                {
+                    <SfButton IsPrimary="true" OnClick="@onUploadclick" IconCss="syncfusion-blazor-icons syncfusion-blazor-icon-fileupload"></SfButton>
+                    <SfButton IsPrimary="true">Users</SfButton>
+                }
+            </div>
+        </div>
 
         @if (CompAccount is not null)
         {
-            <p>Hello</p>
+            <SfListView DataSource="@CompAccount"
+                    ShowHeader="false">
+                <ListViewFieldSettings TValue="CompaniesListDTO" GroupBy="@nameof(CompaniesListDTO.Role)" Id="@nameof(CompaniesListDTO.ID)"></ListViewFieldSettings>
+                <ListViewTemplates TValue="CompaniesListDTO">
+                    <GroupTemplate Context="listItem">
+                        <h5 class="text-center">
+                            @(listItem.Text=="Admin"?"Your Companies":"Companies")
+                        </h5>
+                    </GroupTemplate>
+                    <Template Context="listItem">
+                        @{
+                        <div class="row" @onclick="@(async ()=>await onClick(listItem.ID))">
+                            <div class="col">
+                                @(listItem.CompID)
+                            </div><div class="col">
+                                @(listItem.Name)
+                            </div>
+                            <div class="col">
+                                @(listItem.AccountNo)
+                            </div>
+                            <div class="col">
+                                @if (listItem.IsSelected)
+                                    {
+                                    <span class="badge rounded-pill bg-success">Selected</span>
+                                    }
+                                    else
+                                    {
+                                    <span class="badge rounded-pill bg-danger">Not Selected</span>
+                                    }
+                            </div>
+
+                        </div>
+                    }
+                </Template>
+
+            </ListViewTemplates>
+        </SfListView>
         }
         else
         {
-            <p>Not Hello</p>
+            <h3 class="text-center">Loading, Please wait...</h3>
         }
+        <SfDialog Width="335px" IsModal="true" @bind-Visible="@Visibility">
+            <DialogTemplates>
+                <Header> Error </Header>
+                <Content>
+                    <p>There was an error in changing selected company</p>
+                </Content>
+            </DialogTemplates>
+            <DialogButtons>
+                <DialogButton Content="OK" IsPrimary="true" OnClick="@DlgButtonClick" />
+            </DialogButtons>
+            <DialogAnimationSettings Effect="@DialogEffect.None"></DialogAnimationSettings>
+        </SfDialog>
+
+        <SfDialog Width="335px" IsModal="true" @bind-Visible="@UploadDialogVisible">
+            <DialogTemplates>
+                <Header> Upload Dialog For </Header>
+                <Content>
+                    <SfUploader AllowedExtensions=".txt">
+                        <UploaderAsyncSettings SaveUrl="api/Account/fileupload"></UploaderAsyncSettings>
+                    </SfUploader>
+                </Content>
+            </DialogTemplates>
+            <DialogButtons>
+                <DialogButton Content="Cancel" IsPrimary="true" OnClick="@DlgButtonUploadClick" />
+            </DialogButtons>
+            <DialogAnimationSettings Effect="@DialogEffect.None"></DialogAnimationSettings>
+        </SfDialog>
     </Authorized>
 </AuthorizeView>
 @code {
-    CompanyAccount CompAccount { get; set; }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+
+    List<CompaniesListDTO>? CompAccount { get; set; }
+    CompaniesListDTO? CurrentAccount { get; set; }
+    private bool Visibility { get; set; } = false;
+    private bool UploadDialogVisible { get; set; }
+
+
+    async Task onClick(string ID)
     {
-        var res = await client.GetAsync("/api/Account/GetCurrentSelectedCompany");
-        if (res.IsSuccessStatusCode && await res.Content.ReadAsStreamAsync() is Stream company)
+        var result = await client.GetFromJsonAsync<bool>("/api/Account/ChangeSelectedCompany?ID=" + ID);
+        if (result)
         {
-            if (company.Length > 0)
+            CompAccount = await client.GetFromJsonAsync<List<CompaniesListDTO>?>("/api/Account/GetAllCompaniesForUser");
+            CurrentAccount = CompAccount.FirstOrDefault(x => x.IsSelected);
+            if (string.IsNullOrWhiteSpace(CurrentAccount?.ID))
             {
-                CompAccount = await System.Text.Json.JsonSerializer.DeserializeAsync<CompanyAccount>(company);
+                CurrentAccount = null;
             }
+            await InvokeAsync(StateHasChanged);
         }
+        else
+        {
+            Visibility = true;
+        }
+    }
+   private void onUploadclick(MouseEventArgs args)
+    {
+        UploadDialogVisible = true;
+    }
+    private void DlgButtonUploadClick(MouseEventArgs args)
+    {
+        UploadDialogVisible = false;
+    }
+    private void DlgButtonClick()
+    {
+        Visibility = false;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        CompAccount = await client.GetFromJsonAsync<List<CompaniesListDTO>?>("/api/Account/GetAllCompaniesForUser");
+        CurrentAccount = CompAccount.FirstOrDefault(x => x.IsSelected);
+        if (string.IsNullOrWhiteSpace(CurrentAccount?.ID))
+        {
+            CurrentAccount = null;
+        }
+        await InvokeAsync(StateHasChanged);
     }
 }

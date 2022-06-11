@@ -8,19 +8,20 @@
 <div id="ControlRegion">
     <div class="col-lg-12 control-section">
         <div class="control_wrapper">
-            <SfUploader ID="UploadFiles" AllowedExtensions=".txt">
-                <UploaderAsyncSettings SaveUrl="@SaveUrl"></UploaderAsyncSettings>
+            <SfUploader AllowedExtensions=".txt">
+                <UploaderAsyncSettings SaveUrl="api/Account/fileupload" ></UploaderAsyncSettings>
                @* <UploaderEvents OnUploadStart="@OnStart" OnActionComplete="@OnSuccess"></UploaderEvents>*@
             </SfUploader>
         </div>
     </div>
-</div>
+</div>  
 @code {
     private string SaveUrl;
     protected override void OnInitialized()
     {
-        SaveUrl = nav.ToAbsoluteUri("api/upload/fileupload").AbsolutePath;
+        SaveUrl = nav.ToAbsoluteUri("api/Account/fileupload").AbsolutePath;
     }
+   
     //private bool ShowLoading;
     //private void OnStart(UploadingEventArgs args)
     //{

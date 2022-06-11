@@ -4,6 +4,8 @@ using AccReporting.Server.DbContexts;
 using AccReporting.Server.OptimizedModels;
 using AccReporting.Server.Services;
 
+using HashidsNet;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +29,8 @@ builder.Host.UseSerilog((ctx, lc) => lc
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var connectionString1 = builder.Configuration.GetConnectionString("NoDb");
 var connectionString2 = builder.Configuration.GetConnectionString("test");
+var hashids = new Hashids("OzoneTechnologies softwares avax", minHashLength: 6);
+builder.Services.AddSingleton<IHashids>(hashids);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(connectionString);
