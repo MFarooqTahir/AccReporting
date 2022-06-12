@@ -9,24 +9,22 @@
 @using Syncfusion.Blazor.SplitButtons
 <AuthorizeView>
     <Authorized>
-        <div class="row align-items-center">
+        <div class="row text-center align-items-center mb-2">
+
+            <h3>Company Selection</h3>
             <div class="col">
-            </div>
-            <div class="col">
-                <h3>Company Selection</h3>
-            </div>
-            <div class="col align-items-end">
-                @if (CurrentAccount?.Role=="Admin")
+                @if (CurrentAccount?.Role == "Admin")
                 {
-                    <SfButton IsPrimary="true" OnClick="@onUploadclick" IconCss="syncfusion-blazor-icons syncfusion-blazor-icon-fileupload"></SfButton>
-                    <SfButton IsPrimary="true">Users</SfButton>
+                    <SfButton CssClass="bg-success" OnClick="@onUploadclick" IconCss="syncfusion-blazor-icons syncfusion-blazor-icon-fileupload"></SfButton>
+                    <SfButton CssClass="bg-success" IconCss="e-icons e-user">Users</SfButton>
                 }
+                <SfButton CssClass="bg-success" OnClick="@AddNewCompany" IconCss="e-icons e-plus">Add</SfButton>
             </div>
         </div>
 
         @if (CompAccount is not null)
         {
-            <SfListView DataSource="@CompAccount"
+            <SfListView DataSource="@CompAccount" CssClass="mx-auto"
                     ShowHeader="false">
                 <ListViewFieldSettings TValue="CompaniesListDTO" GroupBy="@nameof(CompaniesListDTO.Role)" Id="@nameof(CompaniesListDTO.ID)"></ListViewFieldSettings>
                 <ListViewTemplates TValue="CompaniesListDTO">
@@ -37,26 +35,9 @@
                     </GroupTemplate>
                     <Template Context="listItem">
                         @{
-                        <div class="row" @onclick="@(async ()=>await onClick(listItem.ID))">
-                            <div class="col">
-                                @(listItem.CompID)
-                            </div><div class="col">
-                                @(listItem.Name)
-                            </div>
-                            <div class="col">
-                                @(listItem.AccountNo)
-                            </div>
-                            <div class="col">
-                                @if (listItem.IsSelected)
-                                    {
-                                    <span class="badge rounded-pill bg-success">Selected</span>
-                                    }
-                                    else
-                                    {
-                                    <span class="badge rounded-pill bg-danger">Not Selected</span>
-                                    }
-                            </div>
-
+                        <div class="d-flex text-center" @onclick="@(async ()=>await onClick(listItem.ID))">
+                            <span class="badge rounded-pill"><i style="font-size:12px;color:@(listItem.IsSelected?"green":"red")" class="oi oi-@(listItem.IsSelected?"check":"x")"></i></span>
+                            @(listItem.AccountNo) - @(listItem.Name)
                         </div>
                     }
                 </Template>
@@ -83,9 +64,11 @@
 
         <SfDialog Width="335px" IsModal="true" @bind-Visible="@UploadDialogVisible">
             <DialogTemplates>
-                <Header> Upload Dialog For </Header>
+                <Header> Upload Database </Header>
                 <Content>
                     <SfUploader AllowedExtensions=".txt">
+                        <UploaderEvents FileSelected="onFileSelect">
+                        </UploaderEvents>
                         <UploaderAsyncSettings SaveUrl="api/Account/fileupload"></UploaderAsyncSettings>
                     </SfUploader>
                 </Content>
@@ -95,16 +78,31 @@
             </DialogButtons>
             <DialogAnimationSettings Effect="@DialogEffect.None"></DialogAnimationSettings>
         </SfDialog>
+        <SfDialog Width="335px" IsModal="true" @bind-Visible="@AddDialogVisible">
+            <DialogTemplates>
+                <Header> Add new company </Header>
+                <Content>
+                    ---form---
+                </Content>
+            </DialogTemplates>
+            <DialogButtons>
+                <DialogButton Content="Cancel" IsPrimary="true" OnClick="@DlgButtonAddClick" />
+            </DialogButtons>
+            <DialogAnimationSettings Effect="@DialogEffect.None"></DialogAnimationSettings>
+        </SfDialog>
     </Authorized>
 </AuthorizeView>
 @code {
+    [CascadingParameter]
+    Task<AuthenticationState> authState { get; set; }
 
     List<CompaniesListDTO>? CompAccount { get; set; }
     CompaniesListDTO? CurrentAccount { get; set; }
     private bool Visibility { get; set; } = false;
     private bool UploadDialogVisible { get; set; }
+    private bool AddDialogVisible { get; set; }
 
-
+    private string currID;
     async Task onClick(string ID)
     {
         var result = await client.GetFromJsonAsync<bool>("/api/Account/ChangeSelectedCompany?ID=" + ID);
@@ -123,7 +121,12 @@
             Visibility = true;
         }
     }
-   private void onUploadclick(MouseEventArgs args)
+    private async void onFileSelect(SelectedEventArgs args)
+    {
+        args.CurrentRequest = new List<object> { new { ID = currID } };
+    }
+
+    private void onUploadclick(MouseEventArgs args)
     {
         UploadDialogVisible = true;
     }
@@ -135,8 +138,18 @@
     {
         Visibility = false;
     }
+    private void DlgButtonAddClick(MouseEventArgs args)
+    {
+        AddDialogVisible = false;
+    }
+    private void AddNewCompany(MouseEventArgs args)
+    {
+        AddDialogVisible = true;
+    }
     protected override async Task OnInitializedAsync()
     {
+        var st = (await authState).User.Claims;
+        currID = st.FirstOrDefault(x => x.Type == "sub").Value;
         CompAccount = await client.GetFromJsonAsync<List<CompaniesListDTO>?>("/api/Account/GetAllCompaniesForUser");
         CurrentAccount = CompAccount.FirstOrDefault(x => x.IsSelected);
         if (string.IsNullOrWhiteSpace(CurrentAccount?.ID))

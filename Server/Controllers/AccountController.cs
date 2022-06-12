@@ -33,15 +33,25 @@ namespace AccReporting.Server.Controllers
             _dataService = dataService;
         }
 
+        [HttpPost("CreateCompany")]
+        public async Task<bool> CreateCompany()
+        {
+            var newCompany = new CompanyDetail()
+            {
+            };
+            return true;
+        }
+
         [AllowAnonymous]
         [HttpPost("fileupload")]
-        public async Task fileupload(IList<IFormFile> UploadFiles, CancellationToken ct)
+        public async Task<IActionResult> fileupload(CancellationToken ct)
         {
+            bool res;
             try
             {
-                var id = User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value;
+                var id = Request.Headers.First(x => string.Equals(x.Key, "ID", StringComparison.InvariantCultureIgnoreCase)).Value[0];
                 string text = string.Empty;
-                var file = UploadFiles[0];
+                var file = Request.Form.Files[0];
                 using (var ms = new MemoryStream())
                 {
                     file.CopyTo(ms);
@@ -49,14 +59,20 @@ namespace AccReporting.Server.Controllers
                     text = Encoding.Default.GetString(fileBytes);
                 }
                 _logger.LogInformation("File uploaded");
-                await _dataService.SetDbName("Test", ct);
-                var res = await _dataService.InsertAllDataBulk(text, ct);
+                var dbname = _context.CompanyAccounts.AsNoTracking()
+                    .Where(x => x.UserID == id && x.CompRole == "Admin" && x.IsSelected)
+                    .Select(x => x.Company.DbName)
+                    .First();
+                await _dataService.SetDbName(dbname, ct);
+                res = await _dataService.InsertAllDataBulk(text, ct);
                 _logger.LogInformation("Data Inserted");
             }
             catch (Exception ex)
             {
                 _logger.LogInformation("Data Error: {Message}", ex.Message);
+                return NotFound();
             }
+            return Ok(res);
         }
 
         [HttpGet("ChangeSelectedCompany")]
@@ -69,12 +85,9 @@ namespace AccReporting.Server.Controllers
                 var res = _context.CompanyAccounts.FirstOrDefault(a => a.ID == curr && a.UserID == id);
                 if (res != null)
                 {
+                    var Selected = await _context.CompanyAccounts.Where(a => a.IsSelected && a.UserID == id).ToListAsync(ct);
+                    Selected?.ForEach(x => x.IsSelected = false);
                     res.IsSelected = true;
-                    var Selected = _context.CompanyAccounts.FirstOrDefault(a => a.IsSelected && a.UserID == id);
-                    if (Selected != null)
-                    {
-                        Selected.IsSelected = false;
-                    }
                     await _context.BulkSaveChangesAsync(cancellationToken: ct);
                     _logger.LogInformation("Updated Selected Company");
                     return true;

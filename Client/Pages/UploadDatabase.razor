@@ -3,25 +3,38 @@
 @inject NavigationManager nav
 @using Syncfusion.Blazor.Inputs
 @using Syncfusion.Blazor.Spinner
+@using System.Security.Claims
 <h3>Upload Database</h3>
 @*@*<SfSpinner Label="Uploading and processing your data, Please wait...." Visible="@ShowLoading"></SfSpinner>*@
 <div id="ControlRegion">
     <div class="col-lg-12 control-section">
         <div class="control_wrapper">
-            <SfUploader ID="UploadFiles" AllowedExtensions=".txt">
-                <UploaderAsyncSettings SaveUrl="api/Account/fileupload" ></UploaderAsyncSettings>
-               
+            <SfUploader ID="UploadFiles" AllowedExtensions=".txt" AutoUpload="true">
+                <UploaderEvents FileSelected="onFileSelect">
+                    </UploaderEvents>
+                    <UploaderAsyncSettings SaveUrl="api/Account/fileupload"></UploaderAsyncSettings>
+
             </SfUploader>
         </div>
     </div>
-</div>  
+</div>
 @code {
+    [CascadingParameter]
+    Task<AuthenticationState> authState{ get; set; }
     private string SaveUrl;
     protected override void OnInitialized()
     {
         SaveUrl = nav.ToAbsoluteUri("api/Account/fileupload").AbsolutePath;
     }
-   
+    private async void onFileSelect(SelectedEventArgs args)
+    {
+        var st = (await authState).User.Claims;
+        var currID = st.FirstOrDefault(x => x.Type == "sub").Value;
+        args.CurrentRequest = new List<object> { new { ID = currID } };
+
+    }
+    
+
     //private bool ShowLoading;
     //private void OnStart(UploadingEventArgs args)
     //{
