@@ -33,13 +33,50 @@ namespace AccReporting.Server.Controllers
             _dataService = dataService;
         }
 
-        [HttpPost("CreateCompany")]
-        public async Task<bool> CreateCompany()
+        [HttpPost("CreateCompany"), HttpGet("CreateCompany")]
+        public async Task<bool> CreateCompany(string name, string phone, string address, CancellationToken ct)
         {
-            var newCompany = new CompanyDetail()
+            try
             {
-            };
-            return true;
+                var exists = await _context.Companies.AnyAsync(x => x.Name == name, ct);
+                if (!exists)
+                {
+                    _logger.LogInformation("Account doesnt exist, adding");
+                    var id = User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value;
+                    var user = await _context.Users.FirstAsync(x => x.Id == id);
+                    var newCompany = new CompanyDetail()
+                    {
+                        Name = name,
+                        Phone = phone,
+                        Address = address,
+                        DbName = name.Length < 15 ? name : name[..15],
+                    };
+                    await _context.AddAsync(newCompany, ct);
+                    var compAccount = new CompanyAccount()
+                    {
+                        CompRole = "Admin",
+                        User = user,
+                        Company = newCompany,
+                        IsSelected = true,
+                    };
+
+                    await _context.AddAsync(compAccount, ct);
+                    var updateCols = new List<string> { nameof(CompanyAccount.IsSelected) };
+                    await _context.CompanyAccounts.BatchUpdateAsync(new CompanyAccount() { IsSelected = false }, updateCols, cancellationToken: ct);
+
+                    await _context.BulkSaveChangesAsync(cancellationToken: ct);
+                    _logger.LogInformation("Account added");
+
+                    return true;
+                }
+                _logger.LogInformation("Account exist, not adding");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation("Data Error: {Message}", ex.Message);
+                return false;
+            }
         }
 
         [AllowAnonymous]
@@ -108,16 +145,18 @@ namespace AccReporting.Server.Controllers
             try
             {
                 var id = User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value;
-
-                var ret = await _context.CompanyAccounts.AsNoTracking()
+                var retx = await _context.CompanyAccounts.AsNoTracking()
                     .Where(x => x.UserID == id)
                     .OrderBy(x => x.CompRole)
-                    .Select(x => new CompaniesListDTO(_hash.Encode(x.ID), _hash.Encode(x.Company.ID), x.Company.Name, x.AcNumber, x.CompRole, x.IsSelected))
+                    .Select(x => new { x.ID, CompID = x.Company.ID, x.Company.Name, x.AcNumber, x.CompRole, x.IsSelected })
                     .ToListAsync(ct);
-                if (ret.Count == 0)
+                var ret = retx
+                    .Select(x =>
+                    new CompaniesListDTO(_hash.Encode(x.ID), _hash.Encode(x.CompID), x.Name, x.AcNumber, x.CompRole, x.IsSelected));
+                if (!ret.Any())
                 {
                     _logger.LogInformation("No account found");
-                    ret.AddRange(
+                    ret = new List<CompaniesListDTO>(
                         new[]
                         {
                             new CompaniesListDTO(_hash.Encode(2),_hash.Encode(2), "No Company Name", "5.6.7", "Admin", true),

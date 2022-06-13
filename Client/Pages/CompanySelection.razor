@@ -37,7 +37,7 @@
                         @{
                         <div class="d-flex text-center" @onclick="@(async ()=>await onClick(listItem.ID))">
                             <span class="badge rounded-pill"><i style="font-size:12px;color:@(listItem.IsSelected?"green":"red")" class="oi oi-@(listItem.IsSelected?"check":"x")"></i></span>
-                            @(listItem.AccountNo) - @(listItem.Name)
+                            @(listItem.AccountNo)@(listItem.Role=="Admin"?"":" - ")@(listItem.Name)
                         </div>
                     }
                 </Template>
@@ -138,8 +138,9 @@
     {
         Visibility = false;
     }
-    private void DlgButtonAddClick(MouseEventArgs args)
+    private async Task DlgButtonAddClick(MouseEventArgs args)
     {
+        var res = await client.GetFromJsonAsync<bool>("/api/Account/CreateCompany?name=xxac&phone=03415551092&address=ExampleAddressCode");
         AddDialogVisible = false;
     }
     private void AddNewCompany(MouseEventArgs args)
