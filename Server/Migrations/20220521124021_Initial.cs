@@ -27,10 +27,7 @@ namespace AccReporting.Server.Migrations
                     GST = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     CrDays = table.Column<int>(type: "int", nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__Acfile__B87C5B5F3831C82B", x => x.IDPr);
-                });
+                constraints: table => table.PrimaryKey("PK__Acfile__B87C5B5F3831C82B", x => x.IDPr));
 
             migrationBuilder.CreateTable(
                 name: "Basic",
@@ -42,10 +39,7 @@ namespace AccReporting.Server.Migrations
                     ActName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Sno = table.Column<int>(type: "int", nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__Basic__B87C5B5FF0F4AE13", x => x.IDPr);
-                });
+                constraints: table => table.PrimaryKey("PK__Basic__B87C5B5FF0F4AE13", x => x.IDPr));
 
             migrationBuilder.CreateTable(
                 name: "Category",
@@ -70,10 +64,7 @@ namespace AccReporting.Server.Migrations
                     Temp6 = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Temp7 = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__Category__B87C5B5F9899F9B0", x => x.IDPr);
-                });
+                constraints: table => table.PrimaryKey("PK__Category__B87C5B5F9899F9B0", x => x.IDPr));
 
             migrationBuilder.CreateTable(
                 name: "InvDet",
@@ -104,10 +95,7 @@ namespace AccReporting.Server.Migrations
                     RegionName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     FILE = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__InvDet__B87C5B5F67F5802F", x => x.IDPr);
-                });
+                constraints: table => table.PrimaryKey("PK__InvDet__B87C5B5F67F5802F", x => x.IDPr));
 
             migrationBuilder.CreateTable(
                 name: "Inventory",
@@ -128,10 +116,7 @@ namespace AccReporting.Server.Migrations
                     Unit = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: true),
                     OpBal = table.Column<double>(type: "float", nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__Inventor__B87C5B5F00A47D01", x => x.IDPr);
-                });
+                constraints: table => table.PrimaryKey("PK__Inventor__B87C5B5F00A47D01", x => x.IDPr));
 
             migrationBuilder.CreateTable(
                 name: "InvSumm",
@@ -161,10 +146,7 @@ namespace AccReporting.Server.Migrations
                     Delivery = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     HCode = table.Column<int>(type: "int", nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__InvSumm__B87C5B5F9C9191C6", x => x.IDPr);
-                });
+                constraints: table => table.PrimaryKey("PK__InvSumm__B87C5B5F9C9191C6", x => x.IDPr));
 
             migrationBuilder.CreateTable(
                 name: "Trans",
@@ -182,10 +164,7 @@ namespace AccReporting.Server.Migrations
                     ChqNo = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: true),
                     ChqDate = table.Column<DateTime>(type: "datetime", nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__Trans__B87C5B5F2A4B3E66", x => x.IDPr);
-                });
+                constraints: table => table.PrimaryKey("PK__Trans__B87C5B5F2A4B3E66", x => x.IDPr));
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

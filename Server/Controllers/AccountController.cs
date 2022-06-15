@@ -33,12 +33,94 @@ namespace AccReporting.Server.Controllers
             _dataService = dataService;
         }
 
-        [HttpPost("CreateCompany"), HttpGet("CreateCompany")]
-        public async Task<bool> CreateCompany(string name, string phone, string address, CancellationToken ct)
+        [HttpPost("AddOrUpdateAccount")]
+        public async Task<bool> AddOrUpdateAccount(DisplayUsersDto model, CancellationToken ct)
         {
             try
             {
-                var exists = await _context.Companies.AnyAsync(x => x.Name == name, ct);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var adminCompany = await _context.CompanyAccounts.AsNoTracking().Where(x => x.IsSelected && x.UserID == userId && x.CompRole == "Admin")
+                    .Select(x => x.Company)
+                    .FirstAsync(ct);
+                var user = await _context.Users.AsNoTracking().FirstAsync(x => x.Email == model.UserEmail, ct);
+                var exists = await _context.CompanyAccounts.FirstOrDefaultAsync(x => x.CompanyID == adminCompany.ID && x.UserID == user.Id, ct);
+                if (exists is null || exists.ID == 0)
+                {
+                    var newAccount = new CompanyAccount()
+                    {
+                        Company = adminCompany,
+                        CompRole = "User",
+                        User = user,
+                        AcNumber = model.AcCode
+                    };
+                    await _context.AddAsync(newAccount, ct);
+                }
+                else
+                {
+                    exists.AcNumber = model.AcCode;
+                }
+                await _context.BulkSaveChangesAsync(cancellationToken: ct);
+                _logger.LogInformation("Saved Account");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation("Data Error: {Message}", ex.Message);
+                return false;
+            }
+        }
+
+        [HttpGet("GetUserAccounts")]
+        public async Task<IEnumerable<DisplayUsersDto>> GetUserAccounts(CancellationToken ct)
+        {
+            try
+            {
+                int c = 1;
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var data = _context.CompanyAccounts.Where(x => x.UserID == userId && x.IsSelected)
+                    .Select(y => new { y.AcNumber, y.Company.DbName }).First();
+                await _dataService.SetDbName(data.DbName, ct);
+                var list = (await _dataService.GetAcFileAsync(ct)).Select(x => x.ActCode).Distinct();
+
+                var accountID = await _context.CompanyAccounts.Where(x => x.IsSelected && x.UserID == userId && x.CompRole == "Admin")
+                    .Select(x => x.CompanyID).FirstAsync();
+                var ret = await _context.Companies.AsNoTracking()
+                    .Where(x => x.ID == accountID)
+                    .Include(x => x.CompanyUsers)
+                    .ThenInclude(x => x.User)
+                    .FirstAsync(cancellationToken: ct);
+                var alUsers = ret.CompanyUsers.Select(x => x.AcNumber).ToList();
+
+                var accounts = ret.CompanyUsers.Select(x => new DisplayUsersDto()
+                {
+                    ID = c++,
+                    AcCode = x.AcNumber,
+                    UserEmail = x.User.Email,
+                    IsAdmin = x.CompRole == "Admin",
+                }).ToList();
+                (accounts ??= new()).AddRange(list.Where(x => !alUsers.Contains(x)).Select(x => new DisplayUsersDto()
+                {
+                    ID = c++,
+                    AcCode = x,
+                    UserEmail = "",
+                    IsAdmin = false,
+                }));
+                _logger.LogInformation("Got Accounts");
+                return accounts;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation("Data Error: {Message}", ex.Message);
+                return new List<DisplayUsersDto>();
+            }
+        }
+
+        [HttpPost("CreateCompany")]
+        public async Task<bool> CreateCompany(NewCompanyInputDto inp, CancellationToken ct)
+        {
+            try
+            {
+                var exists = await _context.Companies.AnyAsync(x => x.Name == inp.Name, ct);
                 if (!exists)
                 {
                     _logger.LogInformation("Account doesnt exist, adding");
@@ -46,10 +128,10 @@ namespace AccReporting.Server.Controllers
                     var user = await _context.Users.FirstAsync(x => x.Id == id);
                     var newCompany = new CompanyDetail()
                     {
-                        Name = name,
-                        Phone = phone,
-                        Address = address,
-                        DbName = name.Length < 15 ? name : name[..15],
+                        Name = inp.Name,
+                        Phone = inp.phone,
+                        Address = inp.Address,
+                        DbName = inp.Name.Length < 15 ? inp.Name : inp.Name[..15],
                     };
                     await _context.AddAsync(newCompany, ct);
                     var compAccount = new CompanyAccount()
@@ -153,19 +235,19 @@ namespace AccReporting.Server.Controllers
                 var ret = retx
                     .Select(x =>
                     new CompaniesListDTO(_hash.Encode(x.ID), _hash.Encode(x.CompID), x.Name, x.AcNumber, x.CompRole, x.IsSelected));
-                if (!ret.Any())
-                {
-                    _logger.LogInformation("No account found");
-                    ret = new List<CompaniesListDTO>(
-                        new[]
-                        {
-                            new CompaniesListDTO(_hash.Encode(2),_hash.Encode(2), "No Company Name", "5.6.7", "Admin", true),
-                            new CompaniesListDTO(_hash.Encode(3),_hash.Encode(3), "No Company Name", "5.73.4", "Admin", false),
-                            new CompaniesListDTO(_hash.Encode(0),_hash.Encode(0), "No Company Name", "1.25", "User", false),
-                            new CompaniesListDTO(_hash.Encode(1),_hash.Encode(1), "No Company Name", "1.5.3", "User", false),
-                            new CompaniesListDTO(_hash.Encode(4),_hash.Encode(4), "No Company Name", "8.75", "User", false),
-                        });
-                }
+                //if (!ret.Any())
+                //{
+                //    _logger.LogInformation("No account found");
+                //    ret = new List<CompaniesListDTO>(
+                //        new[]
+                //        {
+                //            new CompaniesListDTO(_hash.Encode(2),_hash.Encode(2), "No Company Name", "5.6.7", "Admin", true),
+                //            new CompaniesListDTO(_hash.Encode(3),_hash.Encode(3), "No Company Name", "5.73.4", "Admin", false),
+                //            new CompaniesListDTO(_hash.Encode(0),_hash.Encode(0), "No Company Name", "1.25", "User", false),
+                //            new CompaniesListDTO(_hash.Encode(1),_hash.Encode(1), "No Company Name", "1.5.3", "User", false),
+                //            new CompaniesListDTO(_hash.Encode(4),_hash.Encode(4), "No Company Name", "8.75", "User", false),
+                //        });
+                //}
 
                 return ret;
             }

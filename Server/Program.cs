@@ -49,25 +49,25 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.R
     .AddRoles<IdentityRole>()
     //.AddClaimsPrincipalFactory<MyUserClaimsPrincipalFactory>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+//builder.Services.ConfigureApplicationCookie(options =>
+//{
+//    // Cookie settings
+//    options.Cookie.HttpOnly = true;
+//    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
 
+//    options.LoginPath = "/Identity/Account/Login";
+//    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+//    options.SlidingExpiration = true;
+//});
 builder.Services.AddIdentityServer()
     .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
 
 builder.Services.AddAuthentication()
     .AddIdentityServerJwt();
 
-builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
-            {
-                options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
-            });
+builder.Services.AddControllersWithViews().AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver());
 builder.Services.AddDistributedMemoryCache();
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("MyPolicy", builder =>
-    {
-        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-    });
-}); ;
+builder.Services.AddCors(options => options.AddPolicy("MyPolicy", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<DataService>();
 var app = builder.Build();

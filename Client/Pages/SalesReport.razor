@@ -6,11 +6,11 @@
 <AuthorizeView>
     <Authorized>
         <style>
-             .e-export-pdf:before{
-            content: '\e700';
-            color: gray;
-            font-size:28px;
-        }
+            .e-export-pdf:before {
+                content: '\e700';
+                color: gray;
+                font-size: 28px;
+            }
         </style>
         <SfSpinner Label="" Visible="@(SalesReportList is null)"></SfSpinner>
 
@@ -21,13 +21,25 @@
             <GridPageSettings PageSize="8"></GridPageSettings>
             <GridSelectionSettings CheckboxMode="CheckboxSelectionType.Default" Mode="SelectionMode.Row" CheckboxOnly="true"></GridSelectionSettings>
             <GridColumns>
-                <GridColumn Type="ColumnType.None" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Center" AllowSearching="false" AllowFiltering="false" AllowSorting="false" Width="45">
+                <GridColumn Type="ColumnType.None" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Center" AllowSearching="false" AllowFiltering="false" AllowSorting="false" Width="65">
                     <GridCommandColumns>
-                            
-                            <GridCommandColumn ButtonOption="@(new CommandButtonOptions() { CssClass="e-icons e-export-pdf bg-transparent border-0 w-100 h-100"})" Title="View Pdf"></GridCommandColumn>
-                            @*<a class="btn bg-transparent" href=@($"Reports/SalesReport?invNo={s}&type={st}") target="_blank"><Syncfusion.Blazor.Buttons.SfIcon IconCss="color:white" Size="Syncfusion.Blazor.Buttons.IconSize.Large" Name="Syncfusion.Blazor.Buttons.IconName.ExportPdf"></Syncfusion.Blazor.Buttons.SfIcon></a>*@
-                        </GridCommandColumns>
-                        
+
+                    <GridCommandColumn ButtonOption="@(new CommandButtonOptions() { CssClass="e-icons e-export-pdf bg-transparent border-0 w-100 h-100"})" Title="View Pdf"></GridCommandColumn>
+                    </GridCommandColumns>
+                    @*<Template Context="ctx">
+                        @{
+                            var curr = ctx as InvSummGridModel;
+                            <form action=@($"Reports/SalesReport") method="get">
+                                <input type="hidden" name="invNo" value="@(curr.InvNo)" />
+                                <input type="hidden" name="type" value="@(typesAll[curr.Type])" />
+                                <button type="submit" class="bg-transparent border-0"><Syncfusion.Blazor.Buttons.SfIcon IconCss="color:white" Size="Syncfusion.Blazor.Buttons.IconSize.Large" Name="Syncfusion.Blazor.Buttons.IconName.ExportPdf"></Syncfusion.Blazor.Buttons.SfIcon></button>
+
+                            </form>
+                        }
+
+                    </Template>*@
+                                @*<a class="btn bg-transparent" target="_blank"><Syncfusion.Blazor.Buttons.SfIcon IconCss="color:white" Size="Syncfusion.Blazor.Buttons.IconSize.Large" Name="Syncfusion.Blazor.Buttons.IconName.ExportPdf"></Syncfusion.Blazor.Buttons.SfIcon></a>*@
+
                 </GridColumn>
                 <GridColumn Field=@nameof(InvSummGridModel.InvNo) HeaderText="InvNo" AllowEditing="false" IsPrimaryKey="true" Width="80">
                 </GridColumn>
@@ -35,7 +47,7 @@
                     <Template Context="ctx">
                         @{
                             var curr = ctx as InvSummGridModel;
-                                                <span>@(typesAll[curr.Type])</span>
+                            <span>@(typesAll[curr.Type])</span>
                         }
                     </Template>
                 </GridColumn>
@@ -43,7 +55,7 @@
                     <Template Context="ctx">
                         @{
                             var curr = ctx as InvSummGridModel;
-                                                <span>@($"{(1-(curr.NetAmount/curr.Amount))*100:F2} %")</span>
+                            <span>@($"{(1-(curr.NetAmount/curr.Amount))*100:F2} %")</span>
                         }
                     </Template>
                 </GridColumn>
@@ -59,7 +71,7 @@
     </Authorized>
 </AuthorizeView>
 @code {
-    IEnumerable<InvSummGridModel> SalesReportList;
+    IEnumerable<InvSummGridModel>? SalesReportList;
     public SfGrid<InvSummGridModel> defaultGrid = new();
     public int pageNo { get; set; }
     public int totalPages { get; set; }
@@ -70,23 +82,32 @@
     public async Task OnCommandClicked(CommandClickEventArgs<InvSummGridModel> args)
     {
         var curr = args.RowData;
-                            var st = typesAll[curr.Type];
-                            var s = curr.InvNo.ToString();
-        
-        await JS.InvokeVoidAsync("open", $"Reports/SalesReport?invNo={s}&type={st}", "_blank");
-    
+        var st = typesAll[curr.Type];
+        var s = curr.InvNo.ToString();
+        var res = await Http.GetFromJsonAsync<byte[]>($"Reports/SalesReport?invNo={s}&type={st}");
+        await JS.SaveAs("SalesReport.pdf", res);
+        //await JS.InvokeVoidAsync("open", $"Reports/SalesReport?invNo={s}&type={st}", "_blank");
+
     }
 
     protected override async Task OnInitializedAsync()
     {
         await ClickedSalesReport();
     }
+
     private async Task ClickedSalesReport()
     {
         //var response = await Http.GetAsync("/Reports/InvSummaryListPaged?page=0&pageSize=25");
         //var str = await response.Content.ReadAsStringAsync();
-        SalesReportList = await Http.GetFromJsonAsync<IEnumerable<InvSummGridModel>>($"/Reports/InvSummaryList").ConfigureAwait(false);
-        StateHasChanged();
+        try
+        {
+            SalesReportList = await Http.GetFromJsonAsync<IEnumerable<InvSummGridModel>?>($"/Reports/InvSummaryList").ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            SalesReportList = new List<InvSummGridModel>();
+        }
+    StateHasChanged();
     }
     private SalesReportInput model { get; set; } = new();
     public List<string> types = new List<string>
@@ -98,8 +119,8 @@
         await JS.InvokeVoidAsync("open", $"Reports/SalesReport?invNo={invNo}&type={Type}", "_blank");
     }
     private readonly IDictionary<string, string> typesAll = new Dictionary<string, string>()
-                {
-                    {"S","Sale" },{"E","Estimate" },{"P","Purchase" },{"R","Return"}
-                };
+    {
+        {"S","Sale" },{"E","Estimate" },{"P","Purchase" },{"R","Return"}
+    };
 }
 

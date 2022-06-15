@@ -17,10 +17,7 @@ namespace AccReporting.Server.Migrations.ApplicationDb
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
-                });
+                constraints: table => table.PrimaryKey("PK_AspNetRoles", x => x.Id));
 
             migrationBuilder.CreateTable(
                 name: "Companies",
@@ -33,10 +30,7 @@ namespace AccReporting.Server.Migrations.ApplicationDb
                     Name = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: true),
                     Phone = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Companies", x => x.ID);
-                });
+                constraints: table => table.PrimaryKey("PK_Companies", x => x.ID));
 
             migrationBuilder.CreateTable(
                 name: "DeviceCodes",
@@ -52,10 +46,7 @@ namespace AccReporting.Server.Migrations.ApplicationDb
                     SessionId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     SubjectId = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DeviceCodes", x => x.UserCode);
-                });
+                constraints: table => table.PrimaryKey("PK_DeviceCodes", x => x.UserCode));
 
             migrationBuilder.CreateTable(
                 name: "Keys",
@@ -70,10 +61,7 @@ namespace AccReporting.Server.Migrations.ApplicationDb
                     Use = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Version = table.Column<int>(type: "int", nullable: false)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Keys", x => x.Id);
-                });
+                constraints: table => table.PrimaryKey("PK_Keys", x => x.Id));
 
             migrationBuilder.CreateTable(
                 name: "PersistedGrants",
@@ -90,10 +78,7 @@ namespace AccReporting.Server.Migrations.ApplicationDb
                     SubjectId = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     Type = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PersistedGrants", x => x.Key);
-                });
+                constraints: table => table.PrimaryKey("PK_PersistedGrants", x => x.Key));
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",

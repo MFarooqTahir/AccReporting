@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 
 using QuestPDF.Fluent;
 
+using System.Security.Claims;
+
 using Throw;
 
 namespace AccReporting.Server.Controllers
@@ -36,41 +38,61 @@ namespace AccReporting.Server.Controllers
         [HttpGet("InvSummaryList")]
         public async Task<IEnumerable<InvSummGridModel>> InvSummaryListPaged(CancellationToken ct, int page = 0, int pageSize = 0)
         {
-            await _dataService.SetDbName("Test", ct);
-            var ret = await _dataService.GetInvSummGridAsync("2.1.4.154", page, pageSize, ct);
-            return ret;
+            try
+            {
+                _ = Request;
+                var id = User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value;
+                var data = _authDb.CompanyAccounts.Where(x => x.UserID == id && x.IsSelected)
+                    .Select(y => new { y.AcNumber, y.Company.DbName }).First();
+                await _dataService.SetDbName(data.DbName, ct);
+                var ret = await _dataService.GetInvSummGridAsync(data.AcNumber, page, pageSize, ct);
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("There was an error {Message}", ex.Message);
+                return null;
+            }
         }
 
-        [HttpGet("SalesReport")]
-        public async Task<IActionResult> SalesReport(int invNo, string type, CancellationToken ct)
+        [HttpGet("[action]")]
+        public async Task<byte[]> SalesReport(int invNo, string type, CancellationToken ct)
         {
             try
             {
+                _ = Request;
                 string InpType = types[type];
                 invNo.Throw()
                             .IfNegative()
                             .IfDefault();
                 type.Throw()
                     .IfNullOrWhiteSpace(x => x);
-
+                var id = User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value;
+                var data = _authDb.CompanyAccounts
+                    .Where(x => x.UserID == id && x.IsSelected)
+                    .Select(y => new { y.AcNumber, y.Company.DbName, y.Company.Name, y.Company.Phone, y.Company.Address })
+                    .First();
                 _logger.LogInformation("Getting sales report for invoice {invNo}", invNo);
-                await _dataService.SetDbName("Test", ct);
-                var res = await _dataService.GetSalesInvoiceData(invNo, InpType, "2.1.4.154", ct);
+                await _dataService.SetDbName(data.DbName, ct);
+                var res = await _dataService.GetSalesInvoiceData(invNo, InpType, data.AcNumber, ct);
                 if (res?.InvNo != invNo)
                 {
-                    return NotFound($"Error: Invoice number {invNo} not found");
+                    _logger.LogInformation("Invoice not found {invNo}", invNo);
+                    return null;
                 }
                 res.Type = type;
-                res.cell = "0345-5551092";
-                res.Address = "Allah wala town, Korangi crossing";
+                res.CompanyName = data.Name;
+                res.cell = data.Phone;
+                res.Address = data.Address;
                 var Report = new SalesReport(res);
                 _logger.LogInformation("Got sales report for invoice {invNo}", invNo);
-                return File(Report.GeneratePdf(), "application/pdf");
+                var ret = Report.GeneratePdf();
+                return ret;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error getting sales report for invoice {invNo}, request from {User.Identity.Name}");
-                return Redirect("/Error");
+                _logger.LogError(ex, "Error getting sales report for invoice {invNo}, request from {Name}", invNo, User.Identity.Name);
+                return null;
             }
         }
     }

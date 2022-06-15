@@ -16,7 +16,7 @@
                 @if (CurrentAccount?.Role == "Admin")
                 {
                     <SfButton CssClass="bg-success" OnClick="@onUploadclick" IconCss="syncfusion-blazor-icons syncfusion-blazor-icon-fileupload"></SfButton>
-                    <SfButton CssClass="bg-success" IconCss="e-icons e-user">Users</SfButton>
+                    <SfButton CssClass="bg-success" OnClick="@ShowUsers" IconCss="e-icons e-user">Users</SfButton>
                 }
                 <SfButton CssClass="bg-success" OnClick="@AddNewCompany" IconCss="e-icons e-plus">Add</SfButton>
             </div>
@@ -53,7 +53,7 @@
             <DialogTemplates>
                 <Header> Error </Header>
                 <Content>
-                    <p>There was an error in changing selected company</p>
+                    <p>There was an error</p>
                 </Content>
             </DialogTemplates>
             <DialogButtons>
@@ -62,6 +62,28 @@
             <DialogAnimationSettings Effect="@DialogEffect.None"></DialogAnimationSettings>
         </SfDialog>
 
+        <SfDialog Width="450px" IsModal="true" @bind-Visible="@VisibilityUsers">
+            <DialogTemplates>
+                <Header> All Users </Header>
+                <Content>
+                    <SfGrid Toolbar="@(new List<string>() { "Edit","Search" })" DataSource="@CurrUsers" AllowPaging="true" TValue="DisplayUsersDto">
+                        <GridEvents OnActionFailure="@ActionFailureHandler" CellSaved="CellSavedHandler" OnActionComplete="@ActionComplete" TValue="DisplayUsersDto"></GridEvents>
+                        <GridEditSettings AllowEditing="true" Mode="EditMode.Normal"></GridEditSettings>
+                        <GridSearchSettings Fields=@(new string[] { "UserEmail","AcCode"})></GridSearchSettings>
+                        <GridColumns>
+                            @*<GridColumn hidden Field="@nameof(DisplayUsersDto.IsAdmin)" HeaderText="Admin" DisplayAsCheckBox="true" MaxWidth="30" MinWidth="30"></GridColumn>*@
+                            <GridColumn IsPrimaryKey="true" Field="@nameof(DisplayUsersDto.ID)" HeaderText="" Width="50"></GridColumn>
+                            <GridColumn AllowSearching="true" EditType="EditType.DefaultEdit" Field="@nameof(DisplayUsersDto.UserEmail)" HeaderText="User Email"></GridColumn>
+                            <GridColumn AllowSearching="true" AllowEditing="false" Field="@nameof(DisplayUsersDto.AcCode)" HeaderText="Ac Code" Width="85"></GridColumn>
+                        </GridColumns>
+                    </SfGrid>
+                </Content>
+            </DialogTemplates>
+            <DialogButtons>
+                <DialogButton Content="Done" IsPrimary="true" OnClick="@DontShowUsers" />
+            </DialogButtons>
+            <DialogAnimationSettings Effect="@DialogEffect.None"></DialogAnimationSettings>
+        </SfDialog>
         <SfDialog Width="335px" IsModal="true" @bind-Visible="@UploadDialogVisible">
             <DialogTemplates>
                 <Header> Upload Database </Header>
@@ -74,7 +96,7 @@
                 </Content>
             </DialogTemplates>
             <DialogButtons>
-                <DialogButton Content="Cancel" IsPrimary="true" OnClick="@DlgButtonUploadClick" />
+                <DialogButton Content="Cancel" CssClass="bg-danger" OnClick="@DlgButtonUploadClick" />
             </DialogButtons>
             <DialogAnimationSettings Effect="@DialogEffect.None"></DialogAnimationSettings>
         </SfDialog>
@@ -82,11 +104,33 @@
             <DialogTemplates>
                 <Header> Add new company </Header>
                 <Content>
-                    ---form---
+                    <EditForm Model="@inpModel" Context="ct" OnValidSubmit="@OnValidSubmit">
+                        <DataAnnotationsValidator />
+                        <div class="form-group">
+                            <div>
+                                <label for="Name">Name</label>
+                                <SfTextBox @bind-Value="@inpModel.Name" Placeholder="Enter a name"></SfTextBox>
+                                <ValidationMessage For="@(() => inpModel.Name)" />
+                            </div>
+                            <div>
+                                <label for="phone">Phone</label>
+                                <SfTextBox @bind-Value="@inpModel.phone" Placeholder="Enter your phone"></SfTextBox>
+                                <ValidationMessage For="@(() => inpModel.phone)" />
+                            </div>
+                            <div>
+                                <label for="Address">Address</label>
+                                <SfTextBox @bind-Value="@inpModel.Address" Multiline="true" Placeholder="Enter an address"></SfTextBox>
+                                <ValidationMessage For="@(() => inpModel.Address)" />
+                            </div>
+                        </div>
+                        <div class="mt-3 ms-auto me-0">
+                            <SfButton type="submit" IsPrimary="true">Add New</SfButton>
+                        </div>
+                    </EditForm>
                 </Content>
             </DialogTemplates>
             <DialogButtons>
-                <DialogButton Content="Cancel" IsPrimary="true" OnClick="@DlgButtonAddClick" />
+                <DialogButton Content="Cancel" CssClass="bg-danger" OnClick="@DlgButtonAddClick" />
             </DialogButtons>
             <DialogAnimationSettings Effect="@DialogEffect.None"></DialogAnimationSettings>
         </SfDialog>
@@ -95,14 +139,48 @@
 @code {
     [CascadingParameter]
     Task<AuthenticationState> authState { get; set; }
-
+    NewCompanyInputDto inpModel = new();
     List<CompaniesListDTO>? CompAccount { get; set; }
+    List<DisplayUsersDto>? CurrUsers { get; set; }
     CompaniesListDTO? CurrentAccount { get; set; }
     private bool Visibility { get; set; } = false;
     private bool UploadDialogVisible { get; set; }
     private bool AddDialogVisible { get; set; }
+    private bool VisibilityUsers { get; set; }
 
     private string currID;
+
+    public void CellSavedHandler(CellSaveArgs<DisplayUsersDto> args)
+    {
+        // Here, you can customize your code.
+    }
+    public void ActionFailureHandler(Syncfusion.Blazor.Grids.FailureEventArgs args)
+    {
+
+    }
+    public async void ActionComplete(ActionEventArgs<DisplayUsersDto> args)
+    {
+        if (args.RequestType == Syncfusion.Blazor.Grids.Action.Save)
+        {
+            var result = await client.PostAsJsonAsync<DisplayUsersDto>("/api/Account/AddOrUpdateAccount", args.Data);
+            if (result.IsSuccessStatusCode)
+            {
+                var boolresult = await result.Content.ReadFromJsonAsync<bool>();
+                if (!boolresult)
+                {
+                    Visibility = true;
+
+                }
+            }
+
+            CurrUsers = await client.GetFromJsonAsync<List<DisplayUsersDto>?>("/api/Account/GetUserAccounts");
+            if (CurrUsers is null)
+            {
+                CurrUsers = new();
+            }
+            await InvokeAsync(StateHasChanged);
+        }
+    }
     async Task onClick(string ID)
     {
         var result = await client.GetFromJsonAsync<bool>("/api/Account/ChangeSelectedCompany?ID=" + ID);
@@ -119,6 +197,31 @@
         else
         {
             Visibility = true;
+        }
+    }
+    async Task OnValidSubmit(EditContext ctx)
+    {
+        var model = ctx.Model as NewCompanyInputDto;
+        var res = await client.PostAsJsonAsync<NewCompanyInputDto>("/api/Account/CreateCompany", model);
+        if (res.IsSuccessStatusCode)
+        {
+            var boolresult = await res.Content.ReadFromJsonAsync<bool>();
+            if (boolresult)
+            {
+                AddDialogVisible = false;
+                CompAccount = await client.GetFromJsonAsync<List<CompaniesListDTO>?>("/api/Account/GetAllCompaniesForUser");
+                CurrentAccount = CompAccount.FirstOrDefault(x => x.IsSelected);
+                if (string.IsNullOrWhiteSpace(CurrentAccount?.ID))
+                {
+                    CurrentAccount = null;
+                }
+                await InvokeAsync(StateHasChanged);
+            }
+            else
+            {
+                Visibility = true;
+
+            }
         }
     }
     private async void onFileSelect(SelectedEventArgs args)
@@ -140,12 +243,26 @@
     }
     private async Task DlgButtonAddClick(MouseEventArgs args)
     {
-        var res = await client.GetFromJsonAsync<bool>("/api/Account/CreateCompany?name=xxac&phone=03415551092&address=ExampleAddressCode");
         AddDialogVisible = false;
     }
     private void AddNewCompany(MouseEventArgs args)
     {
         AddDialogVisible = true;
+    }
+    private async Task DontShowUsers(MouseEventArgs args)
+    {
+        CurrUsers = null;
+        VisibilityUsers = false;
+    }
+    private async Task ShowUsers(MouseEventArgs args)
+    {
+        CurrUsers = await client.GetFromJsonAsync<List<DisplayUsersDto>?>("/api/Account/GetUserAccounts");
+        if (CurrUsers is null)
+        {
+            CurrUsers = new();
+        }
+
+        VisibilityUsers = true;
     }
     protected override async Task OnInitializedAsync()
     {

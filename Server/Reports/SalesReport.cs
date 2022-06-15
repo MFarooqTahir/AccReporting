@@ -108,21 +108,9 @@ namespace AccReporting.Server.Reports
             cont.Row(row =>
             {
                 row.ConstantItem(100).
-                        Element(x =>
-                        {
-                            x.Column(col =>
-                            {
-                                col.Item().Text(title).Bold();
-                            });
-                        });
+                        Element(x => x.Column(col => col.Item().Text(title).Bold()));
                 row.RelativeItem().
-                Element(x =>
-                {
-                    x.Column(col =>
-                    {
-                        col.Item().Text(val);
-                    });
-                });
+                Element(x => x.Column(col => col.Item().Text(val)));
             });
         }
 
@@ -131,13 +119,7 @@ namespace AccReporting.Server.Reports
             cont.Row(row =>
             {
                 row.RelativeItem().
-                Element(x =>
-                {
-                    x.AlignCenter().Column(col =>
-                    {
-                        col.Item().Text(val).FontSize(20).ExtraBold();
-                    });
-                });
+                Element(x => x.AlignCenter().Column(col => col.Item().Text(val).FontSize(20).ExtraBold()));
             });
         }
 
@@ -146,13 +128,7 @@ namespace AccReporting.Server.Reports
             cont.Row(row =>
             {
                 row.RelativeItem().
-                Element(x =>
-                {
-                    x.AlignCenter().Column(col =>
-                    {
-                        col.Item().Text(val).FontSize(12);
-                    });
-                });
+                Element(x => x.AlignCenter().Column(col => col.Item().Text(val).FontSize(12)));
             });
         }
 

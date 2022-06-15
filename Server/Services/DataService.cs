@@ -66,8 +66,14 @@ public class DataService
         var suc = GetCache(key, out IEnumerable<InvSummGridModel> ret);
         if (!suc)
         {
-            ret = (await GetInvDetAsync(ct))
-                .Where(x => x.Pcode == AcCode && (new[] { "S", "E", "P", "R" }).Contains(x.Sp))
+            var R = await GetInvDetAsync(ct);
+            if (!string.IsNullOrWhiteSpace(AcCode))
+            {
+                R = R.Where(x => x.Pcode == AcCode);
+            }
+            var contList = new[] { "S", "E", "P", "R" };
+            ret = R.Where(x => contList.Contains(x.Sp))
+                .OrderBy(x => x.InvNo)
              .GroupBy(x => new { x.InvNo, x.Sp })
              .Select(x => new InvSummGridModel(x.Key.InvNo, x.Key.Sp, x.Sum(z => z.Amount), x.Sum(z => z.NetAmount)));
 
@@ -88,15 +94,18 @@ public class DataService
         {
             ret = new SalesReportDto()
             {
-                CompanyName = "ABC Company",
                 Type = Type,
             };
             //_Db.Database.SetCommandTimeout(TimeSpan.FromMinutes(3));
 
-            var dataSumm = (await GetInvSummsAsync(ct).ConfigureAwait(false))
-                          .Where(x => x.InvNo == invNo && x.Pcode == AcNumber)
-                         .Select(x => new { x.Payment, x.RefNo, x.DueDate, x.InvDate, x.InvNo })
-                         .FirstOrDefault();
+            var dataSummx = (await GetInvSummsAsync(ct).ConfigureAwait(false))
+                          .Where(x => x.InvNo == invNo);
+            if (!string.IsNullOrWhiteSpace(AcNumber))
+            {
+                dataSummx = dataSummx.Where(x => x.Pcode == AcNumber);
+            }
+            var dataSumm = dataSummx.Select(x => new { x.Payment, x.RefNo, x.DueDate, x.InvDate, x.InvNo })
+            .FirstOrDefault();
             if (dataSumm is not null)
             {
                 ret.RefNumber = dataSumm.RefNo;
@@ -110,9 +119,13 @@ public class DataService
                 return ret;
             }
             ret.tableData ??= new();
+            var R = await GetInvDetAsync(ct).ConfigureAwait(false);
+            if (!string.IsNullOrWhiteSpace(AcNumber))
+            {
+                R = R.Where(x => x.Pcode == AcNumber);
+            }
             ret.tableData.AddRange(
-                            (await GetInvDetAsync(ct).ConfigureAwait(false))
-                            .Where(x => x.Pcode == AcNumber && x.InvNo == invNo && x.Sp == Type)
+                            R.Where(x => x.InvNo == invNo && x.Sp == Type)
                             .Select(
                                     row => new SalesReportModel()
                                     {
@@ -220,7 +233,7 @@ public class DataService
 
     private void SetInvSumm(IEnumerable<InvSumm> Data) => _cache.Set(CachePrefix + "-InvSumm", Data);
 
-    private async Task<IEnumerable<InvSumm>> GetInvSummsAsync(CancellationToken ct)
+    public async Task<IEnumerable<InvSumm>> GetInvSummsAsync(CancellationToken ct)
     {
         var res = _cache.TryGetValue(CachePrefix + "-InvSumm", out IEnumerable<InvSumm> Data);
         if (!res)
@@ -234,7 +247,7 @@ public class DataService
 
     private void SetAcFile(IEnumerable<Acfile> Data) => _cache.Set(CachePrefix + "-AcFile", Data);
 
-    private async Task<IEnumerable<Acfile>> GetAcFileAsync(CancellationToken ct)
+    public async Task<IEnumerable<Acfile>> GetAcFileAsync(CancellationToken ct)
     {
         var res = _cache.TryGetValue(CachePrefix + "-AcFile", out IEnumerable<Acfile> Data);
         if (!res)
@@ -248,7 +261,7 @@ public class DataService
 
     private void SetInventory(IEnumerable<Inventory> Data) => _cache.Set(CachePrefix + "-Inventory", Data);
 
-    private async Task<IEnumerable<Inventory>> GetInventory(CancellationToken ct)
+    public async Task<IEnumerable<Inventory>> GetInventory(CancellationToken ct)
     {
         var res = _cache.TryGetValue(CachePrefix + "-Inventory", out IEnumerable<Inventory> Data);
         if (!res)
@@ -262,7 +275,7 @@ public class DataService
 
     private void SetInvDet(IEnumerable<InvDet> Data) => _cache.Set(CachePrefix + "-InvDet", Data);
 
-    private async Task<IEnumerable<InvDet>> GetInvDetAsync(CancellationToken ct)
+    public async Task<IEnumerable<InvDet>> GetInvDetAsync(CancellationToken ct)
     {
         var res = _cache.TryGetValue(CachePrefix + "-InvDet", out IEnumerable<InvDet> Data);
         if (!res)
@@ -276,7 +289,7 @@ public class DataService
 
     private void SetTrans(IEnumerable<Trans> Data) => _cache.Set(CachePrefix + "-Trans", Data);
 
-    private async Task<IEnumerable<Trans>> GetTransAsync(CancellationToken ct)
+    public async Task<IEnumerable<Trans>> GetTransAsync(CancellationToken ct)
     {
         var res = _cache.TryGetValue(CachePrefix + "-Trans", out IEnumerable<Trans> Data);
         if (!res)

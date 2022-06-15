@@ -16,6 +16,10 @@
     font-size: 18px;
 }
 
+.syncfusion-blazor-icon-people:before {
+    content: "\e7b9";
+}
+
 .syncfusion-blazor-icon-spinner:before {
     content: "\e749";
 }
@@ -339,9 +343,11 @@
 .syncfusion-blazor-icon-breadcrumb:before {
     content: "\e754";
 }
+
 .syncfusion-blazor-icon-signature:before {
     content: "\e755";
 }
+
 .syncfusion-blazor-hide {
     visibility: hidden;
 }
