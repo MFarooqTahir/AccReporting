@@ -25,7 +25,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(CompanyDetail).GetField("<ID>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 valueGenerated: ValueGenerated.OnAdd,
                 afterSaveBehavior: PropertySaveBehavior.Throw);
-            iD.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             var address = runtimeEntityType.AddProperty(
                 "Address",
@@ -34,7 +33,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(CompanyDetail).GetField("<Address>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 150);
-            address.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var dbName = runtimeEntityType.AddProperty(
                 "DbName",
@@ -43,7 +41,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(CompanyDetail).GetField("<DbName>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 15);
-            dbName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var name = runtimeEntityType.AddProperty(
                 "Name",
@@ -52,7 +49,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(CompanyDetail).GetField("<Name>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 30);
-            name.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var phone = runtimeEntityType.AddProperty(
                 "Phone",
@@ -61,7 +57,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(CompanyDetail).GetField("<Phone>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 15);
-            phone.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var key = runtimeEntityType.AddKey(
                 new[] { iD });

@@ -26,20 +26,17 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(IdentityUser<string>).GetProperty("Id", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(IdentityUser<string>).GetField("<Id>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw);
-            id.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var accessFailedCount = runtimeEntityType.AddProperty(
                 "AccessFailedCount",
                 typeof(int),
                 propertyInfo: typeof(IdentityUser<string>).GetProperty("AccessFailedCount", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(IdentityUser<string>).GetField("<AccessFailedCount>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            accessFailedCount.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var companyDetailID = runtimeEntityType.AddProperty(
                 "CompanyDetailID",
                 typeof(int?),
                 nullable: true);
-            companyDetailID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var concurrencyStamp = runtimeEntityType.AddProperty(
                 "ConcurrencyStamp",
@@ -48,7 +45,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(IdentityUser<string>).GetField("<ConcurrencyStamp>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 concurrencyToken: true);
-            concurrencyStamp.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var email = runtimeEntityType.AddProperty(
                 "Email",
@@ -57,21 +53,18 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(IdentityUser<string>).GetField("<Email>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 256);
-            email.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var emailConfirmed = runtimeEntityType.AddProperty(
                 "EmailConfirmed",
                 typeof(bool),
                 propertyInfo: typeof(IdentityUser<string>).GetProperty("EmailConfirmed", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(IdentityUser<string>).GetField("<EmailConfirmed>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            emailConfirmed.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var lockoutEnabled = runtimeEntityType.AddProperty(
                 "LockoutEnabled",
                 typeof(bool),
                 propertyInfo: typeof(IdentityUser<string>).GetProperty("LockoutEnabled", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(IdentityUser<string>).GetField("<LockoutEnabled>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            lockoutEnabled.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var lockoutEnd = runtimeEntityType.AddProperty(
                 "LockoutEnd",
@@ -79,7 +72,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(IdentityUser<string>).GetProperty("LockoutEnd", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(IdentityUser<string>).GetField("<LockoutEnd>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            lockoutEnd.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var normalizedEmail = runtimeEntityType.AddProperty(
                 "NormalizedEmail",
@@ -88,7 +80,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(IdentityUser<string>).GetField("<NormalizedEmail>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 256);
-            normalizedEmail.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var normalizedUserName = runtimeEntityType.AddProperty(
                 "NormalizedUserName",
@@ -97,7 +88,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(IdentityUser<string>).GetField("<NormalizedUserName>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 256);
-            normalizedUserName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var passwordHash = runtimeEntityType.AddProperty(
                 "PasswordHash",
@@ -105,7 +95,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(IdentityUser<string>).GetProperty("PasswordHash", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(IdentityUser<string>).GetField("<PasswordHash>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            passwordHash.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var phoneNumber = runtimeEntityType.AddProperty(
                 "PhoneNumber",
@@ -113,14 +102,12 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(IdentityUser<string>).GetProperty("PhoneNumber", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(IdentityUser<string>).GetField("<PhoneNumber>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            phoneNumber.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var phoneNumberConfirmed = runtimeEntityType.AddProperty(
                 "PhoneNumberConfirmed",
                 typeof(bool),
                 propertyInfo: typeof(IdentityUser<string>).GetProperty("PhoneNumberConfirmed", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(IdentityUser<string>).GetField("<PhoneNumberConfirmed>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            phoneNumberConfirmed.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var securityStamp = runtimeEntityType.AddProperty(
                 "SecurityStamp",
@@ -128,14 +115,12 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(IdentityUser<string>).GetProperty("SecurityStamp", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(IdentityUser<string>).GetField("<SecurityStamp>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            securityStamp.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var twoFactorEnabled = runtimeEntityType.AddProperty(
                 "TwoFactorEnabled",
                 typeof(bool),
                 propertyInfo: typeof(IdentityUser<string>).GetProperty("TwoFactorEnabled", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(IdentityUser<string>).GetField("<TwoFactorEnabled>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            twoFactorEnabled.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var userName = runtimeEntityType.AddProperty(
                 "UserName",
@@ -144,7 +129,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(IdentityUser<string>).GetField("<UserName>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 256);
-            userName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var key = runtimeEntityType.AddKey(
                 new[] { id });

@@ -25,7 +25,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(IdentityUserToken<string>).GetProperty("UserId", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(IdentityUserToken<string>).GetField("<UserId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw);
-            userId.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var loginProvider = runtimeEntityType.AddProperty(
                 "LoginProvider",
@@ -34,7 +33,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(IdentityUserToken<string>).GetField("<LoginProvider>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 maxLength: 128);
-            loginProvider.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var name = runtimeEntityType.AddProperty(
                 "Name",
@@ -43,7 +41,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(IdentityUserToken<string>).GetField("<Name>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 maxLength: 128);
-            name.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var value = runtimeEntityType.AddProperty(
                 "Value",
@@ -51,7 +48,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(IdentityUserToken<string>).GetProperty("Value", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(IdentityUserToken<string>).GetField("<Value>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            value.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var key = runtimeEntityType.AddKey(
                 new[] { userId, loginProvider, name });

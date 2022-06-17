@@ -35,13 +35,13 @@ var hashids = new Hashids("OzoneTechnologies softwares avax", minHashLength: 6);
 builder.Services.AddSingleton<IHashids>(hashids); builder.Services.AddTransient<IEmailSender, EmailService>();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    options.UseSqlServer(connectionString);
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
     options.UseModel(ApplicationDbContextModel.Instance);
 });
 
 builder.Services.AddDbContext<AccountInfoDbContext>(options =>
 {
-    options.UseSqlServer(connectionString2);
+    options.UseMySql(connectionString2, ServerVersion.AutoDetect(connectionString2));
     options.UseModel(AccountInfoDbContextModel.Instance);
 });
 

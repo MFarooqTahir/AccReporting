@@ -48,9 +48,8 @@ namespace AccReporting.Server.OptimizedModels
             IdentityUserRolestringEntityType.CreateAnnotations(identityUserRolestring);
             IdentityUserTokenstringEntityType.CreateAnnotations(identityUserTokenstring);
 
-            AddAnnotation("ProductVersion", "6.0.5");
-            AddAnnotation("Relational:MaxIdentifierLength", 128);
-            AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+            AddAnnotation("ProductVersion", "6.0.6");
+            AddAnnotation("Relational:MaxIdentifierLength", 64);
         }
     }
 }

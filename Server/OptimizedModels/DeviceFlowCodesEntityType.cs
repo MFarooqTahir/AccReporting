@@ -25,7 +25,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(DeviceFlowCodes).GetField("<UserCode>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 maxLength: 200);
-            userCode.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var clientId = runtimeEntityType.AddProperty(
                 "ClientId",
@@ -33,14 +32,12 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(DeviceFlowCodes).GetProperty("ClientId", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(DeviceFlowCodes).GetField("<ClientId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 200);
-            clientId.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var creationTime = runtimeEntityType.AddProperty(
                 "CreationTime",
                 typeof(DateTime),
                 propertyInfo: typeof(DeviceFlowCodes).GetProperty("CreationTime", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(DeviceFlowCodes).GetField("<CreationTime>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            creationTime.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var data = runtimeEntityType.AddProperty(
                 "Data",
@@ -48,7 +45,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(DeviceFlowCodes).GetProperty("Data", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(DeviceFlowCodes).GetField("<Data>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 50000);
-            data.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var description = runtimeEntityType.AddProperty(
                 "Description",
@@ -57,7 +53,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(DeviceFlowCodes).GetField("<Description>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 200);
-            description.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var deviceCode = runtimeEntityType.AddProperty(
                 "DeviceCode",
@@ -65,14 +60,12 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(DeviceFlowCodes).GetProperty("DeviceCode", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(DeviceFlowCodes).GetField("<DeviceCode>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 200);
-            deviceCode.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var expiration = runtimeEntityType.AddProperty(
                 "Expiration",
                 typeof(DateTime?),
                 propertyInfo: typeof(DeviceFlowCodes).GetProperty("Expiration", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(DeviceFlowCodes).GetField("<Expiration>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            expiration.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var sessionId = runtimeEntityType.AddProperty(
                 "SessionId",
@@ -81,7 +74,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(DeviceFlowCodes).GetField("<SessionId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 100);
-            sessionId.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var subjectId = runtimeEntityType.AddProperty(
                 "SubjectId",
@@ -90,7 +82,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(DeviceFlowCodes).GetField("<SubjectId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 200);
-            subjectId.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var key = runtimeEntityType.AddKey(
                 new[] { userCode });

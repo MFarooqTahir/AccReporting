@@ -26,7 +26,6 @@ namespace AccReporting.Server.OptimizedModels
                 valueGenerated: ValueGenerated.OnAdd,
                 afterSaveBehavior: PropertySaveBehavior.Throw);
             idpr.AddAnnotation("Relational:ColumnName", "IDPr");
-            idpr.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             var categoryName = runtimeEntityType.AddProperty(
                 "CategoryName",
@@ -35,7 +34,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Category).GetField("<CategoryName>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 35);
-            categoryName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var code = runtimeEntityType.AddProperty(
                 "Code",
@@ -44,7 +42,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Category).GetField("<Code>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 4);
-            code.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var color = runtimeEntityType.AddProperty(
                 "Color",
@@ -53,7 +50,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Category).GetField("<Color>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 100);
-            color.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var date1 = runtimeEntityType.AddProperty(
                 "Date1",
@@ -62,7 +58,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Category).GetField("<Date1>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
             date1.AddAnnotation("Relational:ColumnType", "datetime");
-            date1.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var item = runtimeEntityType.AddProperty(
                 "Item",
@@ -71,7 +66,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Category).GetField("<Item>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 100);
-            item.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var joiningType = runtimeEntityType.AddProperty(
                 "JoiningType",
@@ -80,7 +74,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Category).GetField("<JoiningType>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 50);
-            joiningType.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var origin = runtimeEntityType.AddProperty(
                 "Origin",
@@ -89,7 +82,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Category).GetField("<Origin>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 100);
-            origin.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var standard = runtimeEntityType.AddProperty(
                 "Standard",
@@ -98,7 +90,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Category).GetField("<Standard>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 100);
-            standard.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var temp1 = runtimeEntityType.AddProperty(
                 "Temp1",
@@ -106,7 +97,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(Category).GetProperty("Temp1", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Category).GetField("<Temp1>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            temp1.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var temp2 = runtimeEntityType.AddProperty(
                 "Temp2",
@@ -114,7 +104,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(Category).GetProperty("Temp2", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Category).GetField("<Temp2>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            temp2.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var temp3 = runtimeEntityType.AddProperty(
                 "Temp3",
@@ -122,7 +111,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(Category).GetProperty("Temp3", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Category).GetField("<Temp3>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            temp3.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var temp4 = runtimeEntityType.AddProperty(
                 "Temp4",
@@ -131,7 +119,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Category).GetField("<Temp4>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 50);
-            temp4.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var temp5 = runtimeEntityType.AddProperty(
                 "Temp5",
@@ -140,7 +127,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Category).GetField("<Temp5>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 50);
-            temp5.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var temp6 = runtimeEntityType.AddProperty(
                 "Temp6",
@@ -149,7 +135,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Category).GetField("<Temp6>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 50);
-            temp6.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var temp7 = runtimeEntityType.AddProperty(
                 "Temp7",
@@ -158,7 +143,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Category).GetField("<Temp7>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 50);
-            temp7.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var userName = runtimeEntityType.AddProperty(
                 "UserName",
@@ -167,7 +151,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Category).GetField("<UserName>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 10);
-            userName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var key = runtimeEntityType.AddKey(
                 new[] { idpr });

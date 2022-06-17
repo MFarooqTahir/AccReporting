@@ -26,7 +26,6 @@ namespace AccReporting.Server.OptimizedModels
                 valueGenerated: ValueGenerated.OnAdd,
                 afterSaveBehavior: PropertySaveBehavior.Throw);
             idpr.AddAnnotation("Relational:ColumnName", "IDPr");
-            idpr.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             var actCode = runtimeEntityType.AddProperty(
                 "ActCode",
@@ -35,7 +34,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Trans).GetField("<ActCode>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 30);
-            actCode.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var actName = runtimeEntityType.AddProperty(
                 "ActName",
@@ -44,7 +42,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Trans).GetField("<ActName>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 70);
-            actName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var chqDate = runtimeEntityType.AddProperty(
                 "ChqDate",
@@ -53,7 +50,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Trans).GetField("<ChqDate>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
             chqDate.AddAnnotation("Relational:ColumnType", "datetime");
-            chqDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var chqNo = runtimeEntityType.AddProperty(
                 "ChqNo",
@@ -62,7 +58,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Trans).GetField("<ChqNo>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 15);
-            chqNo.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var date = runtimeEntityType.AddProperty(
                 "Date",
@@ -71,7 +66,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Trans).GetField("<Date>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
             date.AddAnnotation("Relational:ColumnType", "datetime");
-            date.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var des = runtimeEntityType.AddProperty(
                 "Des",
@@ -80,7 +74,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Trans).GetField("<Des>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 205);
-            des.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var transAmt = runtimeEntityType.AddProperty(
                 "TransAmt",
@@ -88,7 +81,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(Trans).GetProperty("TransAmt", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Trans).GetField("<TransAmt>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            transAmt.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var vnoc = runtimeEntityType.AddProperty(
                 "Vnoc",
@@ -97,7 +89,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Trans).GetField("<Vnoc>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 8);
-            vnoc.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var vnon = runtimeEntityType.AddProperty(
                 "Vnon",
@@ -105,7 +96,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(Trans).GetProperty("Vnon", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Trans).GetField("<Vnon>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            vnon.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var key = runtimeEntityType.AddKey(
                 new[] { idpr });

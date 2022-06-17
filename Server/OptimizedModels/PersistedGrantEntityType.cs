@@ -25,7 +25,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(PersistedGrant).GetField("<Key>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 maxLength: 200);
-            key.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var clientId = runtimeEntityType.AddProperty(
                 "ClientId",
@@ -33,7 +32,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(PersistedGrant).GetProperty("ClientId", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(PersistedGrant).GetField("<ClientId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 200);
-            clientId.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var consumedTime = runtimeEntityType.AddProperty(
                 "ConsumedTime",
@@ -41,14 +39,12 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(PersistedGrant).GetProperty("ConsumedTime", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(PersistedGrant).GetField("<ConsumedTime>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            consumedTime.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var creationTime = runtimeEntityType.AddProperty(
                 "CreationTime",
                 typeof(DateTime),
                 propertyInfo: typeof(PersistedGrant).GetProperty("CreationTime", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(PersistedGrant).GetField("<CreationTime>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            creationTime.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var data = runtimeEntityType.AddProperty(
                 "Data",
@@ -56,7 +52,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(PersistedGrant).GetProperty("Data", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(PersistedGrant).GetField("<Data>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 50000);
-            data.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var description = runtimeEntityType.AddProperty(
                 "Description",
@@ -65,7 +60,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(PersistedGrant).GetField("<Description>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 200);
-            description.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var expiration = runtimeEntityType.AddProperty(
                 "Expiration",
@@ -73,7 +67,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(PersistedGrant).GetProperty("Expiration", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(PersistedGrant).GetField("<Expiration>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            expiration.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var sessionId = runtimeEntityType.AddProperty(
                 "SessionId",
@@ -82,7 +75,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(PersistedGrant).GetField("<SessionId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 100);
-            sessionId.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var subjectId = runtimeEntityType.AddProperty(
                 "SubjectId",
@@ -91,7 +83,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(PersistedGrant).GetField("<SubjectId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 200);
-            subjectId.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var type = runtimeEntityType.AddProperty(
                 "Type",
@@ -99,7 +90,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(PersistedGrant).GetProperty("Type", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(PersistedGrant).GetField("<Type>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 50);
-            type.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var key0 = runtimeEntityType.AddKey(
                 new[] { key });

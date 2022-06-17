@@ -26,7 +26,6 @@ namespace AccReporting.Server.OptimizedModels
                 valueGenerated: ValueGenerated.OnAdd,
                 afterSaveBehavior: PropertySaveBehavior.Throw);
             idpr.AddAnnotation("Relational:ColumnName", "IDPr");
-            idpr.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             var actCode = runtimeEntityType.AddProperty(
                 "ActCode",
@@ -35,7 +34,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Acfile).GetField("<ActCode>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 30);
-            actCode.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var actName = runtimeEntityType.AddProperty(
                 "ActName",
@@ -44,7 +42,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Acfile).GetField("<ActName>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 50);
-            actName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var address1 = runtimeEntityType.AddProperty(
                 "Address1",
@@ -53,7 +50,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Acfile).GetField("<Address1>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 50);
-            address1.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var address2 = runtimeEntityType.AddProperty(
                 "Address2",
@@ -62,7 +58,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Acfile).GetField("<Address2>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 50);
-            address2.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var address3 = runtimeEntityType.AddProperty(
                 "Address3",
@@ -71,7 +66,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Acfile).GetField("<Address3>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 50);
-            address3.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var crDays = runtimeEntityType.AddProperty(
                 "CrDays",
@@ -79,7 +73,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(Acfile).GetProperty("CrDays", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Acfile).GetField("<CrDays>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            crDays.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var email = runtimeEntityType.AddProperty(
                 "Email",
@@ -89,7 +82,6 @@ namespace AccReporting.Server.OptimizedModels
                 nullable: true,
                 maxLength: 40);
             email.AddAnnotation("Relational:ColumnName", "email");
-            email.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var fax = runtimeEntityType.AddProperty(
                 "Fax",
@@ -99,7 +91,6 @@ namespace AccReporting.Server.OptimizedModels
                 nullable: true,
                 maxLength: 20);
             fax.AddAnnotation("Relational:ColumnName", "fax");
-            fax.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var gst = runtimeEntityType.AddProperty(
                 "Gst",
@@ -109,7 +100,6 @@ namespace AccReporting.Server.OptimizedModels
                 nullable: true,
                 maxLength: 20);
             gst.AddAnnotation("Relational:ColumnName", "GST");
-            gst.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var opBal = runtimeEntityType.AddProperty(
                 "OpBal",
@@ -117,7 +107,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(Acfile).GetProperty("OpBal", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Acfile).GetField("<OpBal>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            opBal.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var phone = runtimeEntityType.AddProperty(
                 "Phone",
@@ -127,7 +116,6 @@ namespace AccReporting.Server.OptimizedModels
                 nullable: true,
                 maxLength: 20);
             phone.AddAnnotation("Relational:ColumnName", "phone");
-            phone.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var key = runtimeEntityType.AddKey(
                 new[] { idpr });

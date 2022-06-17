@@ -26,7 +26,6 @@ namespace AccReporting.Server.OptimizedModels
                 valueGenerated: ValueGenerated.OnAdd,
                 afterSaveBehavior: PropertySaveBehavior.Throw);
             idpr.AddAnnotation("Relational:ColumnName", "IDPr");
-            idpr.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             var itemCode = runtimeEntityType.AddProperty(
                 "ItemCode",
@@ -35,7 +34,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Inventory).GetField("<ItemCode>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 30);
-            itemCode.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var itemDescrip = runtimeEntityType.AddProperty(
                 "ItemDescrip",
@@ -44,7 +42,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Inventory).GetField("<ItemDescrip>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 50);
-            itemDescrip.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var length = runtimeEntityType.AddProperty(
                 "Length",
@@ -52,7 +49,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(Inventory).GetProperty("Length", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Inventory).GetField("<Length>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            length.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var manuName = runtimeEntityType.AddProperty(
                 "ManuName",
@@ -61,7 +57,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Inventory).GetField("<ManuName>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 35);
-            manuName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var mfcCode = runtimeEntityType.AddProperty(
                 "MfcCode",
@@ -70,7 +65,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Inventory).GetField("<MfcCode>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 4);
-            mfcCode.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var opBal = runtimeEntityType.AddProperty(
                 "OpBal",
@@ -78,7 +72,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(Inventory).GetProperty("OpBal", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Inventory).GetField("<OpBal>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            opBal.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var pressure = runtimeEntityType.AddProperty(
                 "Pressure",
@@ -87,7 +80,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Inventory).GetField("<Pressure>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 10);
-            pressure.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var price = runtimeEntityType.AddProperty(
                 "Price",
@@ -96,7 +88,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Inventory).GetField("<Price>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
             price.AddAnnotation("Relational:ColumnType", "money");
-            price.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var retPrice = runtimeEntityType.AddProperty(
                 "RetPrice",
@@ -105,7 +96,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Inventory).GetField("<RetPrice>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
             retPrice.AddAnnotation("Relational:ColumnType", "money");
-            retPrice.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var retPrice2 = runtimeEntityType.AddProperty(
                 "RetPrice2",
@@ -114,7 +104,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Inventory).GetField("<RetPrice2>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
             retPrice2.AddAnnotation("Relational:ColumnType", "money");
-            retPrice2.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var size = runtimeEntityType.AddProperty(
                 "Size",
@@ -123,7 +112,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Inventory).GetField("<Size>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 15);
-            size.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var unit = runtimeEntityType.AddProperty(
                 "Unit",
@@ -132,7 +120,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Inventory).GetField("<Unit>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 5);
-            unit.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var key = runtimeEntityType.AddKey(
                 new[] { idpr });

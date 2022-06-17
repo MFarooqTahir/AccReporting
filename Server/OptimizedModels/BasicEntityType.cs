@@ -26,7 +26,6 @@ namespace AccReporting.Server.OptimizedModels
                 valueGenerated: ValueGenerated.OnAdd,
                 afterSaveBehavior: PropertySaveBehavior.Throw);
             idpr.AddAnnotation("Relational:ColumnName", "IDPr");
-            idpr.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             var actCode = runtimeEntityType.AddProperty(
                 "ActCode",
@@ -35,7 +34,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Basic).GetField("<ActCode>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 30);
-            actCode.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var actName = runtimeEntityType.AddProperty(
                 "ActName",
@@ -44,7 +42,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(Basic).GetField("<ActName>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 50);
-            actName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var sno = runtimeEntityType.AddProperty(
                 "Sno",
@@ -52,7 +49,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(Basic).GetProperty("Sno", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Basic).GetField("<Sno>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            sno.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var key = runtimeEntityType.AddKey(
                 new[] { idpr });

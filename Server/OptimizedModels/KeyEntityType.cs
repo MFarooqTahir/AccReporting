@@ -24,7 +24,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(Key).GetProperty("Id", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Key).GetField("<Id>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw);
-            id.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var algorithm = runtimeEntityType.AddProperty(
                 "Algorithm",
@@ -32,35 +31,30 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(Key).GetProperty("Algorithm", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Key).GetField("<Algorithm>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 100);
-            algorithm.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var created = runtimeEntityType.AddProperty(
                 "Created",
                 typeof(DateTime),
                 propertyInfo: typeof(Key).GetProperty("Created", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Key).GetField("<Created>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            created.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var data = runtimeEntityType.AddProperty(
                 "Data",
                 typeof(string),
                 propertyInfo: typeof(Key).GetProperty("Data", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Key).GetField("<Data>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            data.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var dataProtected = runtimeEntityType.AddProperty(
                 "DataProtected",
                 typeof(bool),
                 propertyInfo: typeof(Key).GetProperty("DataProtected", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Key).GetField("<DataProtected>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            dataProtected.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var isX509Certificate = runtimeEntityType.AddProperty(
                 "IsX509Certificate",
                 typeof(bool),
                 propertyInfo: typeof(Key).GetProperty("IsX509Certificate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Key).GetField("<IsX509Certificate>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            isX509Certificate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var use = runtimeEntityType.AddProperty(
                 "Use",
@@ -68,14 +62,12 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(Key).GetProperty("Use", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Key).GetField("<Use>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            use.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var version = runtimeEntityType.AddProperty(
                 "Version",
                 typeof(int),
                 propertyInfo: typeof(Key).GetProperty("Version", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Key).GetField("<Version>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            version.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var key = runtimeEntityType.AddKey(
                 new[] { id });

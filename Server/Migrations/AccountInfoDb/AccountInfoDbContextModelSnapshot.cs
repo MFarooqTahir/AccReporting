@@ -3,24 +3,21 @@ using System;
 using AccReporting.Server.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace AccReporting.Server.Migrations
+namespace AccReporting.Server.Migrations.AccountInfoDb
 {
     [DbContext(typeof(AccountInfoDbContext))]
-    partial class AccountInfoModelSnapshot : ModelSnapshot
+    partial class AccountInfoDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.5")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
-
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+                .HasAnnotation("ProductVersion", "6.0.6")
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("AccReporting.Shared.ContextModels.Acfile", b =>
                 {
@@ -29,52 +26,50 @@ namespace AccReporting.Server.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IDPr");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Idpr"), 1L, 1);
-
                     b.Property<string>("ActCode")
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("varchar(30)");
 
                     b.Property<string>("ActName")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("Address1")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("Address2")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("Address3")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<int?>("CrDays")
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .HasMaxLength(40)
-                        .HasColumnType("nvarchar(40)")
+                        .HasColumnType("varchar(40)")
                         .HasColumnName("email");
 
                     b.Property<string>("Fax")
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
+                        .HasColumnType("varchar(20)")
                         .HasColumnName("fax");
 
                     b.Property<string>("Gst")
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
+                        .HasColumnType("varchar(20)")
                         .HasColumnName("GST");
 
                     b.Property<double?>("OpBal")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<string>("Phone")
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
+                        .HasColumnType("varchar(20)")
                         .HasColumnName("phone");
 
                     b.HasKey("Idpr")
@@ -90,15 +85,13 @@ namespace AccReporting.Server.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IDPr");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Idpr"), 1L, 1);
-
                     b.Property<string>("ActCode")
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("varchar(30)");
 
                     b.Property<string>("ActName")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<int?>("Sno")
                         .HasColumnType("int");
@@ -116,38 +109,36 @@ namespace AccReporting.Server.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IDPr");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Idpr"), 1L, 1);
-
                     b.Property<string>("CategoryName")
                         .HasMaxLength(35)
-                        .HasColumnType("nvarchar(35)");
+                        .HasColumnType("varchar(35)");
 
                     b.Property<string>("Code")
                         .HasMaxLength(4)
-                        .HasColumnType("nvarchar(4)");
+                        .HasColumnType("varchar(4)");
 
                     b.Property<string>("Color")
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)");
 
                     b.Property<DateTime?>("Date1")
                         .HasColumnType("datetime");
 
                     b.Property<string>("Item")
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("JoiningType")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("Origin")
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("Standard")
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)");
 
                     b.Property<int?>("Temp1")
                         .HasColumnType("int");
@@ -160,23 +151,23 @@ namespace AccReporting.Server.Migrations
 
                     b.Property<string>("Temp4")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("Temp5")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("Temp6")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("Temp7")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasColumnType("varchar(10)");
 
                     b.HasKey("Idpr")
                         .HasName("PK__Category__B87C5B5F9899F9B0");
@@ -191,31 +182,29 @@ namespace AccReporting.Server.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IDPr");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Idpr"), 1L, 1);
-
                     b.Property<double?>("Amount")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<string>("CateCode")
                         .HasMaxLength(4)
-                        .HasColumnType("nvarchar(4)");
+                        .HasColumnType("varchar(4)");
 
                     b.Property<double?>("Dper")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<string>("File")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
+                        .HasColumnType("varchar(10)")
                         .HasColumnName("FILE");
 
                     b.Property<string>("Icode")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("varchar(50)")
                         .HasColumnName("ICode");
 
                     b.Property<string>("Iname")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("varchar(50)")
                         .HasColumnName("IName");
 
                     b.Property<DateTime?>("InvDate")
@@ -225,57 +214,57 @@ namespace AccReporting.Server.Migrations
                         .HasColumnType("int");
 
                     b.Property<double?>("NetAmount")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<string>("PName")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("varchar(50)")
                         .HasColumnName("pName");
 
                     b.Property<double?>("Packing")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<string>("Pcode")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("varchar(50)")
                         .HasColumnName("PCode");
 
                     b.Property<string>("Pressure")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasColumnType("varchar(10)");
 
                     b.Property<double?>("Qty")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<double?>("Qty2")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<double?>("Rate")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<int?>("RegionCode")
                         .HasColumnType("int");
 
                     b.Property<string>("RegionName")
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("varchar(20)");
 
                     b.Property<string>("Size")
                         .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                        .HasColumnType("varchar(15)");
 
                     b.Property<string>("Sp")
                         .HasMaxLength(1)
-                        .HasColumnType("nvarchar(1)")
+                        .HasColumnType("varchar(1)")
                         .HasColumnName("SP");
 
                     b.Property<string>("Type")
                         .HasMaxLength(4)
-                        .HasColumnType("nvarchar(4)");
+                        .HasColumnType("varchar(4)");
 
                     b.Property<string>("Unit")
                         .HasMaxLength(5)
-                        .HasColumnType("nvarchar(5)");
+                        .HasColumnType("varchar(5)");
 
                     b.HasKey("Idpr")
                         .HasName("PK__InvDet__B87C5B5F67F5802F");
@@ -290,50 +279,48 @@ namespace AccReporting.Server.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IDPr");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Idpr"), 1L, 1);
-
                     b.Property<string>("ItemCode")
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("varchar(30)");
 
                     b.Property<string>("ItemDescrip")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<double?>("Length")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<string>("ManuName")
                         .HasMaxLength(35)
-                        .HasColumnType("nvarchar(35)");
+                        .HasColumnType("varchar(35)");
 
                     b.Property<string>("MfcCode")
                         .HasMaxLength(4)
-                        .HasColumnType("nvarchar(4)");
+                        .HasColumnType("varchar(4)");
 
                     b.Property<double?>("OpBal")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<string>("Pressure")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasColumnType("varchar(10)");
 
                     b.Property<decimal?>("Price")
-                        .HasColumnType("money");
+                        .HasColumnType("money(65,30)");
 
                     b.Property<decimal?>("RetPrice")
-                        .HasColumnType("money");
+                        .HasColumnType("money(65,30)");
 
                     b.Property<decimal?>("RetPrice2")
-                        .HasColumnType("money");
+                        .HasColumnType("money(65,30)");
 
                     b.Property<string>("Size")
                         .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                        .HasColumnType("varchar(15)");
 
                     b.Property<string>("Unit")
                         .HasMaxLength(5)
-                        .HasColumnType("nvarchar(5)");
+                        .HasColumnType("varchar(5)");
 
                     b.HasKey("Idpr")
                         .HasName("PK__Inventor__B87C5B5F00A47D01");
@@ -348,16 +335,14 @@ namespace AccReporting.Server.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IDPr");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Idpr"), 1L, 1);
-
                     b.Property<double?>("AddLess")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<double?>("Built")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<double?>("Cartage")
-                        .HasColumnType("float")
+                        .HasColumnType("double")
                         .HasColumnName("cartage");
 
                     b.Property<int?>("CrDays")
@@ -365,13 +350,13 @@ namespace AccReporting.Server.Migrations
 
                     b.Property<string>("Delivery")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<double?>("Dis")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<double?>("DisPer")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("datetime");
@@ -388,43 +373,43 @@ namespace AccReporting.Server.Migrations
 
                     b.Property<string>("Note")
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("varchar(150)");
 
                     b.Property<string>("OrderNo")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("Payment")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("Pcode")
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)")
+                        .HasColumnType("varchar(30)")
                         .HasColumnName("PCode");
 
                     b.Property<string>("Pname")
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
+                        .HasColumnType("varchar(100)")
                         .HasColumnName("PName");
 
                     b.Property<string>("RefNo")
                         .HasMaxLength(35)
-                        .HasColumnType("nvarchar(35)");
+                        .HasColumnType("varchar(35)");
 
                     b.Property<string>("Remarks")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<double?>("Ser")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<double?>("TotBill")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<string>("Type")
                         .HasMaxLength(4)
-                        .HasColumnType("nvarchar(4)");
+                        .HasColumnType("varchar(4)");
 
                     b.HasKey("Idpr")
                         .HasName("PK__InvSumm__B87C5B5F9C9191C6");
@@ -439,36 +424,34 @@ namespace AccReporting.Server.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IDPr");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Idpr"), 1L, 1);
-
                     b.Property<string>("ActCode")
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("varchar(30)");
 
                     b.Property<string>("ActName")
                         .HasMaxLength(70)
-                        .HasColumnType("nvarchar(70)");
+                        .HasColumnType("varchar(70)");
 
                     b.Property<DateTime?>("ChqDate")
                         .HasColumnType("datetime");
 
                     b.Property<string>("ChqNo")
                         .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                        .HasColumnType("varchar(15)");
 
                     b.Property<DateTime?>("Date")
                         .HasColumnType("datetime");
 
                     b.Property<string>("Des")
                         .HasMaxLength(205)
-                        .HasColumnType("nvarchar(205)");
+                        .HasColumnType("varchar(205)");
 
                     b.Property<double?>("TransAmt")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<string>("Vnoc")
                         .HasMaxLength(8)
-                        .HasColumnType("nvarchar(8)");
+                        .HasColumnType("varchar(8)");
 
                     b.Property<int?>("Vnon")
                         .HasColumnType("int");

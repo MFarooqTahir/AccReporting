@@ -26,7 +26,6 @@ namespace AccReporting.Server.OptimizedModels
                 valueGenerated: ValueGenerated.OnAdd,
                 afterSaveBehavior: PropertySaveBehavior.Throw);
             idpr.AddAnnotation("Relational:ColumnName", "IDPr");
-            idpr.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             var amount = runtimeEntityType.AddProperty(
                 "Amount",
@@ -34,7 +33,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(InvDet).GetProperty("Amount", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(InvDet).GetField("<Amount>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            amount.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var cateCode = runtimeEntityType.AddProperty(
                 "CateCode",
@@ -43,7 +41,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(InvDet).GetField("<CateCode>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 4);
-            cateCode.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var dper = runtimeEntityType.AddProperty(
                 "Dper",
@@ -51,7 +48,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(InvDet).GetProperty("Dper", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(InvDet).GetField("<Dper>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            dper.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var file = runtimeEntityType.AddProperty(
                 "File",
@@ -61,7 +57,6 @@ namespace AccReporting.Server.OptimizedModels
                 nullable: true,
                 maxLength: 10);
             file.AddAnnotation("Relational:ColumnName", "FILE");
-            file.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var icode = runtimeEntityType.AddProperty(
                 "Icode",
@@ -71,7 +66,6 @@ namespace AccReporting.Server.OptimizedModels
                 nullable: true,
                 maxLength: 50);
             icode.AddAnnotation("Relational:ColumnName", "ICode");
-            icode.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var iname = runtimeEntityType.AddProperty(
                 "Iname",
@@ -81,7 +75,6 @@ namespace AccReporting.Server.OptimizedModels
                 nullable: true,
                 maxLength: 50);
             iname.AddAnnotation("Relational:ColumnName", "IName");
-            iname.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var invDate = runtimeEntityType.AddProperty(
                 "InvDate",
@@ -90,7 +83,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(InvDet).GetField("<InvDate>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
             invDate.AddAnnotation("Relational:ColumnType", "datetime");
-            invDate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var invNo = runtimeEntityType.AddProperty(
                 "InvNo",
@@ -98,7 +90,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(InvDet).GetProperty("InvNo", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(InvDet).GetField("<InvNo>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            invNo.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var netAmount = runtimeEntityType.AddProperty(
                 "NetAmount",
@@ -106,7 +97,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(InvDet).GetProperty("NetAmount", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(InvDet).GetField("<NetAmount>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            netAmount.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var pName = runtimeEntityType.AddProperty(
                 "PName",
@@ -116,7 +106,6 @@ namespace AccReporting.Server.OptimizedModels
                 nullable: true,
                 maxLength: 50);
             pName.AddAnnotation("Relational:ColumnName", "pName");
-            pName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var packing = runtimeEntityType.AddProperty(
                 "Packing",
@@ -124,7 +113,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(InvDet).GetProperty("Packing", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(InvDet).GetField("<Packing>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            packing.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var pcode = runtimeEntityType.AddProperty(
                 "Pcode",
@@ -134,7 +122,6 @@ namespace AccReporting.Server.OptimizedModels
                 nullable: true,
                 maxLength: 50);
             pcode.AddAnnotation("Relational:ColumnName", "PCode");
-            pcode.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var pressure = runtimeEntityType.AddProperty(
                 "Pressure",
@@ -143,7 +130,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(InvDet).GetField("<Pressure>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 10);
-            pressure.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var qty = runtimeEntityType.AddProperty(
                 "Qty",
@@ -151,7 +137,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(InvDet).GetProperty("Qty", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(InvDet).GetField("<Qty>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            qty.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var qty2 = runtimeEntityType.AddProperty(
                 "Qty2",
@@ -159,7 +144,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(InvDet).GetProperty("Qty2", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(InvDet).GetField("<Qty2>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            qty2.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var rate = runtimeEntityType.AddProperty(
                 "Rate",
@@ -167,7 +151,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(InvDet).GetProperty("Rate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(InvDet).GetField("<Rate>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            rate.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var regionCode = runtimeEntityType.AddProperty(
                 "RegionCode",
@@ -175,7 +158,6 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(InvDet).GetProperty("RegionCode", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(InvDet).GetField("<RegionCode>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            regionCode.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var regionName = runtimeEntityType.AddProperty(
                 "RegionName",
@@ -184,7 +166,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(InvDet).GetField("<RegionName>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 20);
-            regionName.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var size = runtimeEntityType.AddProperty(
                 "Size",
@@ -193,7 +174,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(InvDet).GetField("<Size>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 15);
-            size.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var sp = runtimeEntityType.AddProperty(
                 "Sp",
@@ -203,7 +183,6 @@ namespace AccReporting.Server.OptimizedModels
                 nullable: true,
                 maxLength: 1);
             sp.AddAnnotation("Relational:ColumnName", "SP");
-            sp.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var type = runtimeEntityType.AddProperty(
                 "Type",
@@ -212,7 +191,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(InvDet).GetField("<Type>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 4);
-            type.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var unit = runtimeEntityType.AddProperty(
                 "Unit",
@@ -221,7 +199,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(InvDet).GetField("<Unit>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 5);
-            unit.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var key = runtimeEntityType.AddKey(
                 new[] { idpr });

@@ -28,9 +28,8 @@ namespace AccReporting.Server.OptimizedModels
             InvSummEntityType.CreateAnnotations(invSumm);
             TransEntityType.CreateAnnotations(trans);
 
-            AddAnnotation("ProductVersion", "6.0.5");
-            AddAnnotation("Relational:MaxIdentifierLength", 128);
-            AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+            AddAnnotation("ProductVersion", "6.0.6");
+            AddAnnotation("Relational:MaxIdentifierLength", 64);
         }
     }
 }

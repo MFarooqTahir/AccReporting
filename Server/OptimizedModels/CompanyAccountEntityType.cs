@@ -27,7 +27,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(CompanyAccount).GetField("<ID>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 valueGenerated: ValueGenerated.OnAdd,
                 afterSaveBehavior: PropertySaveBehavior.Throw);
-            iD.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             var acNumber = runtimeEntityType.AddProperty(
                 "AcNumber",
@@ -36,7 +35,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(CompanyAccount).GetField("<AcNumber>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 15);
-            acNumber.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var compRole = runtimeEntityType.AddProperty(
                 "CompRole",
@@ -45,7 +43,6 @@ namespace AccReporting.Server.OptimizedModels
                 fieldInfo: typeof(CompanyAccount).GetField("<CompRole>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
                 maxLength: 20);
-            compRole.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var companyID = runtimeEntityType.AddProperty(
                 "CompanyID",
@@ -53,21 +50,18 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(CompanyAccount).GetProperty("CompanyID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(CompanyAccount).GetField("<CompanyID>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            companyID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var isSelected = runtimeEntityType.AddProperty(
                 "IsSelected",
                 typeof(bool),
                 propertyInfo: typeof(CompanyAccount).GetProperty("IsSelected", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(CompanyAccount).GetField("<IsSelected>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            isSelected.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var userID = runtimeEntityType.AddProperty(
                 "UserID",
                 typeof(string),
                 propertyInfo: typeof(CompanyAccount).GetProperty("UserID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(CompanyAccount).GetField("<UserID>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            userID.AddAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.None);
 
             var key = runtimeEntityType.AddKey(
                 new[] { iD });
