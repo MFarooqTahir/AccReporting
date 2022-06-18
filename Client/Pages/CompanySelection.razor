@@ -1,4 +1,5 @@
 ﻿@page "/Company"
+@using AccReporting.Client.Services
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.Inputs
 @using Syncfusion.Blazor.Lists
@@ -7,10 +8,12 @@
 @inject NavigationManager nav
 @using Syncfusion.Blazor.Popups
 @using Syncfusion.Blazor.SplitButtons
+@using System.Diagnostics
+@implements IDisposable
+@using System.Security.Claims
 <AuthorizeView>
     <Authorized>
         <div class="row text-center align-items-center mb-2">
-
             <h3>Company Selection</h3>
             <div class="col">
                 @if (CurrentAccount?.Role == "Admin")
@@ -137,19 +140,21 @@
     </Authorized>
 </AuthorizeView>
 @code {
+    [Inject]
+    public HttpInterceptorService Interceptor { get; set; }
     [CascadingParameter]
     Task<AuthenticationState> authState { get; set; }
     NewCompanyInputDto inpModel = new();
-    List<CompaniesListDTO>? CompAccount { get; set; }
-    List<DisplayUsersDto>? CurrUsers { get; set; }
-    CompaniesListDTO? CurrentAccount { get; set; }
+    List<CompaniesListDTO>? CompAccount { get; set; } = new();
+    List<DisplayUsersDto>? CurrUsers { get; set; } = new();
+    CompaniesListDTO? CurrentAccount { get; set; } = new();
     private bool Visibility { get; set; } = false;
     private bool UploadDialogVisible { get; set; }
     private bool AddDialogVisible { get; set; }
     private bool VisibilityUsers { get; set; }
 
-    private string currID;
 
+    IEnumerable<System.Security.Claims.Claim> st{ get; set; }
     public void CellSavedHandler(CellSaveArgs<DisplayUsersDto> args)
     {
         // Here, you can customize your code.
@@ -224,9 +229,13 @@
             }
         }
     }
+    public void Dispose() => Interceptor.DisposeEvent();
     private async void onFileSelect(SelectedEventArgs args)
     {
-        args.CurrentRequest = new List<object> { new { ID = currID } };
+        var st = (await authState).User.Claims.ToList();
+        var val = st.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+        var valx=val.Value;
+        args.CurrentRequest = new List<object> { new { ID = valx } };
     }
 
     private void onUploadclick(MouseEventArgs args)
@@ -266,8 +275,8 @@
     }
     protected override async Task OnInitializedAsync()
     {
-        var st = (await authState).User.Claims;
-        currID = st.FirstOrDefault(x => x.Type == "sub").Value;
+        Interceptor.RegisterEvent();
+        
         CompAccount = await client.GetFromJsonAsync<List<CompaniesListDTO>?>("/api/Account/GetAllCompaniesForUser");
         CurrentAccount = CompAccount.FirstOrDefault(x => x.IsSelected);
         if (string.IsNullOrWhiteSpace(CurrentAccount?.ID))

@@ -4,7 +4,7 @@ namespace AccReporting.Shared.DTOs;
 
 public class NewCompanyInputDto
 {
-    [StringLength(15, MinimumLength = 1, ErrorMessage = "Name must be between 1 and 15 characters")]
+    [StringLength(30, MinimumLength = 1, ErrorMessage = "Name must be between 1 and 30 characters")]
     public string Name { get; set; }
 
     [StringLength(50, MinimumLength = 1, ErrorMessage = "Address must be between 1 and 50 characters")]

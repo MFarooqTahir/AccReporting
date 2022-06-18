@@ -1,9 +1,11 @@
 using AccReporting.Client;
+using AccReporting.Client.Classes;
+using AccReporting.Client.Services;
 
 using Blazored.LocalStorage;
 
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 using Syncfusion.Blazor;
@@ -21,14 +23,19 @@ builder.Services.AddSyncfusionBlazor();
 
 builder.Services.AddHttpClient("AccReporting.ServerAPI", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
     .ConfigureHttpClient(x => x.DefaultRequestHeaders.Accept
-    .Add(new MediaTypeWithQualityHeaderValue("application/json")))
-    .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
+    .Add(new MediaTypeWithQualityHeaderValue("application/json")));
+//.AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
 builder.Services.AddLoadingBar();
 
 // Supply HttpClient instances that include access tokens when making requests to the server project
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("AccReporting.ServerAPI").EnableIntercept(sp));
-builder.Services.AddApiAuthorization();
 builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddAuthorizationCore();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
+builder.Services.AddScoped<RefreshTokenService>();
+builder.Services.AddHttpClientInterceptor();
+builder.Services.AddScoped<HttpInterceptorService>();
 var culture = new CultureInfo("hi-IN");
 culture.NumberFormat.CurrencySymbol = "Rs.";
 CultureInfo.DefaultThreadCurrentCulture = culture;

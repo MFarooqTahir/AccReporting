@@ -1,8 +1,10 @@
 ﻿@page "/SalesReport"
 @using System.Globalization
+@using AccReporting.Client.Services
 @using Syncfusion.Blazor.Buttons
 @inject IJSRuntime JS
 @inject HttpClient Http
+@implements IDisposable
 <AuthorizeView>
     <Authorized>
         <style>
@@ -79,6 +81,8 @@
     public bool DisableForwardIcon = false;
     public bool DisableFirstIcon = false;
     public bool DisableLastIcon = false;
+        [Inject]
+    public HttpInterceptorService Interceptor { get; set; }
     public async Task OnCommandClicked(CommandClickEventArgs<InvSummGridModel> args)
     {
         var curr = args.RowData;
@@ -89,9 +93,10 @@
         //await JS.InvokeVoidAsync("open", $"Reports/SalesReport?invNo={s}&type={st}", "_blank");
 
     }
-
+    public void Dispose() => Interceptor.DisposeEvent();
     protected override async Task OnInitializedAsync()
     {
+        Interceptor.RegisterEvent();
         await ClickedSalesReport();
     }
 

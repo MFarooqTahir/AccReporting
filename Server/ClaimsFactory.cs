@@ -1,4 +1,5 @@
 ﻿using AccReporting.Server.Data;
+using AccReporting.Shared.ContextModels;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -29,7 +30,7 @@ namespace AccReporting.Server
             //Get the data from EF core
             identity.AddClaims(
            new[] {
-            new Claim(ClaimTypes.Locality, "xddd")
+            new Claim(ClaimTypes.NameIdentifier, user.Id)
            });
 
             return identity;

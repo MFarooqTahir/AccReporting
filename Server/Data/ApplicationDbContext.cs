@@ -1,4 +1,6 @@
-﻿using Duende.IdentityServer.EntityFramework.Options;
+﻿using AccReporting.Shared.ContextModels;
+
+using Duende.IdentityServer.EntityFramework.Options;
 
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Identity;
@@ -10,7 +12,7 @@ namespace AccReporting.Server.Data
     public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
     {
         public ApplicationDbContext(
-            DbContextOptions options,
+            DbContextOptions<ApplicationDbContext> options,
             IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
         {
         }

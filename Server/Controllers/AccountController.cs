@@ -2,8 +2,6 @@
 using AccReporting.Server.Services;
 using AccReporting.Shared.DTOs;
 
-using EFCore.BulkExtensions;
-
 using HashidsNet;
 
 using Microsoft.AspNetCore.Authorization;
@@ -12,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace AccReporting.Server.Controllers
 {
@@ -24,6 +23,7 @@ namespace AccReporting.Server.Controllers
         private readonly ILogger<AccountController> _logger;
         private readonly IHashids _hash;
         private readonly DataService _dataService;
+        private readonly Regex removeSpaces = new Regex(@"\s+", RegexOptions.Compiled);
 
         public AccountController(ApplicationDbContext context, ILogger<AccountController> logger, IHashids hash, DataService dataService)
         {
@@ -59,7 +59,7 @@ namespace AccReporting.Server.Controllers
                 {
                     exists.AcNumber = model.AcCode;
                 }
-                await _context.BulkSaveChangesAsync(cancellationToken: ct);
+                await _context.SaveChangesAsync(cancellationToken: ct);
                 _logger.LogInformation("Saved Account");
                 return true;
             }
@@ -131,7 +131,7 @@ namespace AccReporting.Server.Controllers
                         Name = inp.Name,
                         Phone = inp.phone,
                         Address = inp.Address,
-                        DbName = inp.Name.Length < 15 ? inp.Name : inp.Name[..15],
+                        DbName = inp.Name.Length < 30 ? removeSpaces.Replace(inp.Name, "_") : removeSpaces.Replace(inp.Name[..30], "_"),
                     };
                     await _context.AddAsync(newCompany, ct);
                     var compAccount = new CompanyAccount()
@@ -143,10 +143,11 @@ namespace AccReporting.Server.Controllers
                     };
 
                     await _context.AddAsync(compAccount, ct);
-                    var updateCols = new List<string> { nameof(CompanyAccount.IsSelected) };
-                    await _context.CompanyAccounts.BatchUpdateAsync(new CompanyAccount() { IsSelected = false }, updateCols, cancellationToken: ct);
 
-                    await _context.BulkSaveChangesAsync(cancellationToken: ct);
+                    var allSelected = await _context.CompanyAccounts.Where(x => x.UserID == id && x.IsSelected).ToListAsync(ct);
+                    allSelected.ForEach(x => x.IsSelected = false);
+
+                    await _context.SaveChangesAsync(cancellationToken: ct);
                     _logger.LogInformation("Account added");
 
                     return true;
@@ -156,7 +157,7 @@ namespace AccReporting.Server.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogInformation("Data Error: {Message}", ex.Message);
+                _logger.LogInformation("Error: {Message}", ex.Message);
                 return false;
             }
         }
@@ -207,7 +208,7 @@ namespace AccReporting.Server.Controllers
                     var Selected = await _context.CompanyAccounts.Where(a => a.IsSelected && a.UserID == id).ToListAsync(ct);
                     Selected?.ForEach(x => x.IsSelected = false);
                     res.IsSelected = true;
-                    await _context.BulkSaveChangesAsync(cancellationToken: ct);
+                    await _context.SaveChangesAsync(cancellationToken: ct);
                     _logger.LogInformation("Updated Selected Company");
                     return true;
                 }

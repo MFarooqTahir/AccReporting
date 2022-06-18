@@ -10,7 +10,7 @@ namespace AccReporting.Shared.ContextModels
         [MaxLength(30)]
         public string? Name { get; set; }
 
-        [MaxLength(15)]
+        [MaxLength(30)]
         public string? DbName { get; set; }
 
         [MaxLength(150)]

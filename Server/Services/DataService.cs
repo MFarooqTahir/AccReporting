@@ -4,8 +4,6 @@ using AccReporting.Server.DbContexts;
 using AccReporting.Shared;
 using AccReporting.Shared.DTOs;
 
-using EFCore.BulkExtensions;
-
 using Microsoft.EntityFrameworkCore;
 
 using Microsoft.Extensions.Caching.Memory;
@@ -189,11 +187,11 @@ public class DataService
                 {
                     try
                     {
-                        await _Db.BulkInsertAsync(AcFileInsert, cancellationToken: ct).ConfigureAwait(false);
-                        await _Db.BulkInsertAsync(InvDetInsert, cancellationToken: ct).ConfigureAwait(false);
-                        await _Db.BulkInsertAsync(InventoryInsert, cancellationToken: ct).ConfigureAwait(false);
-                        await _Db.BulkInsertAsync(InvSummInsert, cancellationToken: ct).ConfigureAwait(false);
-                        await _Db.BulkInsertAsync(TransInsert, cancellationToken: ct).ConfigureAwait(false);
+                        await _Db.AddRangeAsync(AcFileInsert, cancellationToken: ct).ConfigureAwait(false);
+                        await _Db.AddRangeAsync(InvDetInsert, cancellationToken: ct).ConfigureAwait(false);
+                        await _Db.AddRangeAsync(InventoryInsert, cancellationToken: ct).ConfigureAwait(false);
+                        await _Db.AddRangeAsync(InvSummInsert, cancellationToken: ct).ConfigureAwait(false);
+                        await _Db.AddRangeAsync(TransInsert, cancellationToken: ct).ConfigureAwait(false);
                         await trans.CommitAsync(ct).ConfigureAwait(false);
                         ClearDbCache();
                         SetAcFile(AcFileInsert);

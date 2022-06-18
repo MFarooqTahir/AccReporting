@@ -12,6 +12,10 @@
             IsSelected = isSelected;
         }
 
+        public CompaniesListDTO()
+        {
+        }
+
         public string ID { get; set; }
         public string CompID { get; set; }
         public string Name { get; set; }

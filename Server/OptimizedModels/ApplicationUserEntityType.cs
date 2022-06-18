@@ -109,6 +109,20 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(IdentityUser<string>).GetProperty("PhoneNumberConfirmed", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(IdentityUser<string>).GetField("<PhoneNumberConfirmed>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
 
+            var refreshToken = runtimeEntityType.AddProperty(
+                "RefreshToken",
+                typeof(string),
+                propertyInfo: typeof(ApplicationUser).GetProperty("RefreshToken", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(ApplicationUser).GetField("<RefreshToken>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+
+            var refreshTokenExpiryTime = runtimeEntityType.AddProperty(
+                "RefreshTokenExpiryTime",
+                typeof(DateTime?),
+                propertyInfo: typeof(ApplicationUser).GetProperty("RefreshTokenExpiryTime", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(ApplicationUser).GetField("<RefreshTokenExpiryTime>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+
             var securityStamp = runtimeEntityType.AddProperty(
                 "SecurityStamp",
                 typeof(string),
