@@ -1,6 +1,7 @@
 ﻿@page "/SalesReport"
 @using System.Globalization
 @using AccReporting.Client.Services
+@using AccReporting.Shared
 @using Syncfusion.Blazor.Buttons
 @inject IJSRuntime JS
 @inject HttpClient Http
@@ -88,8 +89,8 @@
         var curr = args.RowData;
         var st = typesAll[curr.Type];
         var s = curr.InvNo.ToString();
-        var res = await Http.GetFromJsonAsync<byte[]>($"Reports/SalesReport?invNo={s}&type={st}");
-        await JS.SaveAs("SalesReport.pdf", res);
+        var res = await Http.GetFromJsonAsync<FileResponse>($"Reports/SalesReport?invNo={s}&type={st}");
+        await JS.SaveAs(res.Name, res.File);
         //await JS.InvokeVoidAsync("open", $"Reports/SalesReport?invNo={s}&type={st}", "_blank");
 
     }

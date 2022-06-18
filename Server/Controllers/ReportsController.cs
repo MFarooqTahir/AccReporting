@@ -1,6 +1,7 @@
 ﻿using AccReporting.Server.Data;
 using AccReporting.Server.Reports;
 using AccReporting.Server.Services;
+using AccReporting.Shared;
 using AccReporting.Shared.DTOs;
 
 using Microsoft.AspNetCore.Authorization;
@@ -56,7 +57,7 @@ namespace AccReporting.Server.Controllers
         }
 
         [HttpGet("[action]")]
-        public async Task<byte[]> SalesReport(int invNo, string type, CancellationToken ct)
+        public async Task<FileResponse> SalesReport(int invNo, string type, CancellationToken ct)
         {
             try
             {
@@ -86,7 +87,7 @@ namespace AccReporting.Server.Controllers
                 res.Address = data.Address;
                 var Report = new SalesReport(res);
                 _logger.LogInformation("Got sales report for invoice {invNo}", invNo);
-                var ret = Report.GeneratePdf();
+                var ret = new FileResponse() { File = Report.GeneratePdf(), Name = "SalesReport.pdf" };
                 return ret;
             }
             catch (Exception ex)
