@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
+using QuestPDF.Drawing;
+
 using Serilog;
 using Serilog.Events;
 
@@ -25,6 +27,7 @@ var culture = new CultureInfo("hi-IN");
 culture.NumberFormat.CurrencySymbol = "Rs.";
 CultureInfo.DefaultThreadCurrentCulture = culture;
 CultureInfo.DefaultThreadCurrentUICulture = culture;
+
 
 builder.Host.UseSerilog((ctx, lc) => lc
     .WriteTo.Console()
@@ -77,7 +80,14 @@ builder.Services.AddCors(options => options.AddPolicy("MyPolicy", builder => bui
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<DataService>();
 var app = builder.Build();
+var hostingEnvironment = app.Services.GetService<IWebHostEnvironment>();
+string[] filePaths = Directory.GetFiles(Path.Combine(hostingEnvironment.WebRootPath, "Fonts/Calibri"));
+foreach (var filepath in filePaths)
+{
+    using var fs = new FileStream(filepath, FileMode.Open, FileAccess.Read);
+    FontManager.RegisterFont(fs);
 
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
