@@ -7,11 +7,11 @@ using QuestPDF.Infrastructure;
 
 namespace AccReporting.Server.Reports
 {
-    public class SalesReport : IDocument
+    public class SalesReportQuest : IDocument
     {
         public SalesReportDto? ReportData { get; set; }
 
-        public SalesReport(SalesReportDto reportData)
+        public SalesReportQuest(SalesReportDto reportData)
         {
             ReportData = reportData;
         }
@@ -26,7 +26,7 @@ namespace AccReporting.Server.Reports
                 page.Size(PageSizes.A4);
                 page.Header().Element((container) =>
                 {
-                    var titleStyle = TextStyle.Default.FontSize(20).SemiBold();
+                    var titleStyle = TextStyle.Default.FontSize(20).FontFamily("Calibri").SemiBold();
                     container.Column(column1 =>
                     {
                         column1.Item().Row(row =>
@@ -34,35 +34,35 @@ namespace AccReporting.Server.Reports
                         row.ConstantItem(150).Column(column =>
                         {
                             column.Item().Text($"Invoice #{ReportData?.InvNo}").Style(titleStyle);
-                            column.Item().Text($"Type: {ReportData?.Type}").SemiBold();
+                            column.Item().Text($"Type: {ReportData?.Type}").FontFamily("Calibri").SemiBold();
 
                             column.Item().Text(text =>
                             {
-                                text.Span("Issue date: ").SemiBold();
+                                text.Span("Issue date: ").FontFamily("Calibri").SemiBold();
                                 if (ReportData?.Dated is not null)
                                 {
-                                    text.Span((ReportData.Dated ?? DateTime.MinValue).ToString("dd/MM/yyyy"));
+                                    text.Span((ReportData.Dated ?? DateTime.MinValue).ToString("dd/MM/yyyy")).FontFamily("Calibri");
                                 }
                                 else
                                 {
-                                    text.Span("-");
+                                    text.Span("-").FontFamily("Calibri");
                                 }
                             });
 
                             column.Item().Text(text =>
                             {
-                                text.Span("Due date: ").SemiBold();
+                                text.Span("Due date: ").FontFamily("Calibri").SemiBold();
                                 if (ReportData?.DueDate is not null)
                                 {
-                                    text.Span((ReportData.DueDate ?? DateTime.MinValue).ToString("dd/MM/yyyy"));
+                                    text.Span((ReportData.DueDate ?? DateTime.MinValue).ToString("dd/MM/yyyy")).FontFamily("Calibri");
                                 }
                                 else
                                 {
-                                    text.Span("-");
+                                    text.Span("-").FontFamily("Calibri");
                                 }
                             });
                         });
-                        row.RelativeItem().AlignCenter().Text("Sales Report").ExtraBold().FontSize(30);
+                        row.RelativeItem().AlignCenter().Text("Sales Report").FontFamily("Calibri").ExtraBold().FontSize(30);
                         row.ConstantItem(50);
                         row.ConstantItem(100).Height(50).Placeholder();
                     });
@@ -73,9 +73,9 @@ namespace AccReporting.Server.Reports
 
                 page.Footer().AlignCenter().Text(x =>
                 {
-                    x.CurrentPageNumber();
-                    x.Span(" / ");
-                    x.TotalPages();
+                    x.CurrentPageNumber().FontFamily("Calibri");
+                    x.Span(" / ").FontFamily("Calibri");
+                    x.TotalPages().FontFamily("Calibri");
                 });
             });
         }
@@ -96,10 +96,10 @@ namespace AccReporting.Server.Reports
                 column.Item().Element(ComposeTable);
                 double netTotal = (ReportData?.tableData.Sum(x => x.NetAmount)) ?? 0;
                 double Total = (ReportData?.tableData.Sum(x => x.Amount)) ?? 0;
-                double dis = ((1 - (netTotal / Total)) * 100);
-                column.Item().AlignRight().Text($"Discount: {dis:F2} %").FontSize(12);
-                column.Item().AlignRight().Text("Total Amount: " + Total.ToString("C2")).FontSize(12);
-                column.Item().AlignRight().Text("Total After Discount: " + netTotal.ToString("C2")).Bold().FontSize(12);
+                double dis = (1 - netTotal / Total) * 100;
+                column.Item().AlignRight().Text($"Discount: {dis:F2} %").FontFamily("Calibri").FontSize(12);
+                column.Item().AlignRight().Text("Total Amount: " + Total.ToString("C2")).FontFamily("Calibri").FontSize(12);
+                column.Item().AlignRight().Text("Total After Discount: " + netTotal.ToString("C2")).FontFamily("Calibri").Bold().FontSize(12);
             });
         }
 
@@ -108,9 +108,9 @@ namespace AccReporting.Server.Reports
             cont.Row(row =>
             {
                 row.ConstantItem(100).
-                        Element(x => x.Column(col => col.Item().Text(title).Bold()));
+                        Element(x => x.Column(col => col.Item().Text(title).FontFamily("Calibri").Bold()));
                 row.RelativeItem().
-                Element(x => x.Column(col => col.Item().Text(val)));
+                Element(x => x.Column(col => col.Item().Text(val).FontFamily("Calibri")));
             });
         }
 
@@ -119,7 +119,7 @@ namespace AccReporting.Server.Reports
             cont.Row(row =>
             {
                 row.RelativeItem().
-                Element(x => x.AlignCenter().Column(col => col.Item().Text(val).FontSize(20).ExtraBold()));
+                Element(x => x.AlignCenter().Column(col => col.Item().Text(val).FontFamily("Calibri").FontSize(20).ExtraBold()));
             });
         }
 
@@ -128,7 +128,7 @@ namespace AccReporting.Server.Reports
             cont.Row(row =>
             {
                 row.RelativeItem().
-                Element(x => x.AlignCenter().Column(col => col.Item().Text(val).FontSize(12)));
+                Element(x => x.AlignCenter().Column(col => col.Item().Text(val).FontFamily("Calibri").FontSize(12)));
             });
         }
 
@@ -166,7 +166,7 @@ namespace AccReporting.Server.Reports
                         static IContainer CellStyle(IContainer container)
                         {
                             return container
-                                .DefaultTextStyle(x => x.SemiBold())
+                                .DefaultTextStyle(x => x.FontFamily("Calibri").SemiBold())
                                 .PaddingVertical(5).BorderBottom(1).BorderColor(Colors.Black);
                         }
                     });
@@ -174,15 +174,15 @@ namespace AccReporting.Server.Reports
 
                     foreach (var item in ReportData.tableData)
                     {
-                        table.Cell().Element(CellStyle).AlignCenter().Text(++count).FontSize(10);
-                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Description).FontSize(10);
-                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Brand).FontSize(10);
-                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Pcs).FontSize(10);
-                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Quantity).FontSize(10);
-                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Rate).FontSize(10);
-                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Amount).FontSize(10);
-                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Discount + " %").FontSize(10);
-                        table.Cell().Element(CellStyle).AlignCenter().Text(item.NetAmount).FontSize(10);
+                        table.Cell().Element(CellStyle).AlignCenter().Text(++count).FontFamily("Calibri").FontSize(10);
+                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Description).FontFamily("Calibri").FontSize(10);
+                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Brand).FontFamily("Calibri").FontSize(10);
+                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Pcs).FontFamily("Calibri").FontSize(10);
+                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Quantity).FontFamily("Calibri").FontSize(10);
+                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Rate).FontFamily("Calibri").FontSize(10);
+                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Amount).FontFamily("Calibri").FontSize(10);
+                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Discount + " %").FontFamily("Calibri").FontSize(10);
+                        table.Cell().Element(CellStyle).AlignCenter().Text(item.NetAmount).FontFamily("Calibri").FontSize(10);
                         static IContainer CellStyle(IContainer container)
                         {
                             return container.Border(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);

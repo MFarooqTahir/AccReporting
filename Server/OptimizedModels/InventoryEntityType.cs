@@ -87,7 +87,7 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(Inventory).GetProperty("Price", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Inventory).GetField("<Price>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            price.AddAnnotation("Relational:ColumnType", "money");
+            price.AddAnnotation("Relational:ColumnType", "decimal(10,2)");
 
             var retPrice = runtimeEntityType.AddProperty(
                 "RetPrice",
@@ -95,7 +95,7 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(Inventory).GetProperty("RetPrice", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Inventory).GetField("<RetPrice>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            retPrice.AddAnnotation("Relational:ColumnType", "money");
+            retPrice.AddAnnotation("Relational:ColumnType", "decimal(10,2)");
 
             var retPrice2 = runtimeEntityType.AddProperty(
                 "RetPrice2",
@@ -103,7 +103,7 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(Inventory).GetProperty("RetPrice2", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Inventory).GetField("<RetPrice2>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
-            retPrice2.AddAnnotation("Relational:ColumnType", "money");
+            retPrice2.AddAnnotation("Relational:ColumnType", "decimal(10,2)");
 
             var size = runtimeEntityType.AddProperty(
                 "Size",

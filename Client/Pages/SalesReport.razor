@@ -82,7 +82,7 @@
     public bool DisableForwardIcon = false;
     public bool DisableFirstIcon = false;
     public bool DisableLastIcon = false;
-        [Inject]
+    [Inject]
     public HttpInterceptorService Interceptor { get; set; }
     public async Task OnCommandClicked(CommandClickEventArgs<InvSummGridModel> args)
     {

@@ -2,6 +2,8 @@
 #nullable disable
 using AccReporting.Shared.Helpers;
 
+using MySqlConnector;
+
 using System;
 using System.Collections.Generic;
 
@@ -11,23 +13,28 @@ namespace AccReporting.Shared.ContextModels
     {
         public Acfile(string[] x)
         {
-            ActCode = x[0];
-            ActName = x[1];
-            OpBal = ValOrDefault.ToDouble(x[2]);
-            Address1 = x[3];
-            Address2 = x[4];
-            Address3 = x[5];
-            Phone = x[6];
-            Fax = x[7];
-            Email = x[8];
-            Gst = x[9];
-            CrDays = ValOrDefault.ToInt(x[10]);
+            ActCode = MySqlHelper.EscapeString(x[0]);
+            ActName = MySqlHelper.EscapeString(x[1]);
+            OpBal = ValOrDefault.ToDouble(MySqlHelper.EscapeString(x[2]));
+            Address1 = MySqlHelper.EscapeString(x[3]);
+            Address2 = MySqlHelper.EscapeString(x[4]);
+            Address3 = MySqlHelper.EscapeString(x[5]);
+            Phone = MySqlHelper.EscapeString(x[6]);
+            Fax = MySqlHelper.EscapeString(x[7]);
+            Email = MySqlHelper.EscapeString(x[8]);
+            Gst = MySqlHelper.EscapeString(x[9]);
+            CrDays = ValOrDefault.ToInt(MySqlHelper.EscapeString(x[10]));
 
 
         }
         public Acfile()
         {
             
+        }
+        public string ToInsert()
+        {
+           //INSERT INTO `acfile`(`ActCode`,`ActName`,`Address1`,`Address2`,`Address3`,`CrDays`,`email`,`fax`,`GST`,`OpBal`,`phone`) VALUES
+            return $"('{ActCode}','{ActName}','{Address1}','{Address2}','{Address3}',{CrDays??0},'{Email}','{Fax}','{Gst}',{OpBal??0},'{Phone}')";
         }
         public int Idpr { get; set; }
         public string ActCode { get; set; }

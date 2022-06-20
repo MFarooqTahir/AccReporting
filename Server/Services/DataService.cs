@@ -17,6 +17,7 @@ public class DataService
 {
     private readonly IMemoryCache? _cache;
     private readonly AccountInfoDbContext _Db;
+    private readonly ILogger<DataService> _logger;
     private readonly IConfiguration _config;
     private string _ConnectionString = "";
 
@@ -40,11 +41,12 @@ public class DataService
     private string _DbName;
     public string CachePrefix => _DbName;
 
-    public DataService(IMemoryCache cache, AccountInfoDbContext db, IConfiguration config)
+    public DataService(IMemoryCache cache, AccountInfoDbContext db, IConfiguration config, ILogger<DataService> logger)
     {
         _cache = cache;
         _Db = db;
         _config = config;
+        _logger = logger;
     }
 
     public async Task SetDbName(string dbName, CancellationToken ct)
@@ -182,16 +184,49 @@ public class DataService
             try
             {
                 await EnsureDbConenction(ct);
-                await _Db.Database.EnsureCreatedAsync(ct);
+                _logger.LogInformation("Starting Insert");
+                await _Db.Database.EnsureDeletedAsync(ct);
+                await _Db.Database.MigrateAsync(ct);
+                _logger.LogInformation("Migration Done");
                 using (var trans = await _Db.Database.BeginTransactionAsync(ct).ConfigureAwait(false))
                 {
+                    string query = "";
                     try
                     {
-                        await _Db.AddRangeAsync(AcFileInsert, cancellationToken: ct).ConfigureAwait(false);
-                        await _Db.AddRangeAsync(InvDetInsert, cancellationToken: ct).ConfigureAwait(false);
-                        await _Db.AddRangeAsync(InventoryInsert, cancellationToken: ct).ConfigureAwait(false);
-                        await _Db.AddRangeAsync(InvSummInsert, cancellationToken: ct).ConfigureAwait(false);
-                        await _Db.AddRangeAsync(TransInsert, cancellationToken: ct).ConfigureAwait(false);
+                        foreach (var acfile in AcFileInsert.Select(x => x.ToInsert()).Chunk(7000))
+                        {
+                            query = "INSERT INTO `acfile`(`ActCode`,`ActName`,`Address1`,`Address2`,`Address3`,`CrDays`,`email`,`fax`,`GST`,`OpBal`,`phone`) VALUES " +
+                                string.Join(',', acfile) + ";";
+                            await _Db.Database.ExecuteSqlRawAsync(query, ct);
+                        }
+
+                        foreach (var invdet in InvDetInsert.Select(x => x.ToInsert()).Chunk(7000))
+                        {
+                            query = "INSERT INTO `invdet`(`InvNo`,`InvDate`,`PCode`,`ICode`,`IName`,`Qty`,`Qty2`,`Unit`,`Packing`,`Rate`,`Amount`,`NetAmount`,`SP`,`Type`,`pName`,`Size`,`Pressure`,`CateCode`,`Dper`,`RegionCode`,`RegionName`,`FILE`) VALUES " +
+                                string.Join(',', invdet) + ";";
+                            await _Db.Database.ExecuteSqlRawAsync(query, ct);
+                        }
+
+                        foreach (var InvSumm in InvSummInsert.Select(x => x.ToInsert()).Chunk(7000))
+                        {
+                            query = "INSERT INTO `invsumm`(`OrderNo`,`InvNo`,`InvDate`,`PCode`,`PName`, `TotBill`,`Built`,`DisPer`,`Dis`,`Ser`,`Remarks`,`cartage`,`AddLess`,`CrDays`,`DueDate`,`RefNo`,`Payment`,`Note`,`Delivery`,`HCode`) VALUES " +
+                                string.Join(',', InvSumm) + ";";
+                            await _Db.Database.ExecuteSqlRawAsync(query, ct);
+                        }
+
+                        foreach (var Inventory in InventoryInsert.Select(x => x.ToInsert()).Chunk(7000))
+                        {
+                            query = "INSERT INTO `inventory`(`ItemCode`,`ItemDescrip`,`MfcCode`,`ManuName`,`Size`,`Pressure`,`Length`,`Price`,`RetPrice`,`RetPrice2`,`Unit`,`OpBal`) VALUES " +
+                                string.Join(',', Inventory) + ";";
+                            await _Db.Database.ExecuteSqlRawAsync(query, ct);
+                        }
+
+                        foreach (var Trans in TransInsert.Select(x => x.ToInsert()).Chunk(7000))
+                        {
+                            query = "INSERT INTO `trans`(`ActCode`,`ActName`,`ChqDate`,`ChqNo`,`Date`,`Des`,`TransAmt`,`Vnoc`,`Vnon`) VALUES " +
+                                string.Join(',', Trans) + ";";
+                            await _Db.Database.ExecuteSqlRawAsync(query, ct);
+                        }
                         await trans.CommitAsync(ct).ConfigureAwait(false);
                         ClearDbCache();
                         SetAcFile(AcFileInsert);

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AccReporting.Server.Migrations.AccountInfoDb
 {
     [DbContext(typeof(AccountInfoDbContext))]
-    [Migration("20220617195200_InitialMySql")]
-    partial class InitialMySql
+    [Migration("20220618172835_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -308,13 +308,13 @@ namespace AccReporting.Server.Migrations.AccountInfoDb
                         .HasColumnType("varchar(10)");
 
                     b.Property<decimal?>("Price")
-                        .HasColumnType("money(65,30)");
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<decimal?>("RetPrice")
-                        .HasColumnType("money(65,30)");
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<decimal?>("RetPrice2")
-                        .HasColumnType("money(65,30)");
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<string>("Size")
                         .HasMaxLength(15)

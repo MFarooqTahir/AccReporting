@@ -306,13 +306,13 @@ namespace AccReporting.Server.Migrations.AccountInfoDb
                         .HasColumnType("varchar(10)");
 
                     b.Property<decimal?>("Price")
-                        .HasColumnType("money(65,30)");
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<decimal?>("RetPrice")
-                        .HasColumnType("money(65,30)");
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<decimal?>("RetPrice2")
-                        .HasColumnType("money(65,30)");
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<string>("Size")
                         .HasMaxLength(15)

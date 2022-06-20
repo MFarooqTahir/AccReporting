@@ -32,12 +32,6 @@ namespace AccReporting.Server.DbContexts.Configurations
 
             entity.Property(e => e.Pressure).HasMaxLength(10);
 
-            entity.Property(e => e.Price).HasColumnType("money");
-
-            entity.Property(e => e.RetPrice).HasColumnType("money");
-
-            entity.Property(e => e.RetPrice2).HasColumnType("money");
-
             entity.Property(e => e.Size).HasMaxLength(15);
 
             entity.Property(e => e.Unit).HasMaxLength(5);

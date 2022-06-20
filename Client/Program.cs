@@ -29,6 +29,14 @@ builder.Services.AddLoadingBar();
 
 // Supply HttpClient instances that include access tokens when making requests to the server project
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("AccReporting.ServerAPI").EnableIntercept(sp));
+//var client = builder.Services.BuildServiceProvider().GetRequiredService<HttpClient>();
+//var Cal = await client.GetByteArrayAsync("Fonts/Calibri/Calibri.ttf");
+//var Calb = await client.GetByteArrayAsync("Fonts/Calibri/calibrib.ttf");
+//var Call = await client.GetByteArrayAsync("Fonts/Calibri/calibril.ttf");
+//FontManager.RegisterFont(new MemoryStream(Cal));
+//FontManager.RegisterFont(new MemoryStream(Calb));
+//FontManager.RegisterFont(new MemoryStream(Call));
+
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();

@@ -2,6 +2,8 @@
 #nullable disable
 using AccReporting.Shared.Helpers;
 
+using MySqlConnector;
+
 using System;
 using System.Collections.Generic;
 
@@ -11,19 +13,23 @@ namespace AccReporting.Shared.ContextModels
     {
         public Trans(string[] x)
         {
-            ActCode = x[0];
-            ActName = x[1];
-            Date = ValOrDefault.ToDateTime(x[2]);
-            TransAmt = ValOrDefault.ToDouble(x[3]);
-            Vnoc = x[4];
-            Vnon = ValOrDefault.ToInt(x[5]);
-            Des = x[6];
-            ChqNo = x[7];
-            ChqDate = ValOrDefault.ToDateTime(x[8]);
+            ActCode = MySqlHelper.EscapeString(x[0]);
+            ActName = MySqlHelper.EscapeString(x[1]);
+            Date = ValOrDefault.ToDateTime(MySqlHelper.EscapeString(x[2]));
+            TransAmt = ValOrDefault.ToDouble(MySqlHelper.EscapeString(x[3]));
+            Vnoc = MySqlHelper.EscapeString(x[4]);
+            Vnon = ValOrDefault.ToInt(MySqlHelper.EscapeString(x[5]));
+            Des = MySqlHelper.EscapeString(x[6]);
+            ChqNo = MySqlHelper.EscapeString(x[7]);
+            ChqDate = ValOrDefault.ToDateTime(MySqlHelper.EscapeString(x[8]));
         }
         public Trans()
         {
-            
+
+        }
+        public string ToInsert()
+        {
+            return $"('{ActCode}','{ActName}','{(ChqDate??DateTime.MinValue):yyyy-MM-dd HH:mm:ss}','{ChqNo}','{(Date ?? DateTime.MinValue):yyyy-MM-dd HH:mm:ss}','{Des}',{TransAmt??0},'{Vnoc}',{Vnon??0})";
         }
         public int Idpr { get; set; }
         public string ActCode { get; set; }

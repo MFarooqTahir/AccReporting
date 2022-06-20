@@ -2,6 +2,8 @@
 #nullable disable
 using AccReporting.Shared.Helpers;
 
+using MySqlConnector;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,26 +17,26 @@ namespace AccReporting.Shared.ContextModels
             try
             {
 
-                OrderNo = x[0];
-                InvNo = ValOrDefault.ToInt(x[1]);
-                InvDate = ValOrDefault.ToDateTime(x[2]);
-                Pcode = x[3];
-                Pname = x[4];
-                TotBill = ValOrDefault.ToDouble(x[5]);
-                Built = ValOrDefault.ToDouble(x[6]);
-                DisPer = ValOrDefault.ToDouble(x[7]);
-                Dis = ValOrDefault.ToDouble(x[8]);
-                Ser = ValOrDefault.ToDouble(x[9]);
-                Remarks = x[10];
-                Cartage = ValOrDefault.ToDouble(x[11]);
-                AddLess = ValOrDefault.ToDouble(x[12]);
-                CrDays = ValOrDefault.ToInt(x[13]);
-                DueDate = ValOrDefault.ToDateTime(x[14]);
-                RefNo = x[15];
-                Payment = x[16];
-                Note = x[17];
-                Delivery = x[18];
-                Hcode = ValOrDefault.ToInt(x[19]);
+                OrderNo = MySqlHelper.EscapeString(x[0]);
+                InvNo = ValOrDefault.ToInt(MySqlHelper.EscapeString(x[1]));
+                InvDate = ValOrDefault.ToDateTime(MySqlHelper.EscapeString(x[2]));
+                Pcode = MySqlHelper.EscapeString(x[3]);
+                Pname = MySqlHelper.EscapeString(x[4]);
+                TotBill = ValOrDefault.ToDouble(MySqlHelper.EscapeString(x[5]));
+                Built = ValOrDefault.ToDouble(MySqlHelper.EscapeString(x[6]));
+                DisPer = ValOrDefault.ToDouble(MySqlHelper.EscapeString(x[7]));
+                Dis = ValOrDefault.ToDouble(MySqlHelper.EscapeString(x[8]));
+                Ser = ValOrDefault.ToDouble(MySqlHelper.EscapeString(x[9]));
+                Remarks = MySqlHelper.EscapeString(x[10]);
+                Cartage = ValOrDefault.ToDouble(MySqlHelper.EscapeString(x[11]));
+                AddLess = ValOrDefault.ToDouble(MySqlHelper.EscapeString(x[12]));
+                CrDays = ValOrDefault.ToInt(MySqlHelper.EscapeString(x[13]));
+                DueDate = ValOrDefault.ToDateTime(MySqlHelper.EscapeString(x[14]));
+                RefNo = MySqlHelper.EscapeString(x[15]);
+                Payment = MySqlHelper.EscapeString(x[16]);
+                Note = MySqlHelper.EscapeString(x[17]);
+                Delivery = MySqlHelper.EscapeString(x[18]);
+                Hcode = ValOrDefault.ToInt(MySqlHelper.EscapeString(x[19]));
             }
             catch (IndexOutOfRangeException ex)
             {
@@ -46,7 +48,7 @@ namespace AccReporting.Shared.ContextModels
         }
         public InvSumm()
         {
-            
+
         }
         public int Idpr { get; set; }
         public string OrderNo { get; set; }
@@ -70,5 +72,10 @@ namespace AccReporting.Shared.ContextModels
         public string Note { get; set; }
         public string Delivery { get; set; }
         public int? Hcode { get; set; }
+
+        public string ToInsert()
+        {
+            return $"('{OrderNo}',{InvNo ?? 0},'{(InvDate ?? DateTime.MinValue):yyyy-MM-dd HH:mm:ss}','{Pcode}','{Pname}',{TotBill ?? 0},{Built ?? 0},{DisPer ?? 0},{Dis ?? 0},{Ser ?? 0},'{Remarks}',{Cartage ?? 0},{AddLess ?? 0},{CrDays ?? 0},'{(DueDate??DateTime.MinValue):yyyy-MM-dd HH:mm:ss}','{RefNo}','{Payment}','{Note}','{Delivery}',{Hcode ?? 0})";
+        }
     }
 }

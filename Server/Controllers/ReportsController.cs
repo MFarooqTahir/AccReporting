@@ -85,7 +85,7 @@ namespace AccReporting.Server.Controllers
                 res.CompanyName = data.Name;
                 res.cell = data.Phone;
                 res.Address = data.Address;
-                var Report = new SalesReport(res);
+                var Report = new SalesReportQuest(res);
                 _logger.LogInformation("Got sales report for invoice {invNo}", invNo);
                 var ret = new FileResponse() { File = Report.GeneratePdf(), Name = "SalesReport.pdf" };
                 return ret;

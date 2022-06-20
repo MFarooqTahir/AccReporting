@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AccReporting.Server.Migrations.AccountInfoDb
 {
-    public partial class InitialMySql : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -170,9 +170,9 @@ namespace AccReporting.Server.Migrations.AccountInfoDb
                     OpBal = table.Column<double>(type: "double", nullable: true),
                     Pressure = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Price = table.Column<decimal>(type: "money(65,30)", nullable: true),
-                    RetPrice = table.Column<decimal>(type: "money(65,30)", nullable: true),
-                    RetPrice2 = table.Column<decimal>(type: "money(65,30)", nullable: true),
+                    Price = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    RetPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    RetPrice2 = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
                     Size = table.Column<string>(type: "varchar(15)", maxLength: 15, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Unit = table.Column<string>(type: "varchar(5)", maxLength: 5, nullable: true)

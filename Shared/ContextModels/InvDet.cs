@@ -2,6 +2,8 @@
 #nullable disable
 using AccReporting.Shared.Helpers;
 
+using MySqlConnector;
+
 using System;
 using System.Collections.Generic;
 
@@ -12,32 +14,36 @@ namespace AccReporting.Shared.ContextModels
         public InvDet(string[] x)
         {
 
-            InvNo = ValOrDefault.ToInt(x[0]);
-            InvDate = ValOrDefault.ToDateTime(x[1]);
-            Pcode = x[2];
-            Icode = x[3];
-            Iname = x[4];
-            Qty = ValOrDefault.ToDouble(x[5]);
-            Qty2 = ValOrDefault.ToDouble(x[6]);
-            Unit = x[7];
-            Packing = ValOrDefault.ToDouble(x[8]);
-            Rate = ValOrDefault.ToDouble(x[9]);
-            Amount = ValOrDefault.ToDouble(x[10]);
-            NetAmount = ValOrDefault.ToDouble(x[11]);
-            Sp = x[12];
-            Type = x[13];
-            PName = x[14];
-            Size = x[15];
-            Pressure = x[16];
-            CateCode = x[17];
-            Dper = ValOrDefault.ToDouble(x[18]);
-            RegionCode = ValOrDefault.ToInt(x[19]);
-            RegionName = x[20];
-            File = x[21];
+            InvNo = ValOrDefault.ToInt(MySqlHelper.EscapeString(x[0]));
+            InvDate = ValOrDefault.ToDateTime(MySqlHelper.EscapeString(x[1]));
+            Pcode = MySqlHelper.EscapeString(x[2]);
+            Icode = MySqlHelper.EscapeString(x[3]);
+            Iname = MySqlHelper.EscapeString(x[4]);
+            Qty = ValOrDefault.ToDouble(MySqlHelper.EscapeString(x[5]));
+            Qty2 = ValOrDefault.ToDouble(MySqlHelper.EscapeString(x[6]));
+            Unit = MySqlHelper.EscapeString(x[7]);
+            Packing = ValOrDefault.ToDouble(MySqlHelper.EscapeString(x[8]));
+            Rate = ValOrDefault.ToDouble(MySqlHelper.EscapeString(x[9]));
+            Amount = ValOrDefault.ToDouble(MySqlHelper.EscapeString(x[10]));
+            NetAmount = ValOrDefault.ToDouble(MySqlHelper.EscapeString(x[11]));
+            Sp = MySqlHelper.EscapeString(x[12]);
+            Type = MySqlHelper.EscapeString(x[13]);
+            PName = MySqlHelper.EscapeString(x[14]);
+            Size = MySqlHelper.EscapeString(x[15]);
+            Pressure = MySqlHelper.EscapeString(x[16]);
+            CateCode = MySqlHelper.EscapeString(x[17]);
+            Dper = ValOrDefault.ToDouble(MySqlHelper.EscapeString(x[18]));
+            RegionCode = ValOrDefault.ToInt(MySqlHelper.EscapeString(x[19]));
+            RegionName = MySqlHelper.EscapeString(x[20]);
+            File = MySqlHelper.EscapeString(x[21]);
         }
         public InvDet()
         {
             
+        }
+        public string ToInsert()
+        {
+            return $"({InvNo??0},'{(InvDate?? DateTime.MinValue):yyyy-MM-dd HH:mm:ss}','{Pcode}','{Icode}','{Iname}',{Qty??0},{Qty2??0},'{Unit}',{Packing??0},{Rate??0},{Amount??0},{NetAmount??0},'{Sp}','{Type}','{PName}','{Size}','{Pressure}','{CateCode}',{Dper??0},{RegionCode??0},'{RegionName}','{File}')";
         }
         public int Idpr { get; set; }
         public int? InvNo { get; set; }
