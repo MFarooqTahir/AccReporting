@@ -5,7 +5,6 @@
 @using Syncfusion.Blazor.Buttons
 @inject IJSRuntime JS
 @inject HttpClient Http
-@implements IDisposable
 <AuthorizeView>
     <Authorized>
         <style>
@@ -94,7 +93,6 @@
         //await JS.InvokeVoidAsync("open", $"Reports/SalesReport?invNo={s}&type={st}", "_blank");
 
     }
-    public void Dispose() => Interceptor.DisposeEvent();
     protected override async Task OnInitializedAsync()
     {
         Interceptor.RegisterEvent();

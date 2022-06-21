@@ -9,7 +9,6 @@
 @using Syncfusion.Blazor.Popups
 @using Syncfusion.Blazor.SplitButtons
 @using System.Diagnostics
-@implements IDisposable
 @using System.Security.Claims
 <AuthorizeView>
     <Authorized>
@@ -229,7 +228,6 @@
             }
         }
     }
-    public void Dispose() => Interceptor.DisposeEvent();
     private async void onFileSelect(SelectedEventArgs args)
     {
         var st = (await authState).User.Claims.ToList();

@@ -33,7 +33,5 @@ namespace AccReporting.Client.Services
                 }
             }
         }
-
-        public void DisposeEvent() => _interceptor.BeforeSendAsync -= InterceptBeforeHttpAsync;
     }
 }
