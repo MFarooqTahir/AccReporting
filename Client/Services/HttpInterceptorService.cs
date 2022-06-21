@@ -15,7 +15,10 @@ namespace AccReporting.Client.Services
             _refreshTokenService = refreshTokenService;
         }
 
-        public void RegisterEvent() => _interceptor.BeforeSendAsync += InterceptBeforeHttpAsync;
+        public void RegisterEvent()
+        {
+            _interceptor.BeforeSendAsync -= InterceptBeforeHttpAsync; _interceptor.BeforeSendAsync -= InterceptBeforeHttpAsync;
+        }
 
         public async Task InterceptBeforeHttpAsync(object sender, HttpClientInterceptorEventArgs e)
         {
