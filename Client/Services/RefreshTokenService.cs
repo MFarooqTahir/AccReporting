@@ -17,17 +17,25 @@ namespace AccReporting.Client.Services
         {
             var authState = await _authProvider.GetAuthenticationStateAsync();
             var user = authState.User;
+            if (user is not null)
+            {
+                var claims = user.Claims.ToList();
+                var exp1 = user.FindFirst(c => c.Type.Equals("exp"));
+                if (exp1 is not null)
+                {
+                    var exp = exp1.Value;
+                    var expTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(exp));
 
-            var exp = user.FindFirst(c => c.Type.Equals("exp")).Value;
-            var expTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(exp));
+                    var timeUTC = DateTime.UtcNow;
 
-            var timeUTC = DateTime.UtcNow;
+                    var diff = expTime - timeUTC;
+                    if (diff.TotalMinutes <= 2)
+                        return await _authService.RefreshToken();
 
-            var diff = expTime - timeUTC;
-            if (diff.TotalMinutes <= 2)
-                return await _authService.RefreshToken();
-
+                }
+            }
             return string.Empty;
+
         }
     }
 }

@@ -63,7 +63,18 @@
             </DialogButtons>
             <DialogAnimationSettings Effect="@DialogEffect.None"></DialogAnimationSettings>
         </SfDialog>
-
+        <SfDialog Width="335px" IsModal="true" @bind-Visible="@VisibilityCompanyCreatedNeedsApproval">
+            <DialogTemplates>
+                <Header> Success </Header>
+                <Content>
+                    <p>Company Created, It will show in the list once it gets approved</p>
+                </Content>
+            </DialogTemplates>
+            <DialogButtons>
+                <DialogButton Content="OK" IsPrimary="true" OnClick="@showSuccessCreatedClose" />
+            </DialogButtons>
+            <DialogAnimationSettings Effect="@DialogEffect.None"></DialogAnimationSettings>
+        </SfDialog>
         <SfDialog Width="450px" IsModal="true" @bind-Visible="@VisibilityUsers">
             <DialogTemplates>
                 <Header> All Users </Header>
@@ -104,8 +115,10 @@
         </SfDialog>
         <SfDialog Width="335px" IsModal="true" @bind-Visible="@AddDialogVisible">
             <DialogTemplates>
-                <Header> Add new company </Header>
+                <Header> Add new company</Header>
                 <Content>
+                    <span class="text-center">Company needs to be approved after creation</span>
+                    <hr />
                     <EditForm Model="@inpModel" Context="ct" OnValidSubmit="@OnValidSubmit">
                         <DataAnnotationsValidator />
                         <div class="form-group">
@@ -126,7 +139,7 @@
                             </div>
                         </div>
                         <div class="mt-3 ms-auto me-0">
-                            <SfButton type="submit" IsPrimary="true">Add New</SfButton>
+                            <SfButton type="submit" CssClass="bg-success">Add New</SfButton>
                         </div>
                     </EditForm>
                 </Content>
@@ -151,7 +164,7 @@
     private bool UploadDialogVisible { get; set; }
     private bool AddDialogVisible { get; set; }
     private bool VisibilityUsers { get; set; }
-
+    private bool VisibilityCompanyCreatedNeedsApproval{ get; set; }
 
     IEnumerable<System.Security.Claims.Claim> st{ get; set; }
     public void CellSavedHandler(CellSaveArgs<DisplayUsersDto> args)
@@ -213,6 +226,8 @@
             if (boolresult)
             {
                 AddDialogVisible = false;
+                showSuccessCreated(null);
+
                 CompAccount = await client.GetFromJsonAsync<List<CompaniesListDTO>?>("/api/Account/GetAllCompaniesForUser");
                 CurrentAccount = CompAccount.FirstOrDefault(x => x.IsSelected);
                 if (string.IsNullOrWhiteSpace(CurrentAccount?.ID))
@@ -256,6 +271,18 @@
     {
         AddDialogVisible = true;
     }
+
+
+    private async Task showSuccessCreated(MouseEventArgs args)
+    {
+        VisibilityCompanyCreatedNeedsApproval = true;
+    }
+    private void showSuccessCreatedClose(MouseEventArgs args)
+    {
+        VisibilityCompanyCreatedNeedsApproval = false;
+    }
+
+
     private async Task DontShowUsers(MouseEventArgs args)
     {
         CurrUsers = null;

@@ -39,7 +39,7 @@ namespace AccReporting.Server.Controllers
             try
             {
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var adminCompany = await _context.CompanyAccounts.AsNoTracking().Where(x => x.IsSelected && x.UserID == userId && x.CompRole == "Admin")
+                var adminCompany = await _context.CompanyAccounts.AsNoTracking().Where(x => x.Company.Approved && x.IsSelected && x.UserID == userId && x.CompRole == "Admin")
                     .Select(x => x.Company)
                     .FirstAsync(ct);
                 var user = await _context.Users.AsNoTracking().FirstAsync(x => x.Email == model.UserEmail, ct);
@@ -77,12 +77,12 @@ namespace AccReporting.Server.Controllers
             {
                 int c = 1;
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var data = _context.CompanyAccounts.Where(x => x.UserID == userId && x.IsSelected)
+                var data = _context.CompanyAccounts.Where(x => x.Company.Approved && x.UserID == userId && x.IsSelected)
                     .Select(y => new { y.AcNumber, y.Company.DbName }).First();
                 await _dataService.SetDbName(data.DbName, ct);
                 var list = (await _dataService.GetAcFileAsync(ct)).Select(x => x.ActCode).Distinct();
 
-                var accountID = await _context.CompanyAccounts.Where(x => x.IsSelected && x.UserID == userId && x.CompRole == "Admin")
+                var accountID = await _context.CompanyAccounts.Where(x => x.Company.Approved && x.IsSelected && x.UserID == userId && x.CompRole == "Admin")
                     .Select(x => x.CompanyID).FirstAsync();
                 var ret = await _context.Companies.AsNoTracking()
                     .Where(x => x.ID == accountID)
@@ -139,13 +139,13 @@ namespace AccReporting.Server.Controllers
                         CompRole = "Admin",
                         User = user,
                         Company = newCompany,
-                        IsSelected = true,
+                        IsSelected = false,
                     };
 
                     await _context.AddAsync(compAccount, ct);
 
-                    var allSelected = await _context.CompanyAccounts.Where(x => x.UserID == id && x.IsSelected).ToListAsync(ct);
-                    allSelected.ForEach(x => x.IsSelected = false);
+                    //var allSelected = await _context.CompanyAccounts.Where(x => x.Company.Approved && x.UserID == id && x.IsSelected).ToListAsync(ct);
+                    //allSelected.ForEach(x => x.IsSelected = false);
 
                     await _context.SaveChangesAsync(cancellationToken: ct);
                     _logger.LogInformation("Account added");
@@ -180,7 +180,7 @@ namespace AccReporting.Server.Controllers
                 }
                 _logger.LogInformation("File uploaded");
                 var dbname = _context.CompanyAccounts.AsNoTracking()
-                    .Where(x => x.UserID == id && x.CompRole == "Admin" && x.IsSelected)
+                    .Where(x => x.Company.Approved && x.UserID == id && x.CompRole == "Admin" && x.IsSelected)
                     .Select(x => x.Company.DbName)
                     .First();
                 await _dataService.SetDbName(dbname, ct);
@@ -202,7 +202,7 @@ namespace AccReporting.Server.Controllers
             {
                 var id = User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value;
                 int curr = _hash.DecodeSingle(ID);
-                var res = _context.CompanyAccounts.FirstOrDefault(a => a.ID == curr && a.UserID == id);
+                var res = _context.CompanyAccounts.FirstOrDefault(a => a.ID == curr && a.UserID == id && a.Company.Approved);
                 if (res != null)
                 {
                     var Selected = await _context.CompanyAccounts.Where(a => a.IsSelected && a.UserID == id).ToListAsync(ct);
@@ -229,7 +229,7 @@ namespace AccReporting.Server.Controllers
             {
                 var id = User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value;
                 var retx = await _context.CompanyAccounts.AsNoTracking()
-                    .Where(x => x.UserID == id)
+                    .Where(x => x.Company.Approved && x.UserID == id)
                     .OrderBy(x => x.CompRole)
                     .Select(x => new { x.ID, CompID = x.Company.ID, x.Company.Name, x.AcNumber, x.CompRole, x.IsSelected })
                     .ToListAsync(ct);

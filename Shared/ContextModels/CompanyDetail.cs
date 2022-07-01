@@ -18,7 +18,7 @@ namespace AccReporting.Shared.ContextModels
 
         [MaxLength(15)]
         public string? Phone { get; set; }
-
+        public bool Approved { get; set; }
         public ICollection<CompanyAccount>? CompanyUsers { get; set; }
         public ICollection<ApplicationUser>? CurrentSelectedUsers { get; set; }
     }

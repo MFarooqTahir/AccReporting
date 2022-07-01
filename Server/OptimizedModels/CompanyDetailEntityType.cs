@@ -34,13 +34,19 @@ namespace AccReporting.Server.OptimizedModels
                 nullable: true,
                 maxLength: 150);
 
+            var approved = runtimeEntityType.AddProperty(
+                "Approved",
+                typeof(bool),
+                propertyInfo: typeof(CompanyDetail).GetProperty("Approved", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(CompanyDetail).GetField("<Approved>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+
             var dbName = runtimeEntityType.AddProperty(
                 "DbName",
                 typeof(string),
                 propertyInfo: typeof(CompanyDetail).GetProperty("DbName", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(CompanyDetail).GetField("<DbName>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
-                maxLength: 15);
+                maxLength: 30);
 
             var name = runtimeEntityType.AddProperty(
                 "Name",
