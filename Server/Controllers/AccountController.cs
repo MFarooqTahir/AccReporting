@@ -131,7 +131,7 @@ namespace AccReporting.Server.Controllers
                         Name = inp.Name,
                         Phone = inp.phone,
                         Address = inp.Address,
-                        DbName = inp.Name.Length < 30 ? removeSpaces.Replace(inp.Name, "_") : removeSpaces.Replace(inp.Name[..30], "_"),
+                        DbName = inp.Name.Length < 30 ? removeSpaces.Replace(inp.Name.Trim(), "_") : removeSpaces.Replace(inp.Name.Trim()[..30], "_"),
                         Approved = true,
                     };
                     await _context.AddAsync(newCompany, ct);
