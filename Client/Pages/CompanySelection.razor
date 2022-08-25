@@ -101,15 +101,17 @@
             <DialogTemplates>
                 <Header> Upload Database </Header>
                 <Content>
+                    <SfSpinner Label="" Visible="@IsUploading"></SfSpinner>
+
                     <SfUploader AllowedExtensions=".txt">
-                        <UploaderEvents FileSelected="onFileSelect">
+                        <UploaderEvents BeforeUpload="UploadStart" Success="UploadEnd" FileSelected="onFileSelect">
                         </UploaderEvents>
                         <UploaderAsyncSettings SaveUrl="api/Account/fileupload"></UploaderAsyncSettings>
                     </SfUploader>
                 </Content>
             </DialogTemplates>
             <DialogButtons>
-                <DialogButton Content="Cancel" CssClass="bg-danger" OnClick="@DlgButtonUploadClick" />
+                <DialogButton Content="Close" Disabled="IsUploading" CssClass="bg-danger" OnClick="@DlgButtonUploadClick" />
             </DialogButtons>
             <DialogAnimationSettings Effect="@DialogEffect.None"></DialogAnimationSettings>
         </SfDialog>
@@ -164,6 +166,7 @@
     private bool UploadDialogVisible { get; set; }
     private bool AddDialogVisible { get; set; }
     private bool VisibilityUsers { get; set; }
+    private bool IsUploading { get; set; }
     private bool VisibilityCompanyCreatedNeedsApproval{ get; set; }
 
     IEnumerable<System.Security.Claims.Claim> st{ get; set; }
@@ -197,6 +200,16 @@
             }
             await InvokeAsync(StateHasChanged);
         }
+    }
+    async Task UploadStart(BeforeUploadEventArgs args)
+    {
+        IsUploading = true;
+        await InvokeAsync(StateHasChanged);
+    }
+    async Task UploadEnd(SuccessEventArgs args)
+    {
+        IsUploading = false;
+        await InvokeAsync(StateHasChanged);
     }
     async Task onClick(string ID)
     {
@@ -257,6 +270,7 @@
     }
     private void DlgButtonUploadClick(MouseEventArgs args)
     {
+        IsUploading = false;
         UploadDialogVisible = false;
     }
     private void DlgButtonClick()
