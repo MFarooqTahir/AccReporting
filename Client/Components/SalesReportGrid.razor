@@ -1,0 +1,113 @@
+﻿@using AccReporting.Client.Services
+@using AccReporting.Shared
+@inject IJSRuntime JS
+@inject HttpClient Http
+<SfSpinner Label="" Visible="@(SalesReportList is null)"></SfSpinner>
+@if(!SalesReportList?.Any()==true)
+{
+    <h3 class="text-center">No records</h3>
+}
+<SfGrid RowRenderingMode="RowDirection.Vertical" @ref="@defaultGrid" TValue="InvSummGridModel" AllowTextWrap="true" ID="Grid" DataSource="@SalesReportList" AllowPaging="true" AllowSelection="true" AllowFiltering="true" AllowResizing="true" AllowGrouping="true" AllowSorting="true">
+    <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.FilterBar"></GridFilterSettings>
+    <GridEvents CommandClicked="OnCommandClicked" TValue="InvSummGridModel"></GridEvents>
+    <GridPageSettings PageSize="10"></GridPageSettings>
+    <GridSelectionSettings CheckboxMode="CheckboxSelectionType.Default" Mode="SelectionMode.Row" CheckboxOnly="true"></GridSelectionSettings>
+    <GridColumns>
+        <GridColumn Type="ColumnType.None" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Center" AllowSearching="false" AllowFiltering="false" AllowSorting="false" Width="65">
+            <GridCommandColumns>
+
+                <GridCommandColumn ButtonOption="@(new CommandButtonOptions() { CssClass="e-icons e-export-pdf bg-transparent border-0 w-100 h-100"})" Title="View Pdf"></GridCommandColumn>
+            </GridCommandColumns>
+         
+        </GridColumn>
+        <GridColumn Field=@nameof(InvSummGridModel.InvNo) HeaderText="InvNo" AllowEditing="false" IsPrimaryKey="true" Width="80">
+        </GridColumn>
+        <GridColumn Field=@nameof(InvSummGridModel.Name) HeaderText="Name" AllowEditing="false" Width="130" MinWidth="100">
+            <Template Context="ctx">
+                @{
+                    var curr = ctx as InvSummGridModel;
+                    <span>@(curr.Name)</span>
+                }
+            </Template>
+        </GridColumn>
+        <GridColumn HeaderText="Discount %" Width="95" AllowEditing="false">
+            <Template Context="ctx">
+                @{
+                    var curr = ctx as InvSummGridModel;
+                    <span>@($"{(1 - (curr.NetAmount / curr.Amount)) * 100:F2} %")</span>
+                }
+            </Template>
+        </GridColumn>
+        <GridColumn Field=@nameof(InvSummGridModel.Amount) HeaderText="Amount" Format="C2" Width="180" AllowEditing="false" MinWidth="120">
+
+        </GridColumn>
+        <GridColumn Field=@nameof(InvSummGridModel.NetAmount) HeaderText="After Discount" Format="C2" Width="180" AllowEditing="false" MinWidth="120">
+
+        </GridColumn>
+    </GridColumns>
+</SfGrid>
+@code {
+    [Parameter]
+    public string Type{ get; set; }
+
+    public IEnumerable<InvSummGridModel>? SalesReportList { get; set; }
+
+    public SfGrid<InvSummGridModel> defaultGrid = new();
+    public int pageNo { get; set; }
+    public int totalPages { get; set; }
+    public bool DisableBackIcon = false;
+    public bool DisableForwardIcon = false;
+    public bool DisableFirstIcon = false;
+    public bool DisableLastIcon = false;
+    [Inject]
+    public HttpInterceptorService Interceptor { get; set; }
+    public async Task OnCommandClicked(CommandClickEventArgs<InvSummGridModel> args)
+    {
+        var curr = args.RowData;
+        var st = typesAll[curr.Type];
+        var s = curr.InvNo.ToString();
+        try
+        {
+            var res = await Http.GetFromJsonAsync<FileResponse>($"Reports/SalesReport?invNo={s}&type={st}");
+            //await JS.SaveAs(res.Name, res.File);
+            var module = await JS.InvokeAsync<IJSObjectReference>("import","./js/script.js");
+            await module.InvokeVoidAsync("ShowReportNewPage", res.File);
+            //await JS.InvokeVoidAsync("open", $"Reports/SalesReport?invNo={s}&type={st}", "_blank");
+        }
+        catch(Exception e)
+        {
+            //none
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        Interceptor.RegisterEvent();
+        await ClickedSalesReport();
+    }
+
+    private async Task ClickedSalesReport()
+    {
+        try
+        {
+            SalesReportList = await Http.GetFromJsonAsync<IEnumerable<InvSummGridModel>?>($"/Reports/InvSummaryList?Type={Type}").ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            SalesReportList = new List<InvSummGridModel>();
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+    private SalesReportInput model { get; set; } = new();
+    public List<string> types = new List<string>
+    {
+       "Sale","Estimate","Purchase","Return",
+    };
+    private async Task OnGetReportClick(string invNo, string Type)
+    {
+        await JS.InvokeVoidAsync("open", $"Reports/SalesReport?invNo={invNo}&type={Type}", "_blank");
+    }
+    private readonly IDictionary<string, string> typesAll = new Dictionary<string, string>()
+    {
+        {"S","Sale" },{"E","Estimate" },{"P","Purchase" },{"R","Return"}
+    };
+}

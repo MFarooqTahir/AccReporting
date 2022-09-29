@@ -32,7 +32,7 @@ namespace AccReporting.Client.Classes
                 new ClaimsIdentity(x, "jwtAuthType")));
         }
 
-        public void NotifyUserAuthentication(string email)
+        public void NotifyUserAuthentication()
         {
             var authState = GetAuthenticationStateAsync();
             NotifyAuthenticationStateChanged(authState);

@@ -60,29 +60,32 @@ public class DataService
         await EnsureDbConenction(ct);
     }
 
-    public async Task<IEnumerable<InvSummGridModel?>?> GetInvSummGridAsync(string AcCode, int PageNumber, int PageSize, CancellationToken ct)
+    public async Task<IEnumerable<InvSummGridModel?>?> GetInvSummGridAsync(string AcCode, string Type, int PageNumber, int PageSize, CancellationToken ct)
     {
-        string key = $"SRG-{AcCode}";
+        string key = $"SRG-{AcCode}-{Type}-{PageNumber}-{PageSize}";
         var suc = GetCache(key, out IEnumerable<InvSummGridModel> ret);
         if (!suc)
         {
-            var R = await GetInvDetAsync(ct);
-            if (!string.IsNullOrWhiteSpace(AcCode))
+            await EnsureDbConenction(ct);
+            var a = _Db.InvDets.AsNoTracking().Where(x => x.Sp == Type);
+            if (!string.IsNullOrEmpty(AcCode))
             {
-                R = R.Where(x => x.Pcode == AcCode);
+                a = a.Where(x => x.Pcode == AcCode);
             }
-            var contList = new[] { "S", "E", "P", "R" };
-            ret = R.Where(x => contList.Contains(x.Sp))
+            if (PageSize > 0 || PageNumber > 0)
+            {
+                a = a.Skip(PageNumber * PageSize).Take(PageSize);
+            }
+            var eret = await a.ToListAsync(ct).ConfigureAwait(false);
+
+            ret = eret
                 .OrderBy(x => x.InvNo)
-             .GroupBy(x => new { x.InvNo, x.Sp })
-             .Select(x => new InvSummGridModel(x.Key.InvNo, x.Key.Sp, x.Sum(z => z.Amount), x.Sum(z => z.NetAmount)));
+             .GroupBy(x => new { x.InvNo, x.Sp, x.PName })
+             .Select(x => new InvSummGridModel(x.Key.InvNo, x.Key.Sp, x.Sum(z => z.Amount), x.Sum(z => z.NetAmount), x.Key.PName));
 
             SetCache(key, ret);
         }
-        if (PageSize > 0 || PageNumber > 0)
-        {
-            ret = ret.Skip(PageNumber * PageSize).Take(PageSize);
-        }
+
         return ret;
     }
 
@@ -96,10 +99,8 @@ public class DataService
             {
                 Type = Type,
             };
-            //_Db.Database.SetCommandTimeout(TimeSpan.FromMinutes(3));
 
-            var dataSummx = (await GetInvSummsAsync(ct).ConfigureAwait(false))
-                          .Where(x => x.InvNo == invNo);
+            var dataSummx = _Db.InvSumms.AsNoTracking().Where(x => x.InvNo == invNo);
             if (!string.IsNullOrWhiteSpace(AcNumber))
             {
                 dataSummx = dataSummx.Where(x => x.Pcode == AcNumber);
@@ -119,7 +120,7 @@ public class DataService
                 return ret;
             }
             ret.tableData ??= new();
-            var R = await GetInvDetAsync(ct).ConfigureAwait(false);
+            var R = _Db.InvDets.AsNoTracking();
             if (!string.IsNullOrWhiteSpace(AcNumber))
             {
                 R = R.Where(x => x.Pcode == AcNumber);

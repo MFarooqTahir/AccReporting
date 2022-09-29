@@ -28,7 +28,6 @@ culture.NumberFormat.CurrencySymbol = "Rs.";
 CultureInfo.DefaultThreadCurrentCulture = culture;
 CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-
 builder.Host.UseSerilog((ctx, lc) => lc
     .WriteTo.Console()
     .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning));
@@ -36,8 +35,9 @@ builder.Host.UseSerilog((ctx, lc) => lc
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var connectionString1 = builder.Configuration.GetConnectionString("NoDb");
 var connectionString2 = builder.Configuration.GetConnectionString("test");
-var hashids = new Hashids("OzoneTechnologies softwares avax", minHashLength: 6);
-builder.Services.AddSingleton<IHashids>(hashids); builder.Services.AddTransient<IEmailSender, EmailService>();
+
+builder.Services.AddSingleton<IHashids>(new Hashids("OzoneTechnologies softwares avax", minHashLength: 6));
+builder.Services.AddTransient<IEmailSender, EmailService>();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
@@ -79,14 +79,21 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddCors(options => options.AddPolicy("MyPolicy", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<DataService>();
+
 var app = builder.Build();
 var hostingEnvironment = app.Services.GetService<IWebHostEnvironment>();
+
 string[] filePaths = Directory.GetFiles(Path.Combine(hostingEnvironment.WebRootPath, "Fonts/Calibri"));
 foreach (var filepath in filePaths)
 {
     using var fs = new FileStream(filepath, FileMode.Open, FileAccess.Read);
     FontManager.RegisterFont(fs);
-
+}
+filePaths = Directory.GetFiles(Path.Combine(hostingEnvironment.WebRootPath, "Fonts/Fira"));
+foreach (var filepath in filePaths)
+{
+    using var fs = new FileStream(filepath, FileMode.Open, FileAccess.Read);
+    FontManager.RegisterFont(fs);
 }
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

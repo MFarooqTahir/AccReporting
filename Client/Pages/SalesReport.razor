@@ -1,5 +1,6 @@
 ﻿@page "/SalesReport"
 @using System.Globalization
+@using AccReporting.Client.Components
 @using AccReporting.Client.Services
 @using AccReporting.Shared
 @using Syncfusion.Blazor.Buttons
@@ -14,67 +15,55 @@
                 font-size: 28px;
             }
         </style>
-        <SfSpinner Label="" Visible="@(SalesReportList is null)"></SfSpinner>
-
         <h3 class="text-center">Sales Report</h3>
-        <SfGrid RowRenderingMode="RowDirection.Vertical" @ref="@defaultGrid" TValue="InvSummGridModel" AllowTextWrap="true" ID="Grid" DataSource="@SalesReportList" AllowPaging="true" AllowSelection="true" AllowFiltering="true" AllowResizing="true" AllowGrouping="true" AllowPdfExport="true" AllowSorting="true">
-            <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.FilterBar"></GridFilterSettings>
-            <GridEvents CommandClicked="OnCommandClicked" TValue="InvSummGridModel"></GridEvents>
-            <GridPageSettings PageSize="8"></GridPageSettings>
-            <GridSelectionSettings CheckboxMode="CheckboxSelectionType.Default" Mode="SelectionMode.Row" CheckboxOnly="true"></GridSelectionSettings>
-            <GridColumns>
-                <GridColumn Type="ColumnType.None" HeaderTextAlign="TextAlign.Left" TextAlign="TextAlign.Center" AllowSearching="false" AllowFiltering="false" AllowSorting="false" Width="65">
-                    <GridCommandColumns>
 
-                    <GridCommandColumn ButtonOption="@(new CommandButtonOptions() { CssClass="e-icons e-export-pdf bg-transparent border-0 w-100 h-100"})" Title="View Pdf"></GridCommandColumn>
-                    </GridCommandColumns>
-                    @*<Template Context="ctx">
-                        @{
-                            var curr = ctx as InvSummGridModel;
-                            <form action=@($"Reports/SalesReport") method="get">
-                                <input type="hidden" name="invNo" value="@(curr.InvNo)" />
-                                <input type="hidden" name="type" value="@(typesAll[curr.Type])" />
-                                <button type="submit" class="bg-transparent border-0"><Syncfusion.Blazor.Buttons.SfIcon IconCss="color:white" Size="Syncfusion.Blazor.Buttons.IconSize.Large" Name="Syncfusion.Blazor.Buttons.IconName.ExportPdf"></Syncfusion.Blazor.Buttons.SfIcon></button>
+        <SfTab @ref="@Tab" HeaderPlacement="HeaderPosition.Top" LoadOn="ContentLoad.Dynamic" OverflowMode="@OverflowMode.Scrollable">
+            <TabItems>
+                <TabItem>
+                    <ChildContent>
+                        <TabHeader Text="Sales"></TabHeader> @*Replace your required header1 text here *@
+                    </ChildContent>
+                    <ContentTemplate>
+                        <SalesReportGrid Type="S"></SalesReportGrid>
+                    </ContentTemplate>
+                </TabItem>
+                
+                <TabItem>
+                    @*Replace your required tab1 boby content here *@
+                    <ChildContent>
+                        <TabHeader Text="Purchase"></TabHeader> @*Replace your required header1 text here *@
+                    </ChildContent>
+                    <ContentTemplate>
+                        <SalesReportGrid Type="P"></SalesReportGrid>
+                    </ContentTemplate>
+                </TabItem>
+                <TabItem>
+                    @*Replace your required tab2 boby content here *@
+                    <ChildContent>
+                        <TabHeader Text="Return"></TabHeader> @*Replace your required header2 text here *@
+                    </ChildContent>
+                    <ContentTemplate>
+                        <SalesReportGrid Type="R"></SalesReportGrid>
+                    </ContentTemplate>
+                </TabItem>
+                <TabItem>
+                    @*Replace your required tab2 boby content here *@
+                    <ChildContent>
+                        <TabHeader Text="Estimate"></TabHeader> @*Replace your required header2 text here *@
+                    </ChildContent>
+                    <ContentTemplate>
+                        <SalesReportGrid Type="E"></SalesReportGrid>
+                    </ContentTemplate>
+                </TabItem>
 
-                            </form>
-                        }
-
-                    </Template>*@
-                                @*<a class="btn bg-transparent" target="_blank"><Syncfusion.Blazor.Buttons.SfIcon IconCss="color:white" Size="Syncfusion.Blazor.Buttons.IconSize.Large" Name="Syncfusion.Blazor.Buttons.IconName.ExportPdf"></Syncfusion.Blazor.Buttons.SfIcon></a>*@
-
-                </GridColumn>
-                <GridColumn Field=@nameof(InvSummGridModel.InvNo) HeaderText="InvNo" AllowEditing="false" IsPrimaryKey="true" Width="80">
-                </GridColumn>
-                <GridColumn Field=@nameof(InvSummGridModel.Type) HeaderText="Type" AllowEditing="false" Width="130" MinWidth="100">
-                    <Template Context="ctx">
-                        @{
-                            var curr = ctx as InvSummGridModel;
-                            <span>@(typesAll[curr.Type])</span>
-                        }
-                    </Template>
-                </GridColumn>
-                <GridColumn HeaderText="Discount %" Width="95" AllowEditing="false">
-                    <Template Context="ctx">
-                        @{
-                            var curr = ctx as InvSummGridModel;
-                            <span>@($"{(1-(curr.NetAmount/curr.Amount))*100:F2} %")</span>
-                        }
-                    </Template>
-                </GridColumn>
-                <GridColumn Field=@nameof(InvSummGridModel.Amount) HeaderText="Amount" Format="C2" Width="180" AllowEditing="false" MinWidth="120">
-
-                </GridColumn>
-                <GridColumn Field=@nameof(InvSummGridModel.NetAmount) HeaderText="After Discount" Format="C2" Width="180" AllowEditing="false" MinWidth="120">
-
-                </GridColumn>
-            </GridColumns>
-        </SfGrid>
+            </TabItems>
+        </SfTab>
 
     </Authorized>
 </AuthorizeView>
 @code {
-    IEnumerable<InvSummGridModel>? SalesReportList;
     public SfGrid<InvSummGridModel> defaultGrid = new();
+    SfTab Tab { get; set; }
     public int pageNo { get; set; }
     public int totalPages { get; set; }
     public bool DisableBackIcon = false;
@@ -93,26 +82,7 @@
         //await JS.InvokeVoidAsync("open", $"Reports/SalesReport?invNo={s}&type={st}", "_blank");
 
     }
-    protected override async Task OnInitializedAsync()
-    {
-        Interceptor.RegisterEvent();
-        await ClickedSalesReport();
-    }
-
-    private async Task ClickedSalesReport()
-    {
-        //var response = await Http.GetAsync("/Reports/InvSummaryListPaged?page=0&pageSize=25");
-        //var str = await response.Content.ReadAsStringAsync();
-        try
-        {
-            SalesReportList = await Http.GetFromJsonAsync<IEnumerable<InvSummGridModel>?>($"/Reports/InvSummaryList").ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            SalesReportList = new List<InvSummGridModel>();
-        }
-    StateHasChanged();
-    }
+    
     private SalesReportInput model { get; set; } = new();
     public List<string> types = new List<string>
     {
@@ -122,7 +92,7 @@
     {
         await JS.InvokeVoidAsync("open", $"Reports/SalesReport?invNo={invNo}&type={Type}", "_blank");
     }
-    private readonly IDictionary<string, string> typesAll = new Dictionary<string, string>()
+    private readonly IDictionary<string, string> typesAll = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
     {
         {"S","Sale" },{"E","Estimate" },{"P","Purchase" },{"R","Return"}
     };

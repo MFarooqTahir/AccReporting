@@ -70,7 +70,7 @@ namespace AccReporting.Client.Services
             await _localStorage.SetItemAsync("authToken", result.Token);
             await _localStorage.SetItemAsync("refreshToken", result.RefreshToken);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", result.Token);
-            ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(userForAuthentication.Email);
+            ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication();
 
             return new AuthResponseDto { IsAuthSuccessful = true };
         }
