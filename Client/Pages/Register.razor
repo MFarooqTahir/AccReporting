@@ -1,6 +1,6 @@
 ﻿@page "/register"
 @using AccReporting.Client.Services
-<h3>Registration</h3>
+<h3 class="text-center">Registration</h3>
 
 @if (ShowRegistrationErrors)
 {
@@ -11,10 +11,10 @@
         }
     </div>
 }
-
+<div style="max-width:650px;" class="mx-auto">
 <EditForm Model="_userForRegistration" OnValidSubmit="RegisterUser" class="card card-body bg-light mt-5">
     <DataAnnotationsValidator />
-    <div class="form-group row">
+        <div class="form-group row mb-3">
         <label for="email" class="col-md-2 col-form-label">Email:</label>
         <div class="col-md-10">
             <InputText id="email" class="form-control" @bind-Value="_userForRegistration.Email" />
@@ -22,10 +22,10 @@
         </div>
     </div>
 
-    <div class="form-group row">
+        <div class="form-group row mb-3">
         <label for="password" class="col-md-2 col-form-label">Password:</label>
         <div class="col-md-10">
-            <InputText type="password" id="password" class="form-control" @bind-Value="_userForRegistration.Password" />
+                <InputText type="@TxtType" id="password" class="form-control" @bind-Value="_userForRegistration.Password" />
             <ValidationMessage For="@(() => _userForRegistration.Password)" />
         </div>
     </div>
@@ -33,10 +33,12 @@
     <div class="form-group row">
         <label for="confirm" class="col-md-2 col-form-label">Confirm Password:</label>
         <div class="col-md-10">
-            <InputText type="password" id="confirm" class="form-control" @bind-Value="_userForRegistration.ConfirmPassword" />
+                <InputText type="@TxtType" id="confirm" class="form-control" @bind-Value="_userForRegistration.ConfirmPassword" />
+            <i class="far fa-eye" id="togglePassword" style="margin-left: -30px; cursor: pointer;"></i>
             <ValidationMessage For="@(() => _userForRegistration.ConfirmPassword)" />
         </div>
     </div>
+        <Syncfusion.Blazor.Buttons.SfCheckBox @bind-Checked="@ShowPass" @onchange="@((e)=>ShowPassword())" CssClass="my-3 row"> Show Password</Syncfusion.Blazor.Buttons.SfCheckBox>
 
     <div class="row">
         <div class="col-md-12 text-right">
@@ -44,6 +46,7 @@
         </div>
     </div>
 </EditForm>
+</div>
 @code
 {
         private UserForRegistrationDto _userForRegistration = new UserForRegistrationDto();
@@ -53,6 +56,20 @@
     public NavigationManager NavigationManager { get; set; }
     public bool ShowRegistrationErrors { get; set; }
     public IEnumerable<string> Errors { get; set; }
+    public bool ShowPass { get; set; }
+    public string TxtType = "password"; 
+ 
+    public void ShowPassword() 
+    { 
+        if(this.TxtType== "password") 
+        { 
+            this.TxtType = "text"; 
+        } 
+        else 
+        { 
+            this.TxtType = "password"; 
+        } 
+    } 
     public async Task RegisterUser()
     {
         ShowRegistrationErrors = false;

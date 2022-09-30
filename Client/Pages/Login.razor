@@ -1,6 +1,13 @@
 ﻿@page "/login"
 @using AccReporting.Client.Services
-<h3>Login</h3>
+<h3 class="text-center">Login</h3>
+<style>
+    .e-input-eye:before {
+        content: '\e345';
+        font-family: e-icons;
+        font-size: 13px;
+    }
+</style>
 
 @if (ShowAuthError)
 {
@@ -8,10 +15,11 @@
         <p>@Error</p>
     </div>
 }
+<div style="max-width:650px;" class="mx-auto">
 
 <EditForm Model="_userForAuthentication" OnValidSubmit="ExecuteLogin" class="card card-body bg-light mt-5">
     <DataAnnotationsValidator />
-    <div class="form-group row">
+    <div class="form-group row mb-3">
         <label for="email" class="col-md-2 col-form-label">Email:</label>
         <div class="col-md-10">
             <InputText id="email" class="form-control" @bind-Value="_userForAuthentication.Email" />
@@ -22,25 +30,39 @@
     <div class="form-group row">
         <label for="password" class="col-md-2 col-form-label">Password:</label>
         <div class="col-md-10">
-            <InputText type="password" id="password" class="form-control" @bind-Value="_userForAuthentication.Password" />
-            <ValidationMessage For="@(() => _userForAuthentication.Password)" />
+                <InputText type="@TxtType" id="password" class="form-control" @bind-Value="_userForAuthentication.Password" />
         </div>
     </div>
-
+        <Syncfusion.Blazor.Buttons.SfCheckBox @bind-Checked="@ShowPass" @onchange="@((e)=>ShowPassword())" CssClass="my-3 row"> Show Password</Syncfusion.Blazor.Buttons.SfCheckBox>
     <div class="row">
         <div class="col-md-12 text-right">
             <button type="submit" class="btn btn-success">Login</button>
         </div>
     </div>
 </EditForm>
-@code{
-        private UserForAuthenticationDto _userForAuthentication = new UserForAuthenticationDto();
+</div>
+@code {
+    private UserForAuthenticationDto _userForAuthentication = new UserForAuthenticationDto();
     [Inject]
     public IAuthenticationService AuthenticationService { get; set; }
     [Inject]
     public NavigationManager NavigationManager { get; set; }
     public bool ShowAuthError { get; set; }
+    bool ShowPass;
     public string Error { get; set; }
+    public string TxtType = "password"; 
+ 
+    public void ShowPassword() 
+    { 
+        if(this.TxtType== "password") 
+        { 
+            this.TxtType = "text"; 
+        } 
+        else 
+        { 
+            this.TxtType = "password"; 
+        } 
+    } 
     public async Task ExecuteLogin()
     {
         ShowAuthError = false;
