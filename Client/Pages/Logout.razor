@@ -4,12 +4,12 @@
 
 @code {
     [Inject]
-     public IAuthenticationService AuthenticationService { get; set; }
+    public IAuthenticationService AuthenticationService { get; set; } = null!;
      [Inject]
-     public NavigationManager NavigationManager { get; set; }
+     public NavigationManager NavigationManager { get; set; } = null!;
      protected override async Task OnInitializedAsync()
      {
          await AuthenticationService.Logout();
-         NavigationManager.NavigateTo("/");
+         NavigationManager.NavigateTo(uri: "/");
      }
 }

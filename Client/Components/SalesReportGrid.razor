@@ -1,13 +1,13 @@
 ﻿@using AccReporting.Client.Services
 @using AccReporting.Shared
-@inject IJSRuntime JS
+@inject IJSRuntime Js
 @inject HttpClient Http
 <SfSpinner Label="" Visible="@(SalesReportList is null)"></SfSpinner>
 @if(!SalesReportList?.Any()==true)
 {
     <h3 class="text-center">No records</h3>
 }
-<SfGrid RowRenderingMode="RowDirection.Vertical" @ref="@defaultGrid" TValue="InvSummGridModel" AllowTextWrap="true" ID="Grid" DataSource="@SalesReportList" AllowPaging="true" AllowSelection="true" AllowFiltering="true" AllowResizing="true" AllowGrouping="true" AllowSorting="true">
+<SfGrid RowRenderingMode="RowDirection.Vertical" TValue="InvSummGridModel" AllowTextWrap="true" ID="Grid" DataSource="@SalesReportList" AllowPaging="true" AllowSelection="true" AllowFiltering="true" AllowResizing="true" AllowGrouping="true" AllowSorting="true">
     <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.FilterBar"></GridFilterSettings>
     <GridEvents CommandClicked="OnCommandClicked" TValue="InvSummGridModel"></GridEvents>
     <GridPageSettings PageSize="10"></GridPageSettings>
@@ -20,13 +20,13 @@
             </GridCommandColumns>
          
         </GridColumn>
-        <GridColumn Field=@nameof(InvSummGridModel.InvNo) HeaderText="InvNo" AllowEditing="false" IsPrimaryKey="true" Width="80">
+        <GridColumn Field="@nameof(InvSummGridModel.InvNo)" HeaderText="InvNo" AllowEditing="false" IsPrimaryKey="true" Width="80">
         </GridColumn>
-        <GridColumn Field=@nameof(InvSummGridModel.Name) HeaderText="Name" AllowEditing="false" Width="130" MinWidth="100">
+        <GridColumn Field="@nameof(InvSummGridModel.Name)" HeaderText="Name" AllowEditing="false" Width="130" MinWidth="100">
             <Template Context="ctx">
                 @{
                     var curr = ctx as InvSummGridModel;
-                    <span>@(curr.Name)</span>
+                    <span>@(curr?.Name??"")</span>
                 }
             </Template>
         </GridColumn>
@@ -34,47 +34,47 @@
             <Template Context="ctx">
                 @{
                     var curr = ctx as InvSummGridModel;
-                    <span>@($"{(1 - (curr.NetAmount / curr.Amount)) * 100:F2} %")</span>
+                    <span>@($"{(1 - (curr?.NetAmount??0.00) / (curr?.Amount ?? 0.00)) * 100:F2} %")</span>
                 }
             </Template>
         </GridColumn>
-        <GridColumn Field=@nameof(InvSummGridModel.Amount) HeaderText="Amount" Format="C2" Width="180" AllowEditing="false" MinWidth="120">
+        <GridColumn Field="@nameof(InvSummGridModel.Amount)" HeaderText="Amount" Format="C2" Width="180" AllowEditing="false" MinWidth="120">
 
         </GridColumn>
-        <GridColumn Field=@nameof(InvSummGridModel.NetAmount) HeaderText="After Discount" Format="C2" Width="180" AllowEditing="false" MinWidth="120">
+        <GridColumn Field="@nameof(InvSummGridModel.NetAmount)" HeaderText="After Discount" Format="C2" Width="180" AllowEditing="false" MinWidth="120">
 
         </GridColumn>
     </GridColumns>
 </SfGrid>
 @code {
+
     [Parameter]
-    public string Type{ get; set; }
+    public string Type { get; set; } = null!;
 
     public IEnumerable<InvSummGridModel>? SalesReportList { get; set; }
 
-    public SfGrid<InvSummGridModel> defaultGrid = new();
-    public int pageNo { get; set; }
-    public int totalPages { get; set; }
+    public int PageNo { get; set; }
+    public int TotalPages { get; set; }
     public bool DisableBackIcon = false;
     public bool DisableForwardIcon = false;
     public bool DisableFirstIcon = false;
     public bool DisableLastIcon = false;
     [Inject]
-    public HttpInterceptorService Interceptor { get; set; }
+    public HttpInterceptorService Interceptor { get; set; } = null!;
     public async Task OnCommandClicked(CommandClickEventArgs<InvSummGridModel> args)
     {
         var curr = args.RowData;
-        var st = typesAll[curr.Type];
+        var st = _typesAll[key: Type];
         var s = curr.InvNo.ToString();
         try
         {
-            var res = await Http.GetFromJsonAsync<FileResponse>($"Reports/SalesReport?invNo={s}&type={st}");
+            var res = await Http.GetFromJsonAsync<FileResponse>(requestUri: $"Reports/SalesReport?invNo={s}&type={st}&pcode={curr.PCode}");
             //await JS.SaveAs(res.Name, res.File);
-            var module = await JS.InvokeAsync<IJSObjectReference>("import","./js/script.js");
-            await module.InvokeVoidAsync("ShowReportNewPage", res.File);
+            var module = await Js.InvokeAsync<IJSObjectReference>(identifier: "import","./js/script.js");
+            await module.InvokeVoidAsync(identifier: "ShowReportNewPage", res?.File??Array.Empty<byte>());
             //await JS.InvokeVoidAsync("open", $"Reports/SalesReport?invNo={s}&type={st}", "_blank");
         }
-        catch(Exception e)
+        catch
         {
             //none
         }
@@ -89,25 +89,26 @@
     {
         try
         {
-            SalesReportList = await Http.GetFromJsonAsync<IEnumerable<InvSummGridModel>?>($"/Reports/InvSummaryList?Type={Type}").ConfigureAwait(false);
+            SalesReportList = await Http.GetFromJsonAsync<IEnumerable<InvSummGridModel>?>(requestUri: $"/Reports/InvSummaryList?Type={Type}").ConfigureAwait(continueOnCapturedContext: false);
         }
-        catch (Exception ex)
+        catch
         {
             SalesReportList = new List<InvSummGridModel>();
         }
-        await InvokeAsync(StateHasChanged);
+        await InvokeAsync(workItem: StateHasChanged);
     }
-    private SalesReportInput model { get; set; } = new();
-    public List<string> types = new List<string>
+    private SalesReportInput Model { get; set; } = new();
+    public List<string> Types = new()
     {
        "Sale","Estimate","Purchase","Return",
     };
-    private async Task OnGetReportClick(string invNo, string Type)
+    private async Task OnGetReportClick(string invNo, string type)
     {
-        await JS.InvokeVoidAsync("open", $"Reports/SalesReport?invNo={invNo}&type={Type}", "_blank");
+        await Js.InvokeVoidAsync(identifier: "open", $"Reports/SalesReport?invNo={invNo}&type={type}", "_blank");
     }
-    private readonly IDictionary<string, string> typesAll = new Dictionary<string, string>()
+    private readonly IDictionary<string, string> _typesAll = new Dictionary<string, string>()
     {
-        {"S","Sale" },{"E","Estimate" },{"P","Purchase" },{"R","Return"}
+                {"S","Sale" },{"E","Estimate" },{"P","Purchase" },{"R","Return"},{"Q","Purchase Return"},{"C","Cash"}
+
     };
 }

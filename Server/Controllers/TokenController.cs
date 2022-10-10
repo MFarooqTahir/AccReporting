@@ -8,7 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace AccReporting.Server.Controllers
 {
-    [Route("api/[controller]")]
+    [Route(template: "api/[controller]")]
     [ApiController]
     public class TokenController : ControllerBase
     {
@@ -22,25 +22,25 @@ namespace AccReporting.Server.Controllers
         }
 
         [HttpPost]
-        [Route("refresh")]
+        [Route(template: "refresh")]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenDto tokenDto)
         {
             if (tokenDto is null)
             {
-                return BadRequest(new AuthResponseDto { IsAuthSuccessful = false, ErrorMessage = "Invalid client request" });
+                return BadRequest(error: new AuthResponseDto { IsAuthSuccessful = false, ErrorMessage = "Invalid client request" });
             }
-            var principal = _tokenService.GetPrincipalFromExpiredToken(tokenDto.Token);
+            var principal = _tokenService.GetPrincipalFromExpiredToken(token: tokenDto.Token);
             var username = principal.Identity.Name;
-            var user = await _userManager.FindByEmailAsync(username);
+            var user = await _userManager.FindByEmailAsync(email: username);
             if (user == null || user.RefreshToken != tokenDto.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
-                return BadRequest(new AuthResponseDto { IsAuthSuccessful = false, ErrorMessage = "Invalid client request" });
+                return BadRequest(error: new AuthResponseDto { IsAuthSuccessful = false, ErrorMessage = "Invalid client request" });
             var signingCredentials = _tokenService.GetSigningCredentials();
-            var claims = await _tokenService.GetClaims(user);
-            var tokenOptions = _tokenService.GenerateTokenOptions(signingCredentials, claims);
-            var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+            var claims = await _tokenService.GetClaims(user: user);
+            var tokenOptions = _tokenService.GenerateTokenOptions(signingCredentials: signingCredentials, claims: claims);
+            var token = new JwtSecurityTokenHandler().WriteToken(token: tokenOptions);
             user.RefreshToken = _tokenService.GenerateRefreshToken();
-            await _userManager.UpdateAsync(user);
-            return Ok(new AuthResponseDto { Token = token, RefreshToken = user.RefreshToken, IsAuthSuccessful = true });
+            await _userManager.UpdateAsync(user: user);
+            return Ok(value: new AuthResponseDto { Token = token, RefreshToken = user.RefreshToken, IsAuthSuccessful = true });
         }
     }
 }

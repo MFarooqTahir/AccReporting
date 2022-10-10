@@ -4,8 +4,8 @@
 @using Syncfusion.Blazor.Inputs
 @using Syncfusion.Blazor.Lists
 @inject ILocalStorageService LocalStorage
-@inject HttpClient client
-@inject NavigationManager nav
+@inject HttpClient Client
+@inject NavigationManager Nav
 @using Syncfusion.Blazor.Popups
 @using Syncfusion.Blazor.SplitButtons
 @using System.Diagnostics
@@ -17,7 +17,7 @@
             <div class="col">
                 @if (CurrentAccount?.Role == "Admin")
                 {
-                    <SfButton CssClass="bg-success" OnClick="@onUploadclick" IconCss="syncfusion-blazor-icons syncfusion-blazor-icon-fileupload"></SfButton>
+                    <SfButton CssClass="bg-success" OnClick="@OnUploadclick" IconCss="syncfusion-blazor-icons syncfusion-blazor-icon-fileupload"></SfButton>
                     <SfButton CssClass="bg-success" OnClick="@ShowUsers" IconCss="e-icons e-user">Users</SfButton>
                 }
                 <SfButton CssClass="bg-success" OnClick="@AddNewCompany" IconCss="e-icons e-plus">Add</SfButton>
@@ -28,8 +28,8 @@
         {
             <SfListView DataSource="@CompAccount" CssClass="mx-auto"
                     ShowHeader="false">
-                <ListViewFieldSettings TValue="CompaniesListDTO" GroupBy="@nameof(CompaniesListDTO.Role)" Id="@nameof(CompaniesListDTO.ID)"></ListViewFieldSettings>
-                <ListViewTemplates TValue="CompaniesListDTO">
+                <ListViewFieldSettings TValue="CompaniesListDto" GroupBy="@nameof(CompaniesListDto.Role)" Id="@nameof(CompaniesListDto.Id)"></ListViewFieldSettings>
+                <ListViewTemplates TValue="CompaniesListDto">
                     <GroupTemplate Context="listItem">
                         <h5 class="text-center">
                             @(listItem.Text=="Admin"?"Your Companies":"Companies")
@@ -37,7 +37,7 @@
                     </GroupTemplate>
                     <Template Context="listItem">
                         @{
-                        <div class="d-flex text-center" @onclick="@(async ()=>await onClick(listItem.ID))">
+                        <div class="d-flex text-center" @onclick="@(async ()=>await OnClick(id: listItem.Id))">
                             <span class="badge rounded-pill"><i style="font-size:12px;color:@(listItem.IsSelected?"green":"red")" class="oi oi-@(listItem.IsSelected?"check":"x")"></i></span>
                             @(listItem.AccountNo)@(listItem.Role=="Admin"?"":" - ")@(listItem.Name)
                         </div>
@@ -71,7 +71,7 @@
                 </Content>
             </DialogTemplates>
             <DialogButtons>
-                <DialogButton Content="OK" IsPrimary="true" OnClick="@showSuccessCreatedClose" />
+                <DialogButton Content="OK" IsPrimary="true" OnClick="@ShowSuccessCreatedClose" />
             </DialogButtons>
             <DialogAnimationSettings Effect="@DialogEffect.None"></DialogAnimationSettings>
         </SfDialog>
@@ -85,7 +85,7 @@
                         <GridSearchSettings Fields=@(new string[] { "UserEmail","AcCode"})></GridSearchSettings>
                         <GridColumns>
                             @*<GridColumn hidden Field="@nameof(DisplayUsersDto.IsAdmin)" HeaderText="Admin" DisplayAsCheckBox="true" MaxWidth="30" MinWidth="30"></GridColumn>*@
-                            <GridColumn IsPrimaryKey="true" Field="@nameof(DisplayUsersDto.ID)" HeaderText="" Width="50"></GridColumn>
+                            <GridColumn IsPrimaryKey="true" Field="@nameof(DisplayUsersDto.Id)" HeaderText="" Width="50"></GridColumn>
                             <GridColumn AllowSearching="true" EditType="EditType.DefaultEdit" Field="@nameof(DisplayUsersDto.UserEmail)" HeaderText="User Email"></GridColumn>
                             <GridColumn AllowSearching="true" AllowEditing="false" Field="@nameof(DisplayUsersDto.AcCode)" HeaderText="Ac Code" Width="85"></GridColumn>
                         </GridColumns>
@@ -104,7 +104,7 @@
                     <SfSpinner Label="" Visible="@IsUploading"></SfSpinner>
 
                     <SfUploader AllowedExtensions=".txt">
-                        <UploaderEvents BeforeUpload="UploadStart" Success="UploadEnd" FileSelected="onFileSelect">
+                        <UploaderEvents BeforeUpload="UploadStart" Success="UploadEnd" FileSelected="OnFileSelect">
                         </UploaderEvents>
                         <UploaderAsyncSettings SaveUrl="api/Account/fileupload"></UploaderAsyncSettings>
                     </SfUploader>
@@ -121,23 +121,23 @@
                 <Content>
                     <span class="text-center">Company needs to be approved after creation</span>
                     <hr />
-                    <EditForm Model="@inpModel" Context="ct" OnValidSubmit="@OnValidSubmit">
+                    <EditForm Model="@_inpModel" Context="ct" OnValidSubmit="@OnValidSubmit">
                         <DataAnnotationsValidator />
                         <div class="form-group">
                             <div>
                                 <label for="Name">Name</label>
-                                <SfTextBox @bind-Value="@inpModel.Name" Placeholder="Enter a name"></SfTextBox>
-                                <ValidationMessage For="@(() => inpModel.Name)" />
+                                <SfTextBox @bind-Value="@_inpModel.Name" Placeholder="Enter a name"></SfTextBox>
+                                <ValidationMessage For="@(() => _inpModel.Name)" />
                             </div>
                             <div>
                                 <label for="phone">Phone</label>
-                                <SfTextBox @bind-Value="@inpModel.phone" Placeholder="Enter your phone"></SfTextBox>
-                                <ValidationMessage For="@(() => inpModel.phone)" />
+                                <SfTextBox @bind-Value="@_inpModel.Phone" Placeholder="Enter your phone"></SfTextBox>
+                                <ValidationMessage For="@(() => _inpModel.Phone)" />
                             </div>
                             <div>
                                 <label for="Address">Address</label>
-                                <SfTextBox @bind-Value="@inpModel.Address" Multiline="true" Placeholder="Enter an address"></SfTextBox>
-                                <ValidationMessage For="@(() => inpModel.Address)" />
+                                <SfTextBox @bind-Value="@_inpModel.Address" Multiline="true" Placeholder="Enter an address"></SfTextBox>
+                                <ValidationMessage For="@(() => _inpModel.Address)" />
                             </div>
                         </div>
                         <div class="mt-3 ms-auto me-0">
@@ -154,22 +154,21 @@
     </Authorized>
 </AuthorizeView>
 @code {
+
     [Inject]
-    public HttpInterceptorService Interceptor { get; set; }
+    public HttpInterceptorService Interceptor { get; set; } = null!;
     [CascadingParameter]
-    Task<AuthenticationState> authState { get; set; }
-    NewCompanyInputDto inpModel = new();
-    List<CompaniesListDTO>? CompAccount { get; set; } = new();
+    Task<AuthenticationState> AuthState { get; set; } = null!;
+    NewCompanyInputDto _inpModel = new();
+    List<CompaniesListDto>? CompAccount { get; set; } = new();
     List<DisplayUsersDto>? CurrUsers { get; set; } = new();
-    CompaniesListDTO? CurrentAccount { get; set; } = new();
-    private bool Visibility { get; set; } = false;
+    CompaniesListDto? CurrentAccount { get; set; } = new();
+    private bool Visibility { get; set; }
     private bool UploadDialogVisible { get; set; }
     private bool AddDialogVisible { get; set; }
     private bool VisibilityUsers { get; set; }
     private bool IsUploading { get; set; }
     private bool VisibilityCompanyCreatedNeedsApproval{ get; set; }
-
-    IEnumerable<System.Security.Claims.Claim> st{ get; set; }
     public void CellSavedHandler(CellSaveArgs<DisplayUsersDto> args)
     {
         // Here, you can customize your code.
@@ -182,7 +181,7 @@
     {
         if (args.RequestType == Syncfusion.Blazor.Grids.Action.Save)
         {
-            var result = await client.PostAsJsonAsync<DisplayUsersDto>("/api/Account/AddOrUpdateAccount", args.Data);
+            var result = await Client.PostAsJsonAsync(requestUri: "/api/Account/AddOrUpdateAccount", value: args.Data);
             if (result.IsSuccessStatusCode)
             {
                 var boolresult = await result.Content.ReadFromJsonAsync<bool>();
@@ -193,36 +192,36 @@
                 }
             }
 
-            CurrUsers = await client.GetFromJsonAsync<List<DisplayUsersDto>?>("/api/Account/GetUserAccounts");
+            CurrUsers = await Client.GetFromJsonAsync<List<DisplayUsersDto>?>(requestUri: "/api/Account/GetUserAccounts");
             if (CurrUsers is null)
             {
-                CurrUsers = new();
+                CurrUsers = new List<DisplayUsersDto>();
             }
-            await InvokeAsync(StateHasChanged);
+            await InvokeAsync(workItem: StateHasChanged);
         }
     }
     async Task UploadStart(BeforeUploadEventArgs args)
     {
         IsUploading = true;
-        await InvokeAsync(StateHasChanged);
+        await InvokeAsync(workItem: StateHasChanged);
     }
     async Task UploadEnd(SuccessEventArgs args)
     {
         IsUploading = false;
-        await InvokeAsync(StateHasChanged);
+        await InvokeAsync(workItem: StateHasChanged);
     }
-    async Task onClick(string ID)
+    async Task OnClick(string id)
     {
-        var result = await client.GetFromJsonAsync<bool>("/api/Account/ChangeSelectedCompany?ID=" + ID);
+        var result = await Client.GetFromJsonAsync<bool>(requestUri: "/api/Account/ChangeSelectedCompany?ID=" + id);
         if (result)
         {
-            CompAccount = await client.GetFromJsonAsync<List<CompaniesListDTO>?>("/api/Account/GetAllCompaniesForUser");
-            CurrentAccount = CompAccount.FirstOrDefault(x => x.IsSelected);
-            if (string.IsNullOrWhiteSpace(CurrentAccount?.ID))
+            CompAccount = await Client.GetFromJsonAsync<List<CompaniesListDto>?>(requestUri: "/api/Account/GetAllCompaniesForUser");
+            CurrentAccount = CompAccount!.FirstOrDefault(predicate: x => x.IsSelected);
+            if (string.IsNullOrWhiteSpace(value: CurrentAccount?.Id))
             {
                 CurrentAccount = null;
             }
-            await InvokeAsync(StateHasChanged);
+            await InvokeAsync(workItem: StateHasChanged);
         }
         else
         {
@@ -232,22 +231,22 @@
     async Task OnValidSubmit(EditContext ctx)
     {
         var model = ctx.Model as NewCompanyInputDto;
-        var res = await client.PostAsJsonAsync<NewCompanyInputDto>("/api/Account/CreateCompany", model);
+        var res = await Client.PostAsJsonAsync(requestUri: "/api/Account/CreateCompany", value: model!);
         if (res.IsSuccessStatusCode)
         {
-            var boolresult = await res.Content.ReadFromJsonAsync<bool>();
-            if (boolresult)
+            var boolResultFromJsonAsync = await res.Content.ReadFromJsonAsync<bool>();
+            if (boolResultFromJsonAsync)
             {
                 AddDialogVisible = false;
-                showSuccessCreated(null);
+                ShowSuccessCreated(args: null!);
 
-                CompAccount = await client.GetFromJsonAsync<List<CompaniesListDTO>?>("/api/Account/GetAllCompaniesForUser");
-                CurrentAccount = CompAccount.FirstOrDefault(x => x.IsSelected);
-                if (string.IsNullOrWhiteSpace(CurrentAccount?.ID))
+                CompAccount = await Client.GetFromJsonAsync<List<CompaniesListDto>?>(requestUri: "/api/Account/GetAllCompaniesForUser");
+                CurrentAccount = CompAccount!.FirstOrDefault(predicate: x => x.IsSelected);
+                if (string.IsNullOrWhiteSpace(value: CurrentAccount?.Id))
                 {
                     CurrentAccount = null;
                 }
-                await InvokeAsync(StateHasChanged);
+                await InvokeAsync(workItem: StateHasChanged);
             }
             else
             {
@@ -256,15 +255,15 @@
             }
         }
     }
-    private async void onFileSelect(SelectedEventArgs args)
+    private async void OnFileSelect(SelectedEventArgs args)
     {
-        var st = (await authState).User.Claims.ToList();
-        var val = st.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
-        var valx=val.Value;
-        args.CurrentRequest = new List<object> { new { ID = valx } };
+        var st = (await AuthState).User.Claims.ToList();
+        var val = st.FirstOrDefault(predicate: x => x.Type == ClaimTypes.NameIdentifier);
+        var value=val?.Value??"";
+        args.CurrentRequest = new List<object> { new { ID = value } };
     }
 
-    private void onUploadclick(MouseEventArgs args)
+    private void OnUploadclick(MouseEventArgs args)
     {
         UploadDialogVisible = true;
     }
@@ -277,7 +276,7 @@
     {
         Visibility = false;
     }
-    private async Task DlgButtonAddClick(MouseEventArgs args)
+    private void DlgButtonAddClick(MouseEventArgs args)
     {
         AddDialogVisible = false;
     }
@@ -287,28 +286,24 @@
     }
 
 
-    private async Task showSuccessCreated(MouseEventArgs args)
+    private void ShowSuccessCreated(MouseEventArgs args)
     {
         VisibilityCompanyCreatedNeedsApproval = true;
     }
-    private void showSuccessCreatedClose(MouseEventArgs args)
+    private void ShowSuccessCreatedClose(MouseEventArgs args)
     {
         VisibilityCompanyCreatedNeedsApproval = false;
     }
 
 
-    private async Task DontShowUsers(MouseEventArgs args)
+    private void DontShowUsers(MouseEventArgs args)
     {
         CurrUsers = null;
         VisibilityUsers = false;
     }
     private async Task ShowUsers(MouseEventArgs args)
     {
-        CurrUsers = await client.GetFromJsonAsync<List<DisplayUsersDto>?>("/api/Account/GetUserAccounts");
-        if (CurrUsers is null)
-        {
-            CurrUsers = new();
-        }
+        CurrUsers = await Client.GetFromJsonAsync<List<DisplayUsersDto>?>(requestUri: "/api/Account/GetUserAccounts") ?? new List<DisplayUsersDto>();
 
         VisibilityUsers = true;
     }
@@ -316,12 +311,12 @@
     {
         Interceptor.RegisterEvent();
         
-        CompAccount = await client.GetFromJsonAsync<List<CompaniesListDTO>?>("/api/Account/GetAllCompaniesForUser");
-        CurrentAccount = CompAccount.FirstOrDefault(x => x.IsSelected);
-        if (string.IsNullOrWhiteSpace(CurrentAccount?.ID))
+        CompAccount = await Client.GetFromJsonAsync<List<CompaniesListDto>?>(requestUri: "/api/Account/GetAllCompaniesForUser");
+        CurrentAccount = CompAccount!.FirstOrDefault(predicate: x => x.IsSelected);
+        if (string.IsNullOrWhiteSpace(value: CurrentAccount?.Id))
         {
             CurrentAccount = null;
         }
-        await InvokeAsync(StateHasChanged);
+        await InvokeAsync(workItem: StateHasChanged);
     }
 }

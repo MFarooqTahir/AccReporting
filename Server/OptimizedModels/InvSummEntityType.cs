@@ -194,6 +194,10 @@ namespace AccReporting.Server.OptimizedModels
             runtimeEntityType.SetPrimaryKey(key);
             key.AddAnnotation("Relational:Name", "PK__InvSumm__B87C5B5F9C9191C6");
 
+            var index = runtimeEntityType.AddIndex(
+                new[] { invNo });
+            index.AddAnnotation("Relational:Name", "InvNoIndex");
+
             return runtimeEntityType;
         }
 

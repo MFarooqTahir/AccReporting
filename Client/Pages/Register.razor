@@ -49,13 +49,13 @@
 </div>
 @code
 {
-        private UserForRegistrationDto _userForRegistration = new UserForRegistrationDto();
+        private readonly UserForRegistrationDto _userForRegistration = new();
     [Inject]
-    public IAuthenticationService AuthenticationService { get; set; }
+    public IAuthenticationService AuthenticationService { get; set; } = null!;
     [Inject]
-    public NavigationManager NavigationManager { get; set; }
+    public NavigationManager NavigationManager { get; set; } = null!;
     public bool ShowRegistrationErrors { get; set; }
-    public IEnumerable<string> Errors { get; set; }
+    public IEnumerable<string> Errors { get; set; } = null!;
     public bool ShowPass { get; set; }
     public string TxtType = "password"; 
  
@@ -73,7 +73,7 @@
     public async Task RegisterUser()
     {
         ShowRegistrationErrors = false;
-        var result = await AuthenticationService.RegisterUser(_userForRegistration);
+        var result = await AuthenticationService.RegisterUser(userForRegistration: _userForRegistration);
         if(!result.IsSuccessfulRegistration)
         {
             Errors = result.Errors;
@@ -81,7 +81,7 @@
         }
         else
         {
-            NavigationManager.NavigateTo("/login");
+            NavigationManager.NavigateTo(uri: "/login");
         }
     }
 }

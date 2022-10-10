@@ -17,7 +17,7 @@ using Throw;
 namespace AccReporting.Server.Controllers
 {
     [Authorize]
-    [Route("[controller]")]
+    [Route(template: "[controller]")]
     [ApiController]
     public class ReportsController : ControllerBase
     {
@@ -25,9 +25,9 @@ namespace AccReporting.Server.Controllers
         private readonly ILogger<ReportsController> _logger;
         private readonly DataService _dataService;
 
-        private static readonly IDictionary<string, string> types = new Dictionary<string, string>()
+        private static readonly IDictionary<string, string> Types = new Dictionary<string, string>()
                 {
-                    {"Sale","S" },{"Estimate","E" },{"Purchase","P" },{"Return","R"}
+                    {"Sale","S" },{"Estimate","E" },{"Purchase","P" },{"Return","R"},{"Purchase Return","Q"},{"Cash","C"}
                 };
 
         public ReportsController(DataService dataService, ILogger<ReportsController> logger, ApplicationDbContext authDb)
@@ -37,63 +37,61 @@ namespace AccReporting.Server.Controllers
             _authDb = authDb;
         }
 
-        [HttpGet("InvSummaryList")]
-        public async Task<IEnumerable<InvSummGridModel>> InvSummaryListPaged(string Type, CancellationToken ct, int page = 0, int pageSize = 0)
+        [HttpGet(template: "InvSummaryList")]
+        public async Task<IEnumerable<InvSummGridModel>> InvSummaryListPaged(string type, CancellationToken ct, int page = 0, int pageSize = 0)
         {
             try
             {
-                _ = Request;
-                var id = User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value;
-                var data = _authDb.CompanyAccounts.Where(x => x.UserID == id && x.IsSelected)
-                    .Select(y => new { y.AcNumber, y.Company.DbName }).First();
-                await _dataService.SetDbName(data.DbName, ct);
-                var ret = await _dataService.GetInvSummGridAsync(data.AcNumber, Type, page, pageSize, ct);
+                var id = User.Claims.First(predicate: a => a.Type == ClaimTypes.NameIdentifier).Value;
+                var data = _authDb.CompanyAccounts.Where(predicate: x => x.UserId == id && x.IsSelected)
+                    .Select(selector: y => new { y.AcNumber, y.Company.DbName }).First();
+                await _dataService.SetDbName(dbName: data.DbName, ct: ct);
+                var ret = await _dataService.GetInvSummGridAsync(acCode: data.AcNumber, type: type, pageNumber: page, pageSize: pageSize, ct: ct);
                 return ret;
             }
             catch (Exception ex)
             {
-                _logger.LogWarning("There was an error {Message}", ex.Message);
+                _logger.LogWarning(message: "There was an error {Message}", ex.Message);
                 return null;
             }
         }
 
-        [HttpGet("[action]")]
-        public async Task<FileResponse> SalesReport(int invNo, string type, CancellationToken ct)
+        [HttpGet(template: "[action]")]
+        public async Task<FileResponse> SalesReport(int invNo, string type, string pcode, CancellationToken ct)
         {
             try
             {
                 _ = Request;
-                string InpType = types[type];
+                var inpType = Types[key: type];
                 invNo.Throw()
                             .IfNegative()
                             .IfDefault();
                 type.Throw()
-                    .IfNullOrWhiteSpace(x => x);
-                var id = User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value;
+                    .IfNullOrWhiteSpace(func: x => x);
+                var id = User.Claims.First(predicate: a => a.Type == ClaimTypes.NameIdentifier).Value;
                 var data = await _authDb.CompanyAccounts
-                    .Where(x => x.UserID == id && x.IsSelected)
-                    .Select(y => new { y.AcNumber, y.Company.DbName, y.Company.Name, y.Company.Phone, y.Company.Address })
-                    .FirstAsync(ct);
-                _logger.LogInformation("Getting sales report for invoice {invNo}", invNo);
-                await _dataService.SetDbName(data.DbName, ct);
-                var res = await _dataService.GetSalesInvoiceData(invNo, InpType, data.AcNumber, ct);
+                    .Where(predicate: x => x.UserId == id && x.IsSelected)
+                    .Select(selector: y => new { y.AcNumber, y.Company.DbName, y.Company.Name, y.Company.Phone, y.Company.Address })
+                    .FirstAsync(cancellationToken: ct);
+                _logger.LogInformation(message: "Getting sales report for invoice {invNo}", invNo);
+                await _dataService.SetDbName(dbName: data.DbName, ct: ct);
+                var res = await _dataService.GetSalesInvoiceData(invNo: invNo, type: inpType, acNumber: data.AcNumber, pcode: pcode, ct: ct);
                 if (res?.InvNo != invNo)
                 {
-                    _logger.LogInformation("Invoice not found {invNo}", invNo);
+                    _logger.LogInformation(message: "Invoice not found {invNo}", invNo);
                     return null;
                 }
                 res.Type = type;
                 res.CompanyName = data.Name;
-                res.cell = data.Phone;
+                res.Cell = data.Phone;
                 res.Address = data.Address;
-                var Report = new SalesReportQuest(res);
-                _logger.LogInformation("Got sales report for invoice {invNo}", invNo);
-                var ret = new FileResponse() { File = Report.GeneratePdf(), Name = "SalesReport.pdf" };
-                return ret;
+                var report = new SalesReportQuest(reportData: res);
+                _logger.LogInformation(message: "Got sales report for invoice {invNo}", invNo);
+                return new FileResponse() { File = report.GeneratePdf(), Name = "SalesReport.pdf" };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting sales report for invoice {invNo}, request from {Name}", invNo, User.Identity.Name);
+                _logger.LogError(exception: ex, message: "Error getting sales report for invoice {invNo}, request from {Name}", invNo, User.Identity.Name);
                 return null;
             }
         }

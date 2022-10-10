@@ -14,19 +14,19 @@ public class EmailService : IEmailSender
         const string fromPassword = "fyodjikehsunvmdq";
 
         MailMessage message = new();
-        message.From = new MailAddress(fromMail);
+        message.From = new MailAddress(address: fromMail);
         message.Subject = subject;
-        message.To.Add(new MailAddress(email));
+        message.To.Add(item: new MailAddress(address: email));
         message.Body = htmlMessage;
         message.IsBodyHtml = true;
 
-        var smtpClient = new SmtpClient("smtp.gmail.com")
+        var smtpClient = new SmtpClient(host: "smtp.gmail.com")
         {
             Port = 587,
-            Credentials = new NetworkCredential(fromMail, fromPassword),
+            Credentials = new NetworkCredential(userName: fromMail, password: fromPassword),
             EnableSsl = true,
         };
-        await smtpClient.SendMailAsync(message);
+        await smtpClient.SendMailAsync(message: message);
     }
 }
 

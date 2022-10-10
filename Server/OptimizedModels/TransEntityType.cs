@@ -102,6 +102,10 @@ namespace AccReporting.Server.OptimizedModels
             runtimeEntityType.SetPrimaryKey(key);
             key.AddAnnotation("Relational:Name", "PK__Trans__B87C5B5F2A4B3E66");
 
+            var index = runtimeEntityType.AddIndex(
+                new[] { actCode });
+            index.AddAnnotation("Relational:Name", "ActCodeIndex");
+
             return runtimeEntityType;
         }
 

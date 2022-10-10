@@ -51,7 +51,7 @@ namespace AccReporting.Server.DbContexts.Configurations
             entity.Property(e => e.Remarks).HasMaxLength(50);
 
             entity.Property(e => e.Type).HasMaxLength(4);
-
+            entity.HasIndex(x => x.InvNo).HasDatabaseName("InvNoIndex");
             OnConfigurePartial(entity);
         }
 

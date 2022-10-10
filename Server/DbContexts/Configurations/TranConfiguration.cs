@@ -33,7 +33,7 @@ namespace AccReporting.Server.DbContexts.Configurations
             entity.Property(e => e.Des).HasMaxLength(205);
 
             entity.Property(e => e.Vnoc).HasMaxLength(8);
-
+            entity.HasIndex(e => e.ActCode).HasDatabaseName("ActCodeIndex");
             OnConfigurePartial(entity);
         }
 

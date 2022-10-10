@@ -28,7 +28,7 @@ namespace AccReporting.Server.OptimizedModels
             InvSummEntityType.CreateAnnotations(invSumm);
             TransEntityType.CreateAnnotations(trans);
 
-            AddAnnotation("ProductVersion", "6.0.6");
+            AddAnnotation("ProductVersion", "6.0.9");
             AddAnnotation("Relational:MaxIdentifierLength", 64);
         }
     }

@@ -15,20 +15,20 @@ using System.Net.Http.Headers;
 
 using Toolbelt.Blazor.Extensions.DependencyInjection;
 
-var builder = WebAssemblyHostBuilder.CreateDefault(args);
-builder.RootComponents.Add<App>("#app");
-builder.RootComponents.Add<HeadOutlet>("head::after");
+var builder = WebAssemblyHostBuilder.CreateDefault(args: args);
+builder.RootComponents.Add<App>(selector: "#app");
+builder.RootComponents.Add<HeadOutlet>(selector: "head::after");
 builder.Services.AddSyncfusionBlazor();
 //Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(builder.Configuration.GetValue<string>("SyncfusionLicenseKey"));
 
-builder.Services.AddHttpClient("AccReporting.ServerAPI", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
-    .ConfigureHttpClient(x => x.DefaultRequestHeaders.Accept
-    .Add(new MediaTypeWithQualityHeaderValue("application/json")));
+builder.Services.AddHttpClient(name: "AccReporting.ServerAPI", configureClient: client => client.BaseAddress = new Uri(uriString: builder.HostEnvironment.BaseAddress))
+    .ConfigureHttpClient(configureClient: x => x.DefaultRequestHeaders.Accept
+    .Add(item: new MediaTypeWithQualityHeaderValue(mediaType: "application/json")));
 //.AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
 builder.Services.AddLoadingBar();
 
 // Supply HttpClient instances that include access tokens when making requests to the server project
-builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("AccReporting.ServerAPI").EnableIntercept(sp));
+builder.Services.AddScoped(implementationFactory: sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient(name: "AccReporting.ServerAPI").EnableIntercept(services: sp));
 //var client = builder.Services.BuildServiceProvider().GetRequiredService<HttpClient>();
 //var Cal = await client.GetByteArrayAsync("Fonts/Calibri/Calibri.ttf");
 //var Calb = await client.GetByteArrayAsync("Fonts/Calibri/calibrib.ttf");
@@ -44,7 +44,7 @@ builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
 builder.Services.AddScoped<RefreshTokenService>();
 builder.Services.AddHttpClientInterceptor();
 builder.Services.AddScoped<HttpInterceptorService>();
-var culture = new CultureInfo("hi-IN");
+var culture = new CultureInfo(name: "hi-IN");
 culture.NumberFormat.CurrencySymbol = "Rs.";
 CultureInfo.DefaultThreadCurrentCulture = culture;
 CultureInfo.DefaultThreadCurrentUICulture = culture;

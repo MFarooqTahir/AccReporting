@@ -1,17 +1,8 @@
 ﻿@page "/Reports"
-@using AccReporting.Shared.DTOs
-@using Syncfusion.Blazor.Buttons
-@using Syncfusion.Blazor.Cards
-@using Syncfusion.Blazor.Data
-@using Syncfusion.Blazor.DropDowns
-@using Syncfusion.Blazor.Grids
-@using Syncfusion.Blazor.Inputs
-@using Syncfusion.Blazor.Navigations
 @inject HttpClient Http
-@inject IJSRuntime JS
 <div class="d-block align-content-center w-100">
     <h3 class="text-center">Reports</h3>
-    <SfTab @ref="@Tab" SelectedItemChanged="@OnSelectionChanged" HeaderPlacement="HeaderPosition.Top" LoadOn="ContentLoad.Dynamic" OverflowMode="@OverflowMode.Scrollable">
+    <SfTab HeaderPlacement="HeaderPosition.Top" LoadOn="ContentLoad.Dynamic" OverflowMode="@OverflowMode.Scrollable">
         <TabItems>
             <TabItem  Content="Place here your content">
                 @*Replace your required tab1 boby content here *@
@@ -43,56 +34,21 @@
     </SfTab>
 </div>
 @code {
-    IEnumerable<InvSummGridModel>? SalesReportList;
-    SfGrid<InvSummGridModel> DataGrid { get; set; }
-    SfTab Tab { get; set; }
-    /// <summary>
-    /// Event for Toolbar click for Grid Exporting
-    /// </summary>
-    public void GridToolbarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
-    {
-        if (args.Item.Id == "//IDValue###_excelexport")
-        {
-            this.DataGrid.ExcelExport();
-        }
-        if (args.Item.Id == "//IDValue###_pdfexport")
-        {
-            this.DataGrid.PdfExport();
-        }
-        if (args.Item.Id == "//IDValue###_csvexport")
-        {
-            this.DataGrid.CsvExport();
-        }
-    }
-
     protected override async Task OnInitializedAsync()
     {
             await ClickedSalesReport();
         
     }
-    private async Task<int> OnSelectionChanged()
-    {
-        int curr = Tab.SelectedItem;
-        if (curr == 1)
-        {
-        }
-        return curr;
-    }
     private async Task ClickedSalesReport()
     {
-        var response = await Http.GetAsync("/api/SalesReport");
+        var response = await Http.GetAsync(requestUri: "/api/SalesReport");
         var sc = await response.Content.ReadAsStringAsync();
-        SalesReportList = await Http.GetFromJsonAsync<IEnumerable<InvSummGridModel>>("/Reports/InvSummaryListPaged?page=0&pageSize=25").ConfigureAwait(false);
+        await Http.GetFromJsonAsync<IEnumerable<InvSummGridModel>>(requestUri: "/Reports/InvSummaryListPaged?page=0&pageSize=25").ConfigureAwait(continueOnCapturedContext: false);
         StateHasChanged();
     }
-    private SalesReportInput model { get; set; } = new();
-    public List<string> types = new List<string>
+    private SalesReportInput Model { get; set; } = new();
+    public List<string> Types = new()
     {
        "Sale","Estimate","Purchase","Return",
     };
-    private async Task onvalid(EditContext context)
-    {
-        var modelInp = context.Model as SalesReportInput;
-        await JS.InvokeVoidAsync("open", $"Reports/SalesReport?invNo={model.InvNo}&type={model.Type}", "_blank");
-    }
 }

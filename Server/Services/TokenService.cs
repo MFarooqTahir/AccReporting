@@ -21,24 +21,24 @@ namespace AccReporting.Server.Services
 
         public SigningCredentials GetSigningCredentials()
         {
-            var key = Encoding.UTF8.GetBytes(_configuration["securityKey"]);
-            var secret = new SymmetricSecurityKey(key);
+            var key = Encoding.UTF8.GetBytes(s: _configuration[key: "securityKey"]);
+            var secret = new SymmetricSecurityKey(key: key);
 
-            return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
+            return new SigningCredentials(key: secret, algorithm: SecurityAlgorithms.HmacSha256);
         }
 
         public async Task<List<Claim>> GetClaims(ApplicationUser user)
         {
             var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, user.Email),
-                new Claim(ClaimTypes.NameIdentifier, user.Id)
+            new(type: ClaimTypes.Name, value: user.Email),
+                new(type: ClaimTypes.NameIdentifier, value: user.Id)
         };
 
-            var roles = await _userManager.GetRolesAsync(user);
+            var roles = await _userManager.GetRolesAsync(user: user);
             foreach (var role in roles)
             {
-                claims.Add(new Claim(ClaimTypes.Role, role));
+                claims.Add(item: new Claim(type: ClaimTypes.Role, value: role));
             }
 
             return claims;
@@ -47,10 +47,10 @@ namespace AccReporting.Server.Services
         public JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
         {
             var tokenOptions = new JwtSecurityToken(
-                issuer: _configuration["validIssuer"],
-                audience: _configuration["validAudience"],
+                issuer: _configuration[key: "validIssuer"],
+                audience: _configuration[key: "validAudience"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["expiryInMinutes"])),
+                expires: DateTime.Now.AddMinutes(value: Convert.ToDouble(value: _configuration[key: "expiryInMinutes"])),
                 signingCredentials: signingCredentials);
 
             return tokenOptions;
@@ -61,8 +61,8 @@ namespace AccReporting.Server.Services
             var randomNumber = new byte[32];
             using (var rng = RandomNumberGenerator.Create())
             {
-                rng.GetBytes(randomNumber);
-                return Convert.ToBase64String(randomNumber);
+                rng.GetBytes(data: randomNumber);
+                return Convert.ToBase64String(inArray: randomNumber);
             }
         }
 
@@ -74,21 +74,21 @@ namespace AccReporting.Server.Services
                 ValidateIssuer = true,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(_configuration["securityKey"])),
+                    key: Encoding.UTF8.GetBytes(s: _configuration[key: "securityKey"])),
                 ValidateLifetime = false,
-                ValidIssuer = _configuration["validIssuer"],
-                ValidAudience = _configuration["validAudience"],
+                ValidIssuer = _configuration[key: "validIssuer"],
+                ValidAudience = _configuration[key: "validAudience"],
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
             SecurityToken securityToken;
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
+            var principal = tokenHandler.ValidateToken(token: token, validationParameters: tokenValidationParameters, validatedToken: out securityToken);
 
             var jwtSecurityToken = securityToken as JwtSecurityToken;
-            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
-                StringComparison.InvariantCultureIgnoreCase))
+            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(value: SecurityAlgorithms.HmacSha256,
+                comparisonType: StringComparison.InvariantCultureIgnoreCase))
             {
-                throw new SecurityTokenException("Invalid token");
+                throw new SecurityTokenException(message: "Invalid token");
             }
 
             return principal;

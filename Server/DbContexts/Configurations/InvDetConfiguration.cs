@@ -59,7 +59,8 @@ namespace AccReporting.Server.DbContexts.Configurations
             entity.Property(e => e.Type).HasMaxLength(4);
 
             entity.Property(e => e.Unit).HasMaxLength(5);
-
+            entity.HasIndex(e => e.InvNo).HasDatabaseName("InvNoIndex");
+            entity.HasIndex(e => e.Sp).HasDatabaseName("SpIndex");
             OnConfigurePartial(entity);
         }
 

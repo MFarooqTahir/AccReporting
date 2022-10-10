@@ -6,11 +6,11 @@
         {
         }
 
-        public DbEmptyException(string message) : base(message)
+        public DbEmptyException(string message) : base(message: message)
         {
         }
 
-        public DbEmptyException(string message, Exception innerException) : base(message, innerException)
+        public DbEmptyException(string message, Exception innerException) : base(message: message, innerException: innerException)
         {
         }
     }

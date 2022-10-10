@@ -9,7 +9,7 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace AccReporting.Server.Controllers
 {
-    [Route("api/[controller]")]
+    [Route(template: "api/[controller]")]
     [ApiController]
     [AllowAnonymous]
     public class AuthController : ControllerBase
@@ -23,47 +23,42 @@ namespace AccReporting.Server.Controllers
             _tokenService = tokenService;
         }
 
-        [HttpPost("Registration")]
+        [HttpPost(template: "Registration")]
         public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDto userForRegistration)
         {
             try
             {
-                if (userForRegistration == null || !ModelState.IsValid)
+                if (!ModelState.IsValid)
                     return BadRequest();
                 var user = new ApplicationUser { UserName = userForRegistration.Email, Email = userForRegistration.Email };
 
-                var result = await _userManager.CreateAsync(user, userForRegistration.Password);
-                if (!result.Succeeded)
-                {
-                    var errors = result.Errors.Select(e => e.Description);
-                    return BadRequest(new RegistrationResponseDto { Errors = errors });
-                }
-
-                return StatusCode(201);
+                var result = await _userManager.CreateAsync(user: user, password: userForRegistration.Password);
+                if (result.Succeeded) return StatusCode(statusCode: 201);
+                var errors = result.Errors.Select(selector: e => e.Description);
+                return BadRequest(error: new RegistrationResponseDto { Errors = errors });
             }
             catch (Exception ex)
             {
-
-                return BadRequest(new RegistrationResponseDto { Errors = new[] { ex.InnerException.Message } });
+                return BadRequest(error: new RegistrationResponseDto { Errors = new[] { ex.InnerException!.Message } });
             }
         }
 
-        [HttpPost("Login")]
+        [HttpPost(template: nameof(Login))]
         public async Task<IActionResult> Login([FromBody] UserForAuthenticationDto userForAuthentication)
         {
-            var user = await _userManager.FindByNameAsync(userForAuthentication.Email);
+            var user = await _userManager.FindByNameAsync(userName: userForAuthentication.Email);
 
-            if (user == null || !await _userManager.CheckPasswordAsync(user, userForAuthentication.Password))
-                return Unauthorized(new AuthResponseDto { ErrorMessage = "Invalid Authentication" });
+            if (user == null || !await _userManager.CheckPasswordAsync(user: user, password: userForAuthentication.Password))
+                return Unauthorized(value: new AuthResponseDto { ErrorMessage = "Invalid Authentication" });
 
             var signingCredentials = _tokenService.GetSigningCredentials();
-            var claims = await _tokenService.GetClaims(user);
-            var tokenOptions = _tokenService.GenerateTokenOptions(signingCredentials, claims);
-            var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+            var claims = await _tokenService.GetClaims(user: user);
+            var tokenOptions = _tokenService.GenerateTokenOptions(signingCredentials: signingCredentials, claims: claims);
+            var token = new JwtSecurityTokenHandler().WriteToken(token: tokenOptions);
             user.RefreshToken = _tokenService.GenerateRefreshToken();
-            user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7);
-            await _userManager.UpdateAsync(user);
-            return Ok(new AuthResponseDto { IsAuthSuccessful = true, Token = token });
+            user.RefreshTokenExpiryTime = DateTime.Now.AddDays(value: 7);
+            await _userManager.UpdateAsync(user: user);
+            return Ok(value: new AuthResponseDto { IsAuthSuccessful = true, Token = token });
         }
     }
 }

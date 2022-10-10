@@ -8,32 +8,32 @@ namespace AccReporting.Client.Classes
         public static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
         {
             var claims = new List<Claim>();
-            var payload = jwt.Split('.')[1];
-            var jsonBytes = ParseBase64WithoutPadding(payload);
-            var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
+            var payload = jwt.Split(separator: '.')[1];
+            var jsonBytes = ParseBase64WithoutPadding(base64: payload);
+            var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(utf8Json: jsonBytes);
 
-            keyValuePairs.TryGetValue(ClaimTypes.Role, out var roles);
+            keyValuePairs.TryGetValue(key: ClaimTypes.Role, value: out var roles);
 
-            if (roles != null)
+            if (roles is not null)
             {
-                if (roles.ToString().Trim().StartsWith("["))
+                if (roles.ToString().Trim().StartsWith(value: "["))
                 {
-                    var parsedRoles = JsonSerializer.Deserialize<string[]>(roles.ToString());
+                    var parsedRoles = JsonSerializer.Deserialize<string[]>(json: roles.ToString());
 
                     foreach (var parsedRole in parsedRoles)
                     {
-                        claims.Add(new Claim(ClaimTypes.Role, parsedRole));
+                        claims.Add(item: new Claim(type: ClaimTypes.Role, value: parsedRole));
                     }
                 }
                 else
                 {
-                    claims.Add(new Claim(ClaimTypes.Role, roles.ToString()));
+                    claims.Add(item: new Claim(type: ClaimTypes.Role, value: roles.ToString()));
                 }
 
-                keyValuePairs.Remove(ClaimTypes.Role);
+                keyValuePairs.Remove(key: ClaimTypes.Role);
             }
 
-            claims.AddRange(keyValuePairs.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString())));
+            claims.AddRange(collection: keyValuePairs.Select(selector: kvp => new Claim(type: kvp.Key, value: kvp.Value.ToString())));
 
             return claims;
         }
@@ -45,7 +45,7 @@ namespace AccReporting.Client.Classes
                 case 2: base64 += "=="; break;
                 case 3: base64 += "="; break;
             }
-            return Convert.FromBase64String(base64);
+            return Convert.FromBase64String(s: base64);
         }
     }
 }

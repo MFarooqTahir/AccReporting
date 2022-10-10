@@ -22,45 +22,45 @@ using System.Globalization;
 using System.Text;
 
 var builder = WebApplication
-    .CreateBuilder(args);
-var culture = new CultureInfo("hi-IN");
+    .CreateBuilder(args: args);
+var culture = new CultureInfo(name: "hi-IN");
 culture.NumberFormat.CurrencySymbol = "Rs.";
 CultureInfo.DefaultThreadCurrentCulture = culture;
 CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-builder.Host.UseSerilog((ctx, lc) => lc
+builder.Host.UseSerilog(configureLogger: (ctx, lc) => lc
     .WriteTo.Console()
-    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning));
+    .MinimumLevel.Override(source: "Microsoft.AspNetCore", minimumLevel: LogEventLevel.Warning));
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-var connectionString1 = builder.Configuration.GetConnectionString("NoDb");
-var connectionString2 = builder.Configuration.GetConnectionString("test");
+var connectionString = builder.Configuration.GetConnectionString(name: "DefaultConnection");
+var connectionString1 = builder.Configuration.GetConnectionString(name: "NoDb");
+var connectionString2 = builder.Configuration.GetConnectionString(name: "test");
 
-builder.Services.AddSingleton<IHashids>(new Hashids("OzoneTechnologies softwares avax", minHashLength: 6));
+builder.Services.AddSingleton<IHashids>(implementationInstance: new Hashids(salt: "OzoneTechnologies softwares avax", minHashLength: 6));
 builder.Services.AddTransient<IEmailSender, EmailService>();
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContext<ApplicationDbContext>(optionsAction: options =>
 {
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-    options.UseModel(ApplicationDbContextModel.Instance);
+    options.UseMySql(connectionString: connectionString, serverVersion: ServerVersion.AutoDetect(connectionString: connectionString));
+    options.UseModel(model: ApplicationDbContextModel.Instance);
 });
 
-builder.Services.AddDbContext<AccountInfoDbContext>(options =>
+builder.Services.AddDbContext<AccountInfoDbContext>(optionsAction: options =>
 {
-    options.UseMySql(connectionString2, ServerVersion.AutoDetect(connectionString2));
-    options.UseModel(AccountInfoDbContextModel.Instance);
+    options.UseMySql(connectionString: connectionString2, serverVersion: ServerVersion.AutoDetect(connectionString: connectionString2));
+    options.UseModel(model: AccountInfoDbContextModel.Instance);
 });
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<ApplicationUser>(configureOptions: options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
     //.AddClaimsPrincipalFactory<MyUserClaimsPrincipalFactory>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
-builder.Services.AddAuthentication(opt =>
+builder.Services.AddAuthentication(configureOptions: opt =>
 {
     opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
+}).AddJwtBearer(configureOptions: options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -69,31 +69,31 @@ builder.Services.AddAuthentication(opt =>
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
 
-        ValidIssuer = builder.Configuration["validIssuer"],
-        ValidAudience = builder.Configuration["validAudience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["securityKey"]))
+        ValidIssuer = builder.Configuration[key: "validIssuer"],
+        ValidAudience = builder.Configuration[key: "validAudience"],
+        IssuerSigningKey = new SymmetricSecurityKey(key: Encoding.UTF8.GetBytes(s: builder.Configuration[key: "securityKey"]))
     };
 });
-builder.Services.AddControllersWithViews().AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver());
+builder.Services.AddControllersWithViews().AddNewtonsoftJson(setupAction: options => options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver());
 builder.Services.AddDistributedMemoryCache();
-builder.Services.AddCors(options => options.AddPolicy("MyPolicy", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
+builder.Services.AddCors(setupAction: options => options.AddPolicy(name: "MyPolicy", configurePolicy: builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<DataService>();
 
 var app = builder.Build();
 var hostingEnvironment = app.Services.GetService<IWebHostEnvironment>();
 
-string[] filePaths = Directory.GetFiles(Path.Combine(hostingEnvironment.WebRootPath, "Fonts/Calibri"));
+var filePaths = Directory.GetFiles(path: Path.Combine(path1: hostingEnvironment.WebRootPath, path2: "Fonts/Calibri"));
 foreach (var filepath in filePaths)
 {
-    using var fs = new FileStream(filepath, FileMode.Open, FileAccess.Read);
-    FontManager.RegisterFont(fs);
+    using var fs = new FileStream(path: filepath, mode: FileMode.Open, access: FileAccess.Read);
+    FontManager.RegisterFont(stream: fs);
 }
-filePaths = Directory.GetFiles(Path.Combine(hostingEnvironment.WebRootPath, "Fonts/Fira"));
+filePaths = Directory.GetFiles(path: Path.Combine(path1: hostingEnvironment.WebRootPath, path2: "Fonts/Fira"));
 foreach (var filepath in filePaths)
 {
-    using var fs = new FileStream(filepath, FileMode.Open, FileAccess.Read);
-    FontManager.RegisterFont(fs);
+    using var fs = new FileStream(path: filepath, mode: FileMode.Open, access: FileAccess.Read);
+    FontManager.RegisterFont(stream: fs);
 }
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -103,7 +103,7 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseExceptionHandler("/Error");
+    app.UseExceptionHandler(errorHandlingPath: "/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
@@ -118,13 +118,13 @@ var cookiePolicyOptions = new CookiePolicyOptions
 {
     MinimumSameSitePolicy = SameSiteMode.Strict,
 };
-app.UseCookiePolicy(cookiePolicyOptions);
+app.UseCookiePolicy(options: cookiePolicyOptions);
 //app.UseIdentityServer();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();
-app.MapFallbackToFile("index.html");
+app.MapFallbackToFile(filePath: "index.html");
 
 app.Run();

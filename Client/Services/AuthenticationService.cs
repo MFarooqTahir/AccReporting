@@ -28,31 +28,31 @@ namespace AccReporting.Client.Services
 
         public async Task<string> RefreshToken()
         {
-            var token = await _localStorage.GetItemAsync<string>("authToken");
-            var refreshToken = await _localStorage.GetItemAsync<string>("refreshToken");
+            var token = await _localStorage.GetItemAsync<string>(key: "authToken");
+            var refreshToken = await _localStorage.GetItemAsync<string>(key: "refreshToken");
 
-            var refreshResult = await _client.PostAsJsonAsync("/api/Token/refresh", new RefreshTokenDto { Token = token, RefreshToken = refreshToken });
+            var refreshResult = await _client.PostAsJsonAsync(requestUri: "/api/Token/refresh", value: new RefreshTokenDto { Token = token, RefreshToken = refreshToken });
             var refreshContent = await refreshResult.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<AuthResponseDto>(refreshContent, _options);
+            var result = JsonSerializer.Deserialize<AuthResponseDto>(json: refreshContent, options: _options);
 
             if (!refreshResult.IsSuccessStatusCode)
-                throw new ApplicationException("Something went wrong during the refresh token action");
+                throw new ApplicationException(message: "Something went wrong during the refresh token action");
 
-            await _localStorage.SetItemAsync("authToken", result.Token);
-            await _localStorage.SetItemAsync("refreshToken", result.RefreshToken);
+            await _localStorage.SetItemAsync(key: "authToken", data: result.Token);
+            await _localStorage.SetItemAsync(key: nameof(refreshToken), data: result.RefreshToken);
 
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", result.Token);
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme: "bearer", parameter: result.Token);
 
             return result.Token;
         }
 
         public async Task<RegistrationResponseDto> RegisterUser(UserForRegistrationDto userForRegistration)
         {
-            var registrationResult = await _client.PostAsJsonAsync("api/Auth/Registration", userForRegistration);
+            var registrationResult = await _client.PostAsJsonAsync(requestUri: "api/Auth/Registration", value: userForRegistration);
             var registrationContent = await registrationResult.Content.ReadAsStringAsync();
             if (!registrationResult.IsSuccessStatusCode)
             {
-                var result = JsonSerializer.Deserialize<RegistrationResponseDto>(registrationContent, _options);
+                var result = JsonSerializer.Deserialize<RegistrationResponseDto>(json: registrationContent, options: _options);
                 return result;
             }
             return new RegistrationResponseDto { IsSuccessfulRegistration = true };
@@ -60,16 +60,16 @@ namespace AccReporting.Client.Services
 
         public async Task<AuthResponseDto> Login(UserForAuthenticationDto userForAuthentication)
         {
-            var authResult = await _client.PostAsJsonAsync("api/Auth/Login", userForAuthentication);
+            var authResult = await _client.PostAsJsonAsync(requestUri: "api/Auth/Login", value: userForAuthentication);
             var authContent = await authResult.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<AuthResponseDto>(authContent, _options);
+            var result = JsonSerializer.Deserialize<AuthResponseDto>(json: authContent, options: _options);
 
             if (!authResult.IsSuccessStatusCode)
                 return result;
 
-            await _localStorage.SetItemAsync("authToken", result.Token);
-            await _localStorage.SetItemAsync("refreshToken", result.RefreshToken);
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", result.Token);
+            await _localStorage.SetItemAsync(key: "authToken", data: result.Token);
+            await _localStorage.SetItemAsync(key: "refreshToken", data: result.RefreshToken);
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme: "bearer", parameter: result.Token);
             ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication();
 
             return new AuthResponseDto { IsAuthSuccessful = true };

@@ -25,6 +25,7 @@ namespace AccReporting.Server.DbContexts.Configurations
             entity.Property(e => e.ActCode).HasMaxLength(30);
 
             entity.Property(e => e.ActName).HasMaxLength(50);
+            entity.HasIndex(e => e.ActCode).HasDatabaseName("ActCodeIndex");
 
             OnConfigurePartial(entity);
         }

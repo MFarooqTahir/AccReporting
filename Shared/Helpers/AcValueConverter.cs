@@ -4,12 +4,12 @@
     {
         public enum SizeUnits
         {
-            Byte, KB, MB, GB, TB, PB, EB, ZB, YB,
+            Byte, Kb, Mb, Gb, Tb, Pb, Eb, Zb, Yb,
         }
 
         public static string ToSize(long value, SizeUnits unit)
         {
-            return (value / Math.Pow(1024, (int)unit)).ToString("0.00");
+            return (value / Math.Pow(x: 1024, y: (int)unit)).ToString(format: "0.00");
         }
     }
 }

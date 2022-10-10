@@ -17,7 +17,7 @@
             Amount = amount;
             Discount = discount;
             NetAmount = netAmount;
-            this.unit = unit;
+            this.Unit = unit;
         }
 
         public int? Sno { get; set; }
@@ -25,7 +25,7 @@
         public string Brand { get; set; }
         public int Pcs { get; set; }
         public int Quantity { get; set; }
-        public string unit { get; set; }
+        public string Unit { get; set; }
         public double? Rate { get; set; }
         public double? Amount { get; set; }
         public double? Discount { get; set; }

@@ -6,21 +6,21 @@
     <AuthorizeView>
         <Authorized>
             <li class="nav-item">
-                <a class="nav-link text-dark me-1" style="pointer-events: none">Hello, @context.User.Identity?.Name!</a>
+                <a class="nav-link text-dark me-1" style="pointer-events: none;color:white !important;">Hello, @context.User.Identity?.Name!</a>
             </li>
             
            <li class="nav-item">
 
-                <a class="buttonstyle nav-link text-dark me-3" href="Logout"><Syncfusion.Blazor.Buttons.SfIcon IconCss="oi oi-account-logout" Title="Log out" Size="Syncfusion.Blazor.Buttons.IconSize.Large"></Syncfusion.Blazor.Buttons.SfIcon></a>
+                <a class="buttonstyle nav-link text-dark me-3" href="Logout" style="color:white !important"><Syncfusion.Blazor.Buttons.SfIcon IconCss="oi oi-account-logout" Title="Log out" Size="Syncfusion.Blazor.Buttons.IconSize.Large" style="color:white !important"></Syncfusion.Blazor.Buttons.SfIcon></a>
             </li>
         </Authorized>
         <NotAuthorized>
-            <li class="nav-item">
-                <a class="nav-link text-dark" href="register">Register</a>
+            <li class="nav-item" style="color:white">
+                <a class="nav-link text-dark" href="register" style="color:white !important">Register</a>
             </li>
 
-            <li class="nav-item me-3">
-                <a class="nav-link text-dark" href="login">Log in</a>
+            <li class="nav-item me-3"style="color:white">
+                <a class="nav-link text-dark" href="login" style="color:white  !important">Log in</a>
             </li>
         </NotAuthorized>
     </AuthorizeView>

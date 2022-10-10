@@ -1,11 +1,6 @@
 ﻿@page "/SalesReport"
-@using System.Globalization
 @using AccReporting.Client.Components
 @using AccReporting.Client.Services
-@using AccReporting.Shared
-@using Syncfusion.Blazor.Buttons
-@inject IJSRuntime JS
-@inject HttpClient Http
 <AuthorizeView>
     <Authorized>
         <style>
@@ -15,9 +10,9 @@
                 font-size: 28px;
             }
         </style>
-        <h3 class="text-center">Sales Report</h3>
+        <h3 class="text-center">Sales Report @Type</h3>
 
-        <SfTab @ref="@Tab" HeaderPlacement="HeaderPosition.Top" LoadOn="ContentLoad.Dynamic" OverflowMode="@OverflowMode.Scrollable">
+        <SfTab @bind-SelectedItem="@SelectedItemIndex" HeaderPlacement="HeaderPosition.Top" LoadOn="ContentLoad.Dynamic" OverflowMode="@OverflowMode.Scrollable">
             <TabItems>
                 <TabItem>
                     <ChildContent>
@@ -55,46 +50,68 @@
                         <SalesReportGrid Type="E"></SalesReportGrid>
                     </ContentTemplate>
                 </TabItem>
-
+                <TabItem>
+                    @*Replace your required tab2 boby content here *@
+                    <ChildContent>
+                        <TabHeader Text="@_typesAll[key: "Q"]"></TabHeader> @*Replace your required header2 text here *@
+                    </ChildContent>
+                    <ContentTemplate>
+                        <SalesReportGrid Type="Q"></SalesReportGrid>
+                    </ContentTemplate>
+                </TabItem>
+                <TabItem>
+                    @*Replace your required tab2 boby content here *@
+                    <ChildContent>
+                        <TabHeader Text="@_typesAll[key: "C"]"></TabHeader> @*Replace your required header2 text here *@
+                    </ChildContent>
+                    <ContentTemplate>
+                        <SalesReportGrid Type="C"></SalesReportGrid>
+                    </ContentTemplate>
+                </TabItem>
             </TabItems>
         </SfTab>
 
     </Authorized>
 </AuthorizeView>
 @code {
-    public SfGrid<InvSummGridModel> defaultGrid = new();
-    SfTab Tab { get; set; }
-    public int pageNo { get; set; }
-    public int totalPages { get; set; }
+    public SfGrid<InvSummGridModel> DefaultGrid = new();
+    string? _type = "None";
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "Type")]
+    public string? Type
+    {
+        get => _type;
+        set 
+        { 
+            SelectedItemIndex = value switch
+            {
+                "Purchase"=>1,
+                "Return"=>2,
+                "Estimate"=>3,
+                "PurchaseReturn"=>4,
+                "Cash"=>5,
+                _ =>0,
+                };
+            _type = value;
+
+        }
+    }
+    public int SelectedItemIndex { get; set; }
     public bool DisableBackIcon = false;
     public bool DisableForwardIcon = false;
     public bool DisableFirstIcon = false;
     public bool DisableLastIcon = false;
     [Inject]
-    public HttpInterceptorService Interceptor { get; set; }
-    public async Task OnCommandClicked(CommandClickEventArgs<InvSummGridModel> args)
-    {
-        var curr = args.RowData;
-        var st = typesAll[curr.Type];
-        var s = curr.InvNo.ToString();
-        var res = await Http.GetFromJsonAsync<FileResponse>($"Reports/SalesReport?invNo={s}&type={st}");
-        await JS.SaveAs(res.Name, res.File);
-        //await JS.InvokeVoidAsync("open", $"Reports/SalesReport?invNo={s}&type={st}", "_blank");
-
-    }
+    public HttpInterceptorService Interceptor { get; set; } = null!;
     
-    private SalesReportInput model { get; set; } = new();
-    public List<string> types = new List<string>
+    private SalesReportInput Model { get; set; } = new();
+    public List<string> Types = new()
     {
        "Sale","Estimate","Purchase","Return",
     };
-    private async Task OnGetReportClick(string invNo, string Type)
+    private readonly IDictionary<string, string> _typesAll = new Dictionary<string, string>(comparer: StringComparer.InvariantCultureIgnoreCase)
     {
-        await JS.InvokeVoidAsync("open", $"Reports/SalesReport?invNo={invNo}&type={Type}", "_blank");
-    }
-    private readonly IDictionary<string, string> typesAll = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
-    {
-        {"S","Sale" },{"E","Estimate" },{"P","Purchase" },{"R","Return"}
+        {"S","Sale" },{"E","Estimate" },{"P","Purchase" },{"R","Return"},{"Q","Purchase Return"},{"C","Cash"}
     };
 }
 

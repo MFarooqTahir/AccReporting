@@ -19,129 +19,126 @@ namespace AccReporting.Server.Reports
         public void Compose(IDocumentContainer container)
         {
             container
-            .Page(page =>
+            .Page(handler: page =>
             {
-                page.Margin(20);
+                page.Margin(value: 20);
 
-                page.Size(PageSizes.A4);
-                page.Header().Element((container) =>
+                page.Size(pageSize: PageSizes.A4);
+                page.Header().Element(handler: (container) =>
                 {
-                    var titleStyle = TextStyle.Default.FontSize(20).FontFamily("Calibri").SemiBold().Fallback(x => x.FontFamily("Fira Code"));
-                    container.Column(column1 =>
+                    var titleStyle = TextStyle.Default.FontSize(value: 20).FontFamily(value: "Calibri").SemiBold().Fallback(handler: x => x.FontFamily(value: "Fira Code"));
+                    container.Column(handler: column1 =>
                     {
-                        column1.Item().Row(row =>
+                        column1.Item().Row(handler: row =>
                     {
-                        row.ConstantItem(150).Column(column =>
+                        row.ConstantItem(size: 150).Column(handler: column =>
                         {
-                            column.Item().Text($"Invoice #{ReportData?.InvNo}").Style(titleStyle);
-                            column.Item().Text($"Type: {ReportData?.Type}").FontFamily("Calibri").SemiBold().Fallback(x => x.FontFamily("Fira Code"));
+                            column.Item().Text(text: $"Invoice #{ReportData?.InvNo}").Style(style: titleStyle);
+                            column.Item().Text(text: $"Type: {ReportData?.Type}").FontFamily(value: "Calibri").SemiBold().Fallback(handler: x => x.FontFamily(value: "Fira Code"));
 
-                            column.Item().Text(text =>
+                            column.Item().Text(content: text =>
                             {
-                                text.Span("Issue date: ").FontFamily("Calibri").SemiBold().Fallback(x => x.FontFamily("Fira Code"));
+                                text.Span(text: "Issue date: ").FontFamily(value: "Calibri").SemiBold().Fallback(handler: x => x.FontFamily(value: "Fira Code"));
                                 if (ReportData?.Dated is not null)
                                 {
-                                    text.Span((ReportData.Dated ?? DateTime.MinValue).ToString("dd/MM/yyyy")).FontFamily("Calibri").Fallback(x => x.FontFamily("Fira Code"));
+                                    text.Span(text: (ReportData.Dated ?? DateTime.MinValue).ToString(format: "dd/MM/yyyy")).FontFamily(value: "Calibri").Fallback(handler: x => x.FontFamily(value: "Fira Code"));
                                 }
                                 else
                                 {
-                                    text.Span("-").FontFamily("Calibri").Fallback(x => x.FontFamily("Fira Code"));
+                                    text.Span(text: "-").FontFamily(value: "Calibri").Fallback(handler: x => x.FontFamily(value: "Fira Code"));
                                 }
                             });
 
-                            column.Item().Text(text =>
+                            column.Item().Text(content: text =>
                             {
-                                text.Span("Due date: ").FontFamily("Calibri").SemiBold().Fallback(x => x.FontFamily("Fira Code"));
+                                text.Span(text: "Due date: ").FontFamily(value: "Calibri").SemiBold().Fallback(handler: x => x.FontFamily(value: "Fira Code"));
                                 if (ReportData?.DueDate is not null)
                                 {
-                                    text.Span((ReportData.DueDate ?? DateTime.MinValue).ToString("dd/MM/yyyy")).FontFamily("Calibri").Fallback(x => x.FontFamily("Fira Code"));
+                                    text.Span(text: (ReportData.DueDate ?? DateTime.MinValue).ToString(format: "dd/MM/yyyy")).FontFamily(value: "Calibri").Fallback(handler: x => x.FontFamily(value: "Fira Code"));
                                 }
                                 else
                                 {
-                                    text.Span("-").FontFamily("Calibri").Fallback(x => x.FontFamily("Fira Code"));
+                                    text.Span(text: "-").FontFamily(value: "Calibri").Fallback(handler: x => x.FontFamily(value: "Fira Code"));
                                 }
                             });
                         });
-                        row.RelativeItem().AlignCenter().Text("Sales Report").FontFamily("Calibri").ExtraBold().FontSize(30).Fallback(x => x.FontFamily("Fira Code"));
-                        row.ConstantItem(50);
-                        row.ConstantItem(100).Height(50).Placeholder();
+                        row.RelativeItem().AlignCenter().Text(text: "Sales Report").FontFamily(value: "Calibri").ExtraBold().FontSize(value: 30).Fallback(handler: x => x.FontFamily(value: "Fira Code"));
+                        row.ConstantItem(size: 50);
+                        row.ConstantItem(size: 100).Height(value: 50).Placeholder();
                     });
-                        column1.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Grey.Medium);
+                        column1.Item().PaddingVertical(value: 5).LineHorizontal(size: 1).LineColor(value: Colors.Grey.Medium);
                     });
                 });
-                page.Content().Element(ComposeContent);
+                page.Content().Element(handler: ComposeContent);
 
-                page.Footer().AlignCenter().Text(x =>
+                page.Footer().AlignCenter().Text(content: x =>
                 {
-                    x.CurrentPageNumber().FontFamily("Calibri").Fallback(x => x.FontFamily("Fira Code"));
-                    x.Span(" / ").FontFamily("Calibri").Fallback(x => x.FontFamily("Fira Code"));
-                    x.TotalPages().FontFamily("Calibri").Fallback(x => x.FontFamily("Fira Code"));
+                    x.CurrentPageNumber().FontFamily(value: "Calibri").Fallback(handler: x => x.FontFamily(value: "Fira Code"));
+                    x.Span(text: " / ").FontFamily(value: "Calibri").Fallback(handler: x => x.FontFamily(value: "Fira Code"));
+                    x.TotalPages().FontFamily(value: "Calibri").Fallback(handler: x => x.FontFamily(value: "Fira Code"));
                 });
             });
         }
 
         private void ComposeContent(IContainer container)
         {
-            container.PaddingVertical(20).Column(column =>
+            container.PaddingVertical(value: 20).Column(handler: column =>
             {
-                column.Spacing(5);
-                column.Item().Element(x => NewHeadingRow(x, ReportData?.CompanyName));
-                column.Item().Element(x => NewSmallHeadingRow(x, ReportData?.Address));
-                column.Item().Element(x => NewSmallHeadingRow(x, ReportData?.cell));
-                column.Item().LineHorizontal(1).LineColor(Colors.Grey.Medium);
-                column.Item().Element(x => NewDataRow(x, "Ref. #: ", ReportData?.RefNumber));
-                column.Item().Element(x => NewDataRow(x, "Driver/Veh.: ", ReportData?.Driver));
-                column.Item().Element(x => NewDataRow(x, "Payment: ", ReportData?.Payment));
-                column.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Grey.Medium);
-                column.Item().Element(ComposeTable);
-                double netTotal = (ReportData?.tableData.Sum(x => x.NetAmount)) ?? 0;
-                double Total = (ReportData?.tableData.Sum(x => x.Amount)) ?? 0;
-                double dis = (1 - netTotal / Total) * 100;
-                column.Item().AlignRight().Text($"Discount: {dis:F2} %").FontFamily("Calibri").FontSize(12).Fallback(x => x.FontFamily("Fira Code"));
-                column.Item().AlignRight().Text("Total Amount: " + Total.ToString("C2")).FontFamily("Calibri").FontSize(12).Fallback(x => x.FontFamily("Fira Code"));
-                column.Item().AlignRight().Text("Total After Discount: " + netTotal.ToString("C2")).FontFamily("Calibri").Bold().FontSize(12).Fallback(x => x.FontFamily("Fira Code"));
+                column.Spacing(value: 5);
+                column.Item().Element(handler: x => NewHeadingRow(cont: x, val: ReportData?.CompanyName ?? ""));
+                column.Item().Element(handler: x => NewSmallHeadingRow(cont: x, val: ReportData?.Address ?? ""));
+                column.Item().Element(handler: x => NewSmallHeadingRow(cont: x, val: ReportData?.Cell ?? ""));
+                column.Item().LineHorizontal(size: 1).LineColor(value: Colors.Grey.Medium);
+                column.Item().Element(handler: x => NewDataRow(cont: x, title: "Ref. #: ", val: ReportData?.RefNumber ?? ""));
+                column.Item().Element(handler: x => NewDataRow(cont: x, title: "Driver/Veh.: ", val: ReportData?.Driver ?? ""));
+                column.Item().Element(handler: x => NewDataRow(cont: x, title: "Payment: ", val: ReportData?.Payment ?? ""));
+                column.Item().PaddingVertical(value: 5).LineHorizontal(size: 1).LineColor(value: Colors.Grey.Medium);
+                column.Item().Element(handler: ComposeTable);
+                column.Item().AlignRight().Text(text: "Total Amount: " + (ReportData?.TotalBeforeDiscount ?? 0).ToString(format: "C2")).FontFamily(value: "Calibri").FontSize(value: 12).Fallback(handler: x => x.FontFamily(value: "Fira Code"));
+                column.Item().AlignRight().Text(text: $"Invoice Discount: {(1 - ((ReportData?.TotalAfterDiscount ?? 0) / (ReportData?.TotalBeforeDiscount ?? 0))) * 100:F2} %").FontFamily(value: "Calibri").FontSize(value: 12).Fallback(handler: x => x.FontFamily(value: "Fira Code"));
+                column.Item().AlignRight().Text(text: "Net Total: " + (ReportData?.TotalAfterDiscount ?? 0).ToString(format: "C2")).FontFamily(value: "Calibri").Bold().FontSize(value: 12).Fallback(handler: x => x.FontFamily(value: "Fira Code"));
             });
         }
 
         private static void NewDataRow(IContainer cont, string title, string val)
         {
-            cont.Row(row =>
+            cont.Row(handler: row =>
             {
-                row.ConstantItem(100).
-                        Element(x => x.Column(col => col.Item().Text(title).FontFamily("Calibri").Bold().Fallback(x => x.FontFamily("Fira Code"))));
+                row.ConstantItem(size: 100).
+                        Element(handler: x => x.Column(handler: col => col.Item().Text(text: title).FontFamily(value: "Calibri").Bold().Fallback(handler: x => x.FontFamily(value: "Fira Code"))));
                 row.RelativeItem().
-                Element(x => x.Column(col => col.Item().Text(val).FontFamily("Calibri").Fallback(x => x.FontFamily("Fira Code"))));
+                Element(handler: x => x.Column(handler: col => col.Item().Text(text: val).FontFamily(value: "Calibri").Fallback(handler: x => x.FontFamily(value: "Fira Code"))));
             });
         }
 
         private static void NewHeadingRow(IContainer cont, string val)
         {
-            cont.Row(row =>
+            cont.Row(handler: row =>
             {
                 row.RelativeItem().
-                Element(x => x.AlignCenter().Column(col => col.Item().Text(val).FontFamily("Calibri").FontSize(20).ExtraBold().Fallback(x => x.FontFamily("Fira Code"))));
+                Element(handler: x => x.AlignCenter().Column(handler: col => col.Item().Text(text: val).FontFamily(value: "Calibri").FontSize(value: 20).ExtraBold().Fallback(handler: x => x.FontFamily(value: "Fira Code"))));
             });
         }
 
         private static void NewSmallHeadingRow(IContainer cont, string val)
         {
-            cont.Row(row =>
+            cont.Row(handler: row =>
             {
                 row.RelativeItem().
-                Element(x => x.AlignCenter().Column(col => col.Item().Text(val).FontFamily("Calibri").FontSize(12).Fallback(x => x.FontFamily("Fira Code"))));
+                Element(handler: x => x.AlignCenter().Column(handler: col => col.Item().Text(text: val).FontFamily(value: "Calibri").FontSize(value: 12).Fallback(handler: x => x.FontFamily(value: "Fira Code"))));
             });
         }
 
         private void ComposeTable(IContainer container)
         {
-            if (ReportData.tableData is not null)
+            if (ReportData?.TableData is not null)
             {
-                container.Table(table =>
+                container.Table(handler: table =>
                 {
-                    table.ColumnsDefinition(columns =>
+                    table.ColumnsDefinition(handler: columns =>
                     {
-                        columns.ConstantColumn(25);
-                        columns.RelativeColumn(2);
+                        columns.ConstantColumn(width: 25);
+                        columns.RelativeColumn(width: 2);
                         columns.RelativeColumn();
                         columns.RelativeColumn();
                         columns.RelativeColumn();
@@ -151,41 +148,41 @@ namespace AccReporting.Server.Reports
                         columns.RelativeColumn();
                     });
 
-                    table.Header(header =>
+                    table.Header(handler: header =>
                     {
-                        header.Cell().Element(CellStyle).AlignCenter().Text("#").FontSize(10);
-                        header.Cell().Element(CellStyle).AlignCenter().Text("Description of Goods").FontSize(10);
-                        header.Cell().Element(CellStyle).AlignCenter().Text("Brand").FontSize(10);
-                        header.Cell().Element(CellStyle).AlignCenter().Text("Cartons/PCS").FontSize(10);
-                        header.Cell().Element(CellStyle).AlignCenter().Text("Quantity").FontSize(10);
-                        header.Cell().Element(CellStyle).AlignCenter().Text("Rate").FontSize(10);
-                        header.Cell().Element(CellStyle).AlignCenter().Text("Amount").FontSize(10);
-                        header.Cell().Element(CellStyle).AlignCenter().Text("Disc%").FontSize(10);
-                        header.Cell().Element(CellStyle).AlignCenter().Text("Net Amount").FontSize(10);
+                        header.Cell().Element(handler: CellStyle).AlignCenter().Text(text: "#").FontSize(value: 10);
+                        header.Cell().Element(handler: CellStyle).AlignCenter().Text(text: "Description of Goods").FontSize(value: 10);
+                        header.Cell().Element(handler: CellStyle).AlignCenter().Text(text: "Brand").FontSize(value: 10);
+                        header.Cell().Element(handler: CellStyle).AlignCenter().Text(text: "Cartons/PCS").FontSize(value: 10);
+                        header.Cell().Element(handler: CellStyle).AlignCenter().Text(text: "Quantity").FontSize(value: 10);
+                        header.Cell().Element(handler: CellStyle).AlignCenter().Text(text: "Rate").FontSize(value: 10);
+                        header.Cell().Element(handler: CellStyle).AlignCenter().Text(text: "Amount").FontSize(value: 10);
+                        header.Cell().Element(handler: CellStyle).AlignCenter().Text(text: "Disc%").FontSize(value: 10);
+                        header.Cell().Element(handler: CellStyle).AlignCenter().Text(text: "Net Amount").FontSize(value: 10);
 
                         static IContainer CellStyle(IContainer container)
                         {
                             return container
-                                .DefaultTextStyle(x => x.FontFamily("Calibri").SemiBold())
-                                .PaddingVertical(5).BorderBottom(1).BorderColor(Colors.Black);
+                                .DefaultTextStyle(handler: x => x.FontFamily(value: "Calibri").SemiBold())
+                                .PaddingVertical(value: 5).BorderBottom(value: 1).BorderColor(color: Colors.Black);
                         }
                     });
-                    int count = 0;
+                    var count = 0;
 
-                    foreach (var item in ReportData.tableData)
+                    foreach (var item in ReportData.TableData)
                     {
-                        table.Cell().Element(CellStyle).AlignCenter().Text(++count).FontFamily("Calibri").FontSize(10).Fallback(x => x.FontFamily("Fira Code"));
-                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Description).FontFamily("Calibri").FontSize(10).Fallback(x => x.FontFamily("Fira Code"));
-                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Brand).FontFamily("Calibri").FontSize(10).Fallback(x => x.FontFamily("Fira Code"));
-                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Pcs).FontFamily("Calibri").FontSize(10).Fallback(x => x.FontFamily("Fira Code"));
-                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Quantity).FontFamily("Calibri").FontSize(10).Fallback(x => x.FontFamily("Fira Code"));
-                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Rate).FontFamily("Calibri").FontSize(10).Fallback(x => x.FontFamily("Fira Code"));
-                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Amount).FontFamily("Calibri").FontSize(10).Fallback(x => x.FontFamily("Fira Code"));
-                        table.Cell().Element(CellStyle).AlignCenter().Text(item.Discount + " %").FontFamily("Calibri").FontSize(10).Fallback(x => x.FontFamily("Fira Code"));
-                        table.Cell().Element(CellStyle).AlignCenter().Text(item.NetAmount).FontFamily("Calibri").FontSize(10).Fallback(x => x.FontFamily("Fira Code"));
+                        table.Cell().Element(handler: CellStyle).AlignCenter().Text(text: ++count).FontFamily(value: "Calibri").FontSize(value: 10).Fallback(handler: x => x.FontFamily(value: "Fira Code"));
+                        table.Cell().Element(handler: CellStyle).AlignCenter().Text(text: item.Description).FontFamily(value: "Calibri").FontSize(value: 10).Fallback(handler: x => x.FontFamily(value: "Fira Code"));
+                        table.Cell().Element(handler: CellStyle).AlignCenter().Text(text: item.Brand).FontFamily(value: "Calibri").FontSize(value: 10).Fallback(handler: x => x.FontFamily(value: "Fira Code"));
+                        table.Cell().Element(handler: CellStyle).AlignCenter().Text(text: item.Pcs).FontFamily(value: "Calibri").FontSize(value: 10).Fallback(handler: x => x.FontFamily(value: "Fira Code"));
+                        table.Cell().Element(handler: CellStyle).AlignCenter().Text(text: item.Quantity).FontFamily(value: "Calibri").FontSize(value: 10).Fallback(handler: x => x.FontFamily(value: "Fira Code"));
+                        table.Cell().Element(handler: CellStyle).AlignCenter().Text(text: item.Rate).FontFamily(value: "Calibri").FontSize(value: 10).Fallback(handler: x => x.FontFamily(value: "Fira Code"));
+                        table.Cell().Element(handler: CellStyle).AlignCenter().Text(text: item.Amount).FontFamily(value: "Calibri").FontSize(value: 10).Fallback(handler: x => x.FontFamily(value: "Fira Code"));
+                        table.Cell().Element(handler: CellStyle).AlignCenter().Text(text: item.Discount + " %").FontFamily(value: "Calibri").FontSize(value: 10).Fallback(handler: x => x.FontFamily(value: "Fira Code"));
+                        table.Cell().Element(handler: CellStyle).AlignCenter().Text(text: item.NetAmount).FontFamily(value: "Calibri").FontSize(value: 10).Fallback(handler: x => x.FontFamily(value: "Fira Code"));
                         static IContainer CellStyle(IContainer container)
                         {
-                            return container.Border(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
+                            return container.Border(value: 1).BorderColor(color: Colors.Grey.Lighten2).PaddingVertical(value: 5);
                         }
                     }
                 });

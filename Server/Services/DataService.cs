@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 using Microsoft.Extensions.Caching.Memory;
 
+using System.Collections.Immutable;
 using System.Data;
 using System.Diagnostics;
 
@@ -16,132 +17,135 @@ namespace AccReporting.Server.Services;
 public class DataService
 {
     private readonly IMemoryCache? _cache;
-    private readonly AccountInfoDbContext _Db;
+    private readonly AccountInfoDbContext _db;
     private readonly ILogger<DataService> _logger;
     private readonly IConfiguration _config;
-    private string _ConnectionString = "";
+    private string _connectionString = "";
 
     private string ConnectionString
     {
         get
         {
-            if (string.IsNullOrWhiteSpace(_ConnectionString))
+            if (string.IsNullOrWhiteSpace(value: _connectionString))
             {
-                _ConnectionString = _config.GetConnectionString("NoDb") + "Database=" + _DbName + ";";
+                _connectionString = _config.GetConnectionString(name: "NoDb") + "Database=" + _dbName + ";";
             }
-            return _ConnectionString;
+            return _connectionString;
         }
 
         set
         {
-            _ConnectionString = value;
+            _connectionString = value;
         }
     }
 
-    private string _DbName;
-    public string CachePrefix => _DbName;
+    private string _dbName;
+    public string CachePrefix => _dbName;
 
     public DataService(IMemoryCache cache, AccountInfoDbContext db, IConfiguration config, ILogger<DataService> logger)
     {
         _cache = cache;
-        _Db = db;
+        _db = db;
         _config = config;
         _logger = logger;
     }
 
     public async Task SetDbName(string dbName, CancellationToken ct)
     {
-        if (string.Equals(dbName, _DbName, StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(a: dbName, b: _dbName, comparisonType: StringComparison.OrdinalIgnoreCase))
         {
             return;
         }
-        _DbName = dbName;
+        _dbName = dbName;
         ConnectionString = "";
-        await EnsureDbConenction(ct);
+        await EnsureDbConnection(ct: ct);
     }
 
-    public async Task<IEnumerable<InvSummGridModel?>?> GetInvSummGridAsync(string AcCode, string Type, int PageNumber, int PageSize, CancellationToken ct)
+    public async Task<IEnumerable<InvSummGridModel?>?> GetInvSummGridAsync(string acCode, string type, int pageNumber, int pageSize, CancellationToken ct)
     {
-        string key = $"SRG-{AcCode}-{Type}-{PageNumber}-{PageSize}";
-        var suc = GetCache(key, out IEnumerable<InvSummGridModel> ret);
+        var key = $"SRG-{acCode}-{type}-{pageNumber}-{pageSize}";
+        var suc = GetCache(key: key, result: out IEnumerable<InvSummGridModel> ret);
         if (!suc)
         {
-            await EnsureDbConenction(ct);
-            var a = _Db.InvDets.AsNoTracking().Where(x => x.Sp == Type);
-            if (!string.IsNullOrEmpty(AcCode))
+            await EnsureDbConnection(ct: ct);
+            var a = _db.InvDets.AsNoTracking().Where(predicate: x => x.Sp == type);
+            if (!string.IsNullOrEmpty(value: acCode))
             {
-                a = a.Where(x => x.Pcode == AcCode);
+                a = a.Where(predicate: x => x.Pcode == acCode);
             }
-            if (PageSize > 0 || PageNumber > 0)
+            if (pageSize > 0 || pageNumber > 0)
             {
-                a = a.Skip(PageNumber * PageSize).Take(PageSize);
+                a = a.Skip(count: pageNumber * pageSize).Take(count: pageSize);
             }
-            var eret = await a.ToListAsync(ct).ConfigureAwait(false);
 
-            ret = eret
-                .OrderBy(x => x.InvNo)
-             .GroupBy(x => new { x.InvNo, x.Sp, x.PName })
-             .Select(x => new InvSummGridModel(x.Key.InvNo, x.Key.Sp, x.Sum(z => z.Amount), x.Sum(z => z.NetAmount), x.Key.PName));
+            var retx = await a.Select(selector: x => x.InvNo + "-" + x.Pcode)
+             .ToArrayAsync(cancellationToken: ct);
+            ret = await _db.InvSumms
+                .Where(predicate: x => retx.Contains(x.InvNo + "-" + x.Pcode))
+                .OrderBy(keySelector: x => x.InvNo)
+                .Select(selector: x => new InvSummGridModel { InvNo = x.InvNo, Amount = x.TotBill + x.DisPer, NetAmount = x.TotBill, Name = x.Pname, PCode = x.Pcode })
+                .ToArrayAsync(cancellationToken: ct);
 
-            SetCache(key, ret);
+            SetCache(key: key, value: ret);
         }
 
         return ret;
     }
 
-    public async Task<SalesReportDto?> GetSalesInvoiceData(int invNo, string Type, string AcNumber, CancellationToken ct)
+    public async Task<SalesReportDto?> GetSalesInvoiceData(int invNo, string type, string acNumber, string pcode, CancellationToken ct)
     {
-        string reportKey = "SR-" + invNo + "-" + Type + "-" + AcNumber;
-        var successful = GetCache(reportKey, out SalesReportDto? ret);
-        if (!successful)
+        var reportKey = "SR-" + invNo + "-" + type + "-" + acNumber + "-" + pcode;
+        var successful = GetCache(key: reportKey, result: out SalesReportDto? ret);
+        if (successful) return ret;
+        ret = new SalesReportDto
         {
-            ret = new SalesReportDto()
-            {
-                Type = Type,
-            };
+            Type = type,
+        };
 
-            var dataSummx = _Db.InvSumms.AsNoTracking().Where(x => x.InvNo == invNo);
-            if (!string.IsNullOrWhiteSpace(AcNumber))
-            {
-                dataSummx = dataSummx.Where(x => x.Pcode == AcNumber);
-            }
-            var dataSumm = dataSummx.Select(x => new { x.Payment, x.RefNo, x.DueDate, x.InvDate, x.InvNo })
-            .FirstOrDefault();
-            if (dataSumm is not null)
-            {
-                ret.RefNumber = dataSumm.RefNo;
-                ret.Dated = dataSumm.InvDate;
-                ret.DueDate = dataSumm.DueDate;
-                ret.Payment = dataSumm.Payment;
-                ret.InvNo = dataSumm.InvNo ?? 0;
-            }
-            if (ret.InvNo == 0)
-            {
-                return ret;
-            }
-            ret.tableData ??= new();
-            var R = _Db.InvDets.AsNoTracking();
-            if (!string.IsNullOrWhiteSpace(AcNumber))
-            {
-                R = R.Where(x => x.Pcode == AcNumber);
-            }
-            ret.tableData.AddRange(
-                            R.Where(x => x.InvNo == invNo && x.Sp == Type)
-                            .Select(
-                                    row => new SalesReportModel()
-                                    {
-                                        Amount = row.Amount,
-                                        NetAmount = row.NetAmount,
-                                        Rate = row.Rate,
-                                        Quantity = (int)(row.Qty ?? 0.0),
-                                        unit = row.Unit,
-                                        Description = row.Iname,
-                                        Discount = row.Dper
-                                    }
-                            )
-                            );
-            SetCache(reportKey, ret);
+        var dataSummx = _db.InvSumms.AsNoTracking().Where(predicate: x => x.InvNo == invNo && x.Remarks == type && x.Pcode == pcode);
+        if (!string.IsNullOrWhiteSpace(value: acNumber))
+        {
+            dataSummx = dataSummx.Where(predicate: x => x.Pcode == acNumber);
         }
+        var dataSumm = dataSummx.Select(selector: x => new { x.TotBill, x.DisPer, x.Payment, x.RefNo, x.DueDate, x.InvDate, x.InvNo })
+            .FirstOrDefault();
+        if (dataSumm is not null)
+        {
+            ret.RefNumber = dataSumm.RefNo;
+            ret.Dated = dataSumm.InvDate;
+            ret.DueDate = dataSumm.DueDate;
+            ret.Payment = dataSumm.Payment;
+            ret.InvNo = dataSumm.InvNo ?? 0;
+            ret.TotalBeforeDiscount = dataSumm.TotBill + dataSumm.DisPer;
+            ret.TotalAfterDiscount = dataSumm.TotBill;
+        }
+        if (ret.InvNo == 0)
+        {
+            return ret;
+        }
+        ret.TableData ??= new List<SalesReportModel>();
+        var r = _db.InvDets.AsNoTracking();
+        if (!string.IsNullOrWhiteSpace(value: acNumber))
+        {
+            r = r.Where(predicate: x => x.Pcode == acNumber);
+        }
+        ret.TableData.AddRange(
+            collection: await r.Where(predicate: x => x.InvNo == invNo && x.Sp == type && x.Pcode == pcode)
+                .Select(
+                    selector: row => new SalesReportModel()
+                    {
+                        Amount = row.Amount,
+                        NetAmount = row.NetAmount,
+                        Rate = row.Rate,
+                        Quantity = (int)(row.Qty ?? 0.0),
+                        Unit = row.Unit,
+                        Description = row.Iname,
+                        Discount = row.Dper
+                    }
+                ).ToArrayAsync(cancellationToken: ct)
+        );
+        SetCache(key: reportKey, value: ret);
+
         return ret;
     }
 
@@ -149,109 +153,103 @@ public class DataService
     {
         try
         {
-            List<Acfile> AcFileInsert = new();
-            List<InvDet> InvDetInsert = new();
-            List<Inventory> InventoryInsert = new();
-            List<InvSumm> InvSummInsert = new();
-            List<Trans> TransInsert = new();
-            string[]? splitData = access.Split("---START---", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            Parallel.ForEach(splitData, SplitEntries =>
+            List<Acfile> acFileInsert = new();
+            List<InvDet> invDetInsert = new();
+            List<Inventory> inventoryInsert = new();
+            List<InvSumm> invSummInsert = new();
+            List<Trans> transInsert = new();
+            var splitData = access.Split(separator: "---START---", options: StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            Parallel.ForEach(source: splitData, body: splitEntries =>
             {
-                string[]? entries = SplitEntries.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);//.Where(x => !(x.Contains("DROP", StringComparison.InvariantCultureIgnoreCase) && x.Contains("DELETE FROM", StringComparison.InvariantCultureIgnoreCase) && x.Contains("UPDATE", StringComparison.InvariantCultureIgnoreCase)));
-                IEnumerable<string[]>? newEnt = entries.Skip(1).Select(x => x.Split("|"));
+                var entries = splitEntries.Split(separator: new string[] { "\r\n", "\n" }, options: StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                var newEnt = entries.Skip(count: 1).Select(selector: x => x.Split(separator: "|"));
                 switch (entries[0].ToUpperInvariant())
                 {
                     case "ACFILE":
-                        AcFileInsert.AddRange(newEnt.Select(x => new Acfile(x)));
+                        acFileInsert.AddRange(collection: newEnt.Select(selector: x => new Acfile(x: x)));
                         break;
 
                     case "INVDET":
-                        InvDetInsert.AddRange(newEnt.Where(x => !string.IsNullOrWhiteSpace(x[0])).Select(x => new InvDet(x)));
+                        invDetInsert.AddRange(collection: newEnt.Where(predicate: x => !string.IsNullOrWhiteSpace(value: x[0])).Select(selector: x => new InvDet(x: x)));
                         break;
 
                     case "INVENTORY":
-                        InventoryInsert.AddRange(newEnt.Select(x => new Inventory(x)));
+                        inventoryInsert.AddRange(collection: newEnt.Select(selector: x => new Inventory(x: x)));
                         break;
 
                     case "INVSUMM":
-                        InvSummInsert.AddRange(newEnt.Where(x => !string.IsNullOrWhiteSpace(x[1])).Select(x => new InvSumm(x)));
+                        invSummInsert.AddRange(collection: newEnt.Where(predicate: x => !string.IsNullOrWhiteSpace(value: x[1])).Select(selector: x => new InvSumm(x: x)));
                         break;
 
                     case "TRANS":
-                        TransInsert.AddRange(newEnt.Select(x => new Trans(x)));
+                        transInsert.AddRange(collection: newEnt.Select(selector: x => new Trans(x: x)));
                         break;
                 }
             });
             try
             {
-                await EnsureDbConenction(ct);
-                _logger.LogInformation("Starting Insert");
-                await _Db.Database.EnsureDeletedAsync(ct);
-                await _Db.Database.MigrateAsync(ct);
-                _logger.LogInformation("Migration Done");
-                using (var trans = await _Db.Database.BeginTransactionAsync(ct).ConfigureAwait(false))
+                await EnsureDbConnection(ct: ct);
+                _logger.LogInformation(message: "Starting Insert");
+                await _db.Database.EnsureDeletedAsync(cancellationToken: ct);
+                await _db.Database.MigrateAsync(cancellationToken: ct);
+                _logger.LogInformation(message: "Migration Done");
+                await using (var transaction = await _db.Database.BeginTransactionAsync(cancellationToken: ct).ConfigureAwait(continueOnCapturedContext: false))
                 {
-                    string query = "";
                     try
                     {
-                        foreach (var acfile in AcFileInsert.Select(x => x.ToInsert()).Chunk(7000))
+                        string query;
+                        foreach (var acfile in acFileInsert.Select(selector: x => x.ToInsert()).Chunk(size: 7000))
                         {
                             query = "INSERT INTO `acfile`(`ActCode`,`ActName`,`Address1`,`Address2`,`Address3`,`CrDays`,`email`,`fax`,`GST`,`OpBal`,`phone`) VALUES " +
-                                string.Join(',', acfile) + ";";
-                            await _Db.Database.ExecuteSqlRawAsync(query, ct);
+                                string.Join(separator: ',', value: acfile) + ";";
+                            await _db.Database.ExecuteSqlRawAsync(sql: query, cancellationToken: ct);
                         }
 
-                        foreach (var invdet in InvDetInsert.Select(x => x.ToInsert()).Chunk(7000))
+                        foreach (var invdet in invDetInsert.Select(selector: x => x.ToInsert()).Chunk(size: 7000))
                         {
                             query = "INSERT INTO `invdet`(`InvNo`,`InvDate`,`PCode`,`ICode`,`IName`,`Qty`,`Qty2`,`Unit`,`Packing`,`Rate`,`Amount`,`NetAmount`,`SP`,`Type`,`pName`,`Size`,`Pressure`,`CateCode`,`Dper`,`RegionCode`,`RegionName`,`FILE`) VALUES " +
-                                string.Join(',', invdet) + ";";
-                            await _Db.Database.ExecuteSqlRawAsync(query, ct);
+                                string.Join(separator: ',', value: invdet) + ";";
+                            await _db.Database.ExecuteSqlRawAsync(sql: query, cancellationToken: ct);
                         }
 
-                        foreach (var InvSumm in InvSummInsert.Select(x => x.ToInsert()).Chunk(7000))
+                        foreach (var invSumm in invSummInsert.Select(selector: x => x.ToInsert()).Chunk(size: 7000))
                         {
                             query = "INSERT INTO `invsumm`(`OrderNo`,`InvNo`,`InvDate`,`PCode`,`PName`, `TotBill`,`Built`,`DisPer`,`Dis`,`Ser`,`Remarks`,`cartage`,`AddLess`,`CrDays`,`DueDate`,`RefNo`,`Payment`,`Note`,`Delivery`,`HCode`) VALUES " +
-                                string.Join(',', InvSumm) + ";";
-                            await _Db.Database.ExecuteSqlRawAsync(query, ct);
+                                string.Join(separator: ',', value: invSumm) + ";";
+                            await _db.Database.ExecuteSqlRawAsync(sql: query, cancellationToken: ct);
                         }
 
-                        foreach (var Inventory in InventoryInsert.Select(x => x.ToInsert()).Chunk(7000))
+                        foreach (var inventory in inventoryInsert.Select(selector: x => x.ToInsert()).Chunk(size: 7000))
                         {
                             query = "INSERT INTO `inventory`(`ItemCode`,`ItemDescrip`,`MfcCode`,`ManuName`,`Size`,`Pressure`,`Length`,`Price`,`RetPrice`,`RetPrice2`,`Unit`,`OpBal`) VALUES " +
-                                string.Join(',', Inventory) + ";";
-                            await _Db.Database.ExecuteSqlRawAsync(query, ct);
+                                string.Join(separator: ',', value: inventory) + ";";
+                            await _db.Database.ExecuteSqlRawAsync(sql: query, cancellationToken: ct);
                         }
 
-                        foreach (var Trans in TransInsert.Select(x => x.ToInsert()).Chunk(7000))
+                        foreach (var trans in transInsert.Select(selector: x => x.ToInsert()).Chunk(size: 7000))
                         {
                             query = "INSERT INTO `trans`(`ActCode`,`ActName`,`ChqDate`,`ChqNo`,`Date`,`Des`,`TransAmt`,`Vnoc`,`Vnon`) VALUES " +
-                                string.Join(',', Trans) + ";";
-                            await _Db.Database.ExecuteSqlRawAsync(query, ct);
+                                string.Join(separator: ',', value: trans) + ";";
+                            await _db.Database.ExecuteSqlRawAsync(sql: query, cancellationToken: ct);
                         }
-                        await trans.CommitAsync(ct).ConfigureAwait(false);
-                        ClearDbCache();
-                        SetAcFile(AcFileInsert);
-                        SetInventory(InventoryInsert);
-                        SetTrans(TransInsert);
-                        SetInvSumm(InvSummInsert);
-                        SetInvDet(InvDetInsert);
+                        await transaction.CommitAsync(cancellationToken: ct).ConfigureAwait(continueOnCapturedContext: false);
                     }
                     catch (Exception ex)
                     {
 #if DEBUG
-                        Debug.WriteLine(ex.Message + " " + ex.InnerException + " " + ex.StackTrace);
+                        Debug.WriteLine(message: ex.Message + " " + ex.InnerException + " " + ex.StackTrace);
 #endif
-                        await trans.RollbackAsync(ct).ConfigureAwait(false);
+                        await transaction.RollbackAsync(cancellationToken: ct).ConfigureAwait(continueOnCapturedContext: false);
                         return false;
                     }
                 }
-                await _Db.Database.CloseConnectionAsync();
+                await _db.Database.CloseConnectionAsync();
                 return true;
             }
             catch (Exception ex)
             {
 #if DEBUG
-                Debug.WriteLine(ex.Message + " " + ex.InnerException + " " + ex.StackTrace);
+                Debug.WriteLine(message: ex.Message + " " + ex.InnerException + " " + ex.StackTrace);
 #endif
                 return false;
             }
@@ -259,96 +257,32 @@ public class DataService
         catch (Exception ex)
         {
 #if DEBUG
-            Debug.WriteLine(ex.Message + " " + ex.InnerException + " " + ex.StackTrace);
+            Debug.WriteLine(message: ex.Message + " " + ex.InnerException + " " + ex.StackTrace);
 #endif
             return false;
         }
     }
 
-    private void SetInvSumm(IEnumerable<InvSumm> Data) => _cache.Set(CachePrefix + "-InvSumm", Data);
-
-    public async Task<IEnumerable<InvSumm>> GetInvSummsAsync(CancellationToken ct)
+    public async Task<AccountInfoDbContext> GetDbContext(CancellationToken ct)
     {
-        var res = _cache.TryGetValue(CachePrefix + "-InvSumm", out IEnumerable<InvSumm> Data);
-        if (!res)
-        {
-            await EnsureDbConenction(ct);
-            Data = await _Db.InvSumms.AsNoTracking().ToListAsync(ct).ConfigureAwait(false);
-            SetInvSumm(Data);
-        }
-        return Data;
+        await EnsureDbConnection(ct: ct);
+        return _db;
     }
 
-    private void SetAcFile(IEnumerable<Acfile> Data) => _cache.Set(CachePrefix + "-AcFile", Data);
-
-    public async Task<IEnumerable<Acfile>> GetAcFileAsync(CancellationToken ct)
+    private async Task EnsureDbConnection(CancellationToken ct)
     {
-        var res = _cache.TryGetValue(CachePrefix + "-AcFile", out IEnumerable<Acfile> Data);
-        if (!res)
+        if (string.IsNullOrWhiteSpace(value: _dbName))
         {
-            await EnsureDbConenction(ct);
-            Data = await _Db.Acfiles.AsNoTracking().ToListAsync(ct).ConfigureAwait(false);
-            SetAcFile(Data);
+            throw new DbEmptyException(message: "No database name set");
         }
-        return Data;
-    }
-
-    private void SetInventory(IEnumerable<Inventory> Data) => _cache.Set(CachePrefix + "-Inventory", Data);
-
-    public async Task<IEnumerable<Inventory>> GetInventory(CancellationToken ct)
-    {
-        var res = _cache.TryGetValue(CachePrefix + "-Inventory", out IEnumerable<Inventory> Data);
-        if (!res)
+        if (string.IsNullOrWhiteSpace(value: ConnectionString))
         {
-            await EnsureDbConenction(ct);
-            Data = await _Db.Inventories.AsNoTracking().ToListAsync(ct).ConfigureAwait(false);
-            SetInventory(Data);
+            throw new DbEmptyException(message: "No connection string set");
         }
-        return Data;
-    }
-
-    private void SetInvDet(IEnumerable<InvDet> Data) => _cache.Set(CachePrefix + "-InvDet", Data);
-
-    public async Task<IEnumerable<InvDet>> GetInvDetAsync(CancellationToken ct)
-    {
-        var res = _cache.TryGetValue(CachePrefix + "-InvDet", out IEnumerable<InvDet> Data);
-        if (!res)
+        var db = _db.Database.GetDbConnection().Database;
+        if (db != _dbName || !await _db.Database.CanConnectAsync(cancellationToken: ct))
         {
-            await EnsureDbConenction(ct);
-            Data = await _Db.InvDets.AsNoTracking().ToListAsync(ct).ConfigureAwait(false);
-            SetInvDet(Data);
-        }
-        return Data;
-    }
-
-    private void SetTrans(IEnumerable<Trans> Data) => _cache.Set(CachePrefix + "-Trans", Data);
-
-    public async Task<IEnumerable<Trans>> GetTransAsync(CancellationToken ct)
-    {
-        var res = _cache.TryGetValue(CachePrefix + "-Trans", out IEnumerable<Trans> Data);
-        if (!res)
-        {
-            await EnsureDbConenction(ct);
-            Data = await _Db.Trans.AsNoTracking().ToListAsync(ct).ConfigureAwait(false);
-            SetTrans(Data);
-        }
-        return Data;
-    }
-
-    private async Task EnsureDbConenction(CancellationToken ct)
-    {
-        if (string.IsNullOrWhiteSpace(_DbName))
-        {
-            throw new DbEmptyException("No database name set");
-        }
-        if (string.IsNullOrWhiteSpace(ConnectionString))
-        {
-            throw new DbEmptyException("No connection string set");
-        }
-        string db = _Db.Database.GetDbConnection().Database;
-        if (db != _DbName || !await _Db.Database.CanConnectAsync(ct))
-        {
-            _Db.Database.SetConnectionString(ConnectionString);
+            _db.Database.SetConnectionString(connectionString: ConnectionString);
         }
     }
 
@@ -356,27 +290,17 @@ public class DataService
     {
         if (_cache is not null)
         {
-            _cache.Set(CachePrefix + key, value);
+            _cache.Set(key: CachePrefix + key, value: value);
         }
     }
 
-    private bool GetCache<T>(string key, out T Result)
+    private bool GetCache<T>(string key, out T result)
     {
-        Result = default!;
+        result = default!;
         if (_cache is not null)
         {
-            return _cache.TryGetValue(CachePrefix + key, out Result);
+            return _cache.TryGetValue(key: CachePrefix + key, value: out result);
         }
         return false;
-    }
-
-    private void ClearDbCache()
-    {
-        var keysList = _cache.GetKeysForDb(CachePrefix);
-        if (keysList is not null && keysList.Any())
-        {
-            foreach (var key in keysList)
-                _cache.Remove(key);
-        }
     }
 }

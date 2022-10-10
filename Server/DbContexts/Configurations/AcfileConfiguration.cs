@@ -42,13 +42,14 @@ namespace AccReporting.Server.DbContexts.Configurations
                 .HasColumnName("fax");
 
             entity.Property(e => e.Gst)
-                .HasMaxLength(20)
+                .HasMaxLength(100)
                 .HasColumnName("GST");
 
             entity.Property(e => e.Phone)
                 .HasMaxLength(20)
                 .HasColumnName("phone");
-
+            entity.HasIndex(e => e.ActCode)
+                .HasDatabaseName("ActCodeIndex");
             OnConfigurePartial(entity);
         }
 

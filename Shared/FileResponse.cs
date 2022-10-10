@@ -4,10 +4,10 @@ namespace AccReporting.Shared
 {
     public class FileResponse
     {
-        [JsonPropertyName("File")]
+        [JsonPropertyName(name: nameof(File))]
         public byte[] File { get; set; }
 
-        [JsonPropertyName("Name")]
+        [JsonPropertyName(name: nameof(Name))]
         public string Name { get; set; }
     }
 }

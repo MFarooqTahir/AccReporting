@@ -126,6 +126,10 @@ namespace AccReporting.Server.OptimizedModels
             runtimeEntityType.SetPrimaryKey(key);
             key.AddAnnotation("Relational:Name", "PK__Inventor__B87C5B5F00A47D01");
 
+            var index = runtimeEntityType.AddIndex(
+                new[] { itemCode });
+            index.AddAnnotation("Relational:Name", "ItemCodeIndex");
+
             return runtimeEntityType;
         }
 

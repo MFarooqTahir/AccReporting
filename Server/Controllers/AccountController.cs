@@ -15,7 +15,7 @@ using System.Text.RegularExpressions;
 namespace AccReporting.Server.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route(template: "api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
     {
@@ -23,7 +23,7 @@ namespace AccReporting.Server.Controllers
         private readonly ILogger<AccountController> _logger;
         private readonly IHashids _hash;
         private readonly DataService _dataService;
-        private readonly Regex removeSpaces = new Regex(@"\s+", RegexOptions.Compiled);
+        private readonly Regex _removeSpaces = new(pattern: @"\s+", options: RegexOptions.Compiled);
 
         public AccountController(ApplicationDbContext context, ILogger<AccountController> logger, IHashids hash, DataService dataService)
         {
@@ -33,108 +33,118 @@ namespace AccReporting.Server.Controllers
             _dataService = dataService;
         }
 
-        [HttpPost("AddOrUpdateAccount")]
+        [HttpPost(template: nameof(AddOrUpdateAccount))]
         public async Task<bool> AddOrUpdateAccount(DisplayUsersDto model, CancellationToken ct)
         {
             try
             {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var adminCompany = await _context.CompanyAccounts.AsNoTracking().Where(x => x.Company.Approved && x.IsSelected && x.UserID == userId && x.CompRole == "Admin")
-                    .Select(x => x.Company)
-                    .FirstAsync(ct);
-                var user = await _context.Users.AsNoTracking().FirstAsync(x => x.Email == model.UserEmail, ct);
-                var exists = await _context.CompanyAccounts.FirstOrDefaultAsync(x => x.CompanyID == adminCompany.ID && x.UserID == user.Id, ct);
-                if (exists is null || exists.ID == 0)
+                var userId = User.FindFirstValue(claimType: ClaimTypes.NameIdentifier);
+                var adminCompany = await _context.CompanyAccounts.AsNoTracking().Where(predicate: x => x.Company!.Approved && x.IsSelected && x.UserId == userId && x.CompRole == "Admin")
+                    .Select(selector: x => x.Company)
+                    .SingleAsync(cancellationToken: ct);
+                var user = await _context.Users.AsNoTracking().FirstAsync(predicate: x => x.Email == model.UserEmail, cancellationToken: ct);
+                var exists = await _context.CompanyAccounts.FirstOrDefaultAsync(predicate: x => x.CompanyId == adminCompany!.Id && x.UserId == user.Id, cancellationToken: ct);
+                if (exists is null || exists.Id == 0)
                 {
                     var newAccount = new CompanyAccount()
                     {
                         Company = adminCompany,
-                        CompRole = "User",
+                        CompRole = nameof(User),
                         User = user,
                         AcNumber = model.AcCode
                     };
-                    await _context.AddAsync(newAccount, ct);
+                    await _context.AddAsync(entity: newAccount, cancellationToken: ct);
                 }
                 else
                 {
                     exists.AcNumber = model.AcCode;
                 }
                 await _context.SaveChangesAsync(cancellationToken: ct);
-                _logger.LogInformation("Saved Account");
+                _logger.LogInformation(message: "Saved Account");
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogInformation("Data Error: {Message}", ex.Message);
+                _logger.LogInformation(message: "Data Error: {Message}", ex.Message);
                 return false;
             }
         }
 
-        [HttpGet("GetUserAccounts")]
+        [HttpGet(template: nameof(GetUserAccounts))]
         public async Task<IEnumerable<DisplayUsersDto>> GetUserAccounts(CancellationToken ct)
         {
             try
             {
-                int c = 1;
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var data = _context.CompanyAccounts.Where(x => x.Company.Approved && x.UserID == userId && x.IsSelected)
-                    .Select(y => new { y.AcNumber, y.Company.DbName }).First();
-                await _dataService.SetDbName(data.DbName, ct);
-                var list = (await _dataService.GetAcFileAsync(ct)).Select(x => x.ActCode).Distinct();
+                var c = 1;
+                var userId = User.FindFirstValue(claimType: ClaimTypes.NameIdentifier);
+                var data = await _context.CompanyAccounts.Where(predicate: x => x.Company!.Approved && x.UserId == userId && x.IsSelected)
+                    .Select(selector: y => new { y.AcNumber, y.Company!.DbName }).SingleAsync(cancellationToken: ct);
+                await _dataService.SetDbName(dbName: data.DbName!, ct: ct);
+                var list = await (await _dataService.GetDbContext(ct: ct)).Acfiles.Select(selector: x => x.ActCode).Distinct().ToArrayAsync(cancellationToken: ct);
 
-                var accountID = await _context.CompanyAccounts.Where(x => x.Company.Approved && x.IsSelected && x.UserID == userId && x.CompRole == "Admin")
-                    .Select(x => x.CompanyID).FirstAsync();
+                var accountId = await _context.CompanyAccounts.Where(predicate: x => x.Company!.Approved && x.IsSelected && x.UserId == userId && x.CompRole == "Admin")
+                    .Select(selector: x => x.CompanyId).FirstAsync();
                 var ret = await _context.Companies.AsNoTracking()
-                    .Where(x => x.ID == accountID)
-                    .Include(x => x.CompanyUsers)
-                    .ThenInclude(x => x.User)
+                    .Where(predicate: x => x.Id == accountId)
+                    .Include(navigationPropertyPath: x => x.CompanyUsers)!
+                    .ThenInclude(navigationPropertyPath: x => x.User)
                     .FirstAsync(cancellationToken: ct);
-                var alUsers = ret.CompanyUsers.Select(x => x.AcNumber).ToList();
+                if (ret.CompanyUsers is not null)
+                {
+                    var alUsers = ret.CompanyUsers.Select(selector: x => x.AcNumber).ToList();
+                    var accounts = ret.CompanyUsers.Select(selector: x => new DisplayUsersDto()
+                    {
+                        Id = c++,
+                        AcCode = x.AcNumber ?? "",
+                        UserEmail = x.User?.Email ?? "",
+                        IsAdmin = x.CompRole == "Admin",
+                    }).ToList();
 
-                var accounts = ret.CompanyUsers.Select(x => new DisplayUsersDto()
-                {
-                    ID = c++,
-                    AcCode = x.AcNumber,
-                    UserEmail = x.User.Email,
-                    IsAdmin = x.CompRole == "Admin",
-                }).ToList();
-                (accounts ??= new()).AddRange(list.Where(x => !alUsers.Contains(x)).Select(x => new DisplayUsersDto()
-                {
-                    ID = c++,
-                    AcCode = x,
-                    UserEmail = "",
-                    IsAdmin = false,
-                }));
-                _logger.LogInformation("Got Accounts");
-                return accounts;
+                    accounts ??= new List<DisplayUsersDto>();
+                    accounts.AddRange(collection: list.Where(predicate: x => !alUsers.Contains(item: x)).Select(selector: x =>
+
+                        new DisplayUsersDto()
+                        {
+                            Id = c++,
+                            AcCode = x,
+                            UserEmail = "",
+                            IsAdmin = false,
+                        }
+                    ));
+
+                    _logger.LogInformation(message: "Got Accounts");
+                    return accounts;
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogInformation("Data Error: {Message}", ex.Message);
+                _logger.LogInformation(message: "Data Error: {Message}", ex.Message);
                 return new List<DisplayUsersDto>();
             }
+
+            return Array.Empty<DisplayUsersDto>();
         }
 
-        [HttpPost("CreateCompany")]
+        [HttpPost(template: nameof(CreateCompany))]
         public async Task<bool> CreateCompany(NewCompanyInputDto inp, CancellationToken ct)
         {
             try
             {
-                var exists = await _context.Companies.AnyAsync(x => x.Name == inp.Name, ct);
+                var exists = await _context.Companies.AnyAsync(predicate: x => x.Name == inp.Name, cancellationToken: ct);
                 if (!exists)
                 {
-                    _logger.LogInformation("Account doesnt exist, adding");
-                    var id = User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value;
-                    var user = await _context.Users.FirstAsync(x => x.Id == id);
+                    _logger.LogInformation(message: "Account doesnt exist, adding");
+                    var id = User.Claims.First(predicate: a => a.Type == ClaimTypes.NameIdentifier).Value;
+                    var user = await _context.Users.SingleAsync(predicate: x => x.Id == id, cancellationToken: ct);
                     var newCompany = new CompanyDetail()
                     {
                         Name = inp.Name,
-                        Phone = inp.phone,
+                        Phone = inp.Phone,
                         Address = inp.Address,
-                        DbName = inp.Name.Length < 30 ? removeSpaces.Replace(inp.Name.Trim(), "_") : removeSpaces.Replace(inp.Name.Trim()[..30], "_"),
+                        DbName = inp.Name.Length < 30 ? _removeSpaces.Replace(input: inp.Name.Trim(), replacement: "_") : _removeSpaces.Replace(input: inp.Name.Trim()[..30], replacement: "_"),
                         Approved = true,
                     };
-                    await _context.AddAsync(newCompany, ct);
+                    await _context.AddAsync(entity: newCompany, cancellationToken: ct);
                     var compAccount = new CompanyAccount()
                     {
                         CompRole = "Admin",
@@ -143,120 +153,103 @@ namespace AccReporting.Server.Controllers
                         IsSelected = false,
                     };
 
-                    await _context.AddAsync(compAccount, ct);
-
-                    //var allSelected = await _context.CompanyAccounts.Where(x => x.Company.Approved && x.UserID == id && x.IsSelected).ToListAsync(ct);
-                    //allSelected.ForEach(x => x.IsSelected = false);
-
+                    await _context.AddAsync(entity: compAccount, cancellationToken: ct);
                     await _context.SaveChangesAsync(cancellationToken: ct);
-                    _logger.LogInformation("Account added");
+                    _logger.LogInformation(message: "Account added");
 
                     return true;
                 }
-                _logger.LogInformation("Account exist, not adding");
+                _logger.LogInformation(message: "Account exist, not adding");
                 return false;
             }
             catch (Exception ex)
             {
-                _logger.LogInformation("Error: {Message}", ex.Message);
+                _logger.LogInformation(message: "Error: {Message}", ex.Message);
                 return false;
             }
         }
 
         [AllowAnonymous]
-        [HttpPost("fileupload")]
-        public async Task<IActionResult> fileupload(CancellationToken ct)
+        [HttpPost(template: "fileupload")]
+        public async Task<IResult> Fileupload(CancellationToken ct)
         {
             bool res;
             try
             {
-                var id = Request.Headers.First(x => string.Equals(x.Key, "ID", StringComparison.InvariantCultureIgnoreCase)).Value[0];
-                string text = string.Empty;
-                var file = Request.Form.Files[0];
+                var id = Request.Headers.First(predicate: x => string.Equals(a: x.Key, b: "ID", comparisonType: StringComparison.InvariantCultureIgnoreCase)).Value[index: 0];
+                var text = string.Empty;
+                var file = Request.Form.Files[index: 0];
                 using (var ms = new MemoryStream())
                 {
-                    file.CopyTo(ms);
-                    byte[]? fileBytes = ms.ToArray();
-                    text = Encoding.Default.GetString(fileBytes);
+                    file.CopyTo(target: ms);
+                    var fileBytes = ms.ToArray();
+                    text = Encoding.Default.GetString(bytes: fileBytes);
                 }
-                _logger.LogInformation("File uploaded");
-                var dbname = _context.CompanyAccounts.AsNoTracking()
-                    .Where(x => x.Company.Approved && x.UserID == id && x.CompRole == "Admin" && x.IsSelected)
-                    .Select(x => x.Company.DbName)
-                    .First();
-                await _dataService.SetDbName(dbname, ct);
-                res = await _dataService.InsertAllDataBulk(text, ct);
-                _logger.LogInformation("Data Inserted");
+                _logger.LogInformation(message: "File uploaded");
+                var dbNameSingleAsync = await _context.CompanyAccounts.AsNoTracking()
+                    .Where(predicate: x => x.Company!.Approved && x.UserId == id && x.CompRole == "Admin" && x.IsSelected)
+                    .Select(selector: x => x.Company!.DbName)
+                    .SingleAsync(cancellationToken: ct) ?? "";
+                await _dataService.SetDbName(dbName: dbNameSingleAsync, ct: ct);
+                res = await _dataService.InsertAllDataBulk(access: text, ct: ct);
+                _logger.LogInformation(message: "Data Inserted");
             }
             catch (Exception ex)
             {
-                _logger.LogInformation("Data Error: {Message}", ex.Message);
-                return NotFound();
+                _logger.LogInformation(message: "Data Error: {Message}", ex.Message);
+                return Results.NoContent();
             }
-            return Ok(res);
+            return res ? Results.Ok() : Results.NoContent();
         }
 
-        [HttpGet("ChangeSelectedCompany")]
-        public async Task<bool> ChangeSelectedCompany(string ID, CancellationToken ct)
+        [HttpGet(template: nameof(ChangeSelectedCompany))]
+        public async Task<bool> ChangeSelectedCompany(string id, CancellationToken ct)
         {
             try
             {
-                var id = User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value;
-                int curr = _hash.DecodeSingle(ID);
-                var res = _context.CompanyAccounts.FirstOrDefault(a => a.ID == curr && a.UserID == id && a.Company.Approved);
-                if (res != null)
+                var s = User.Claims.First(predicate: a => a.Type == ClaimTypes.NameIdentifier).Value;
+                var curr = _hash.DecodeSingle(hash: id);
+                var res = await _context.CompanyAccounts.SingleOrDefaultAsync(predicate: a => a.Id == curr && a.UserId == s && a.Company!.Approved, cancellationToken: ct);
+                if (res is not null)
                 {
-                    var Selected = await _context.CompanyAccounts.Where(a => a.IsSelected && a.UserID == id).ToListAsync(ct);
-                    Selected?.ForEach(x => x.IsSelected = false);
+                    var selected = await _context.CompanyAccounts.Where(predicate: a => a.IsSelected && a.UserId == s).ToListAsync(cancellationToken: ct);
+                    selected?.ForEach(action: x => x.IsSelected = false);
                     res.IsSelected = true;
                     await _context.SaveChangesAsync(cancellationToken: ct);
-                    _logger.LogInformation("Updated Selected Company");
+                    _logger.LogInformation(message: "Updated Selected Company");
                     return true;
                 }
-                _logger.LogInformation("Company not found");
+                _logger.LogInformation(message: "Company not found");
                 return false;
             }
             catch (Exception ex)
             {
-                _logger.LogInformation("Error occured, {Message}", ex.Message);
+                _logger.LogInformation(message: "Error occured, {Message}", ex.Message);
                 return false;
             }
         }
 
-        [HttpGet("GetAllCompaniesForUser")]
-        public async Task<IEnumerable<CompaniesListDTO?>?> GetCurrentSelectedCompany(CancellationToken ct)
+        [HttpGet(template: "GetAllCompaniesForUser")]
+        public async Task<IEnumerable<CompaniesListDto?>?> GetCurrentSelectedCompany(CancellationToken ct)
         {
             try
             {
-                var id = User.Claims.First(a => a.Type == ClaimTypes.NameIdentifier).Value;
+                var id = User.Claims.First(predicate: a => a.Type == ClaimTypes.NameIdentifier).Value;
                 var retx = await _context.CompanyAccounts.AsNoTracking()
-                    .Where(x => x.Company.Approved && x.UserID == id)
-                    .OrderBy(x => x.CompRole)
-                    .Select(x => new { x.ID, CompID = x.Company.ID, x.Company.Name, x.AcNumber, x.CompRole, x.IsSelected })
-                    .ToListAsync(ct);
+                    .Where(predicate: x => x.Company!.Approved && x.UserId == id)
+                    .OrderBy(keySelector: x => x.CompRole)
+                    .Select(selector: x => new { ID = x.Id, CompID = x.Company!.Id, x.Company.Name, x.AcNumber, x.CompRole, x.IsSelected })
+                    .ToListAsync(cancellationToken: ct);
                 var ret = retx
-                    .Select(x =>
-                    new CompaniesListDTO(_hash.Encode(x.ID), _hash.Encode(x.CompID), x.Name, x.AcNumber, x.CompRole, x.IsSelected));
-                //if (!ret.Any())
-                //{
-                //    _logger.LogInformation("No account found");
-                //    ret = new List<CompaniesListDTO>(
-                //        new[]
-                //        {
-                //            new CompaniesListDTO(_hash.Encode(2),_hash.Encode(2), "No Company Name", "5.6.7", "Admin", true),
-                //            new CompaniesListDTO(_hash.Encode(3),_hash.Encode(3), "No Company Name", "5.73.4", "Admin", false),
-                //            new CompaniesListDTO(_hash.Encode(0),_hash.Encode(0), "No Company Name", "1.25", "User", false),
-                //            new CompaniesListDTO(_hash.Encode(1),_hash.Encode(1), "No Company Name", "1.5.3", "User", false),
-                //            new CompaniesListDTO(_hash.Encode(4),_hash.Encode(4), "No Company Name", "8.75", "User", false),
-                //        });
-                //}
+                    .Select(selector: x =>
+                    new CompaniesListDto(id: _hash.Encode(number: x.ID), compId: _hash.Encode(number: x.CompID), name: x.Name!, accountNo: x.AcNumber, role: x.CompRole!, isSelected: x.IsSelected));
 
                 return ret;
             }
             catch (Exception ex)
             {
-                _logger.LogInformation("Error in getting user, {Message}", ex.Message);
-                return new List<CompaniesListDTO>();
+                _logger.LogInformation(message: "Error in getting user, {Message}", ex.Message);
+                return new List<CompaniesListDto>();
             }
         }
     }

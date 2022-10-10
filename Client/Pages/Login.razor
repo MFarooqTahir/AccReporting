@@ -33,7 +33,7 @@
                 <InputText type="@TxtType" id="password" class="form-control" @bind-Value="_userForAuthentication.Password" />
         </div>
     </div>
-        <Syncfusion.Blazor.Buttons.SfCheckBox @bind-Checked="@ShowPass" @onchange="@((e)=>ShowPassword())" CssClass="my-3 row"> Show Password</Syncfusion.Blazor.Buttons.SfCheckBox>
+        <Syncfusion.Blazor.Buttons.SfCheckBox @bind-Checked="@_showPass" @onchange="@((e)=>ShowPassword())" CssClass="my-3 row"> Show Password</Syncfusion.Blazor.Buttons.SfCheckBox>
     <div class="row">
         <div class="col-md-12 text-right">
             <button type="submit" class="btn btn-success">Login</button>
@@ -42,14 +42,14 @@
 </EditForm>
 </div>
 @code {
-    private UserForAuthenticationDto _userForAuthentication = new UserForAuthenticationDto();
+    private readonly UserForAuthenticationDto _userForAuthentication = new();
     [Inject]
-    public IAuthenticationService AuthenticationService { get; set; }
+    public IAuthenticationService AuthenticationService { get; set; } = null!;
     [Inject]
-    public NavigationManager NavigationManager { get; set; }
+    public NavigationManager NavigationManager { get; set; } = null!;
     public bool ShowAuthError { get; set; }
-    bool ShowPass;
-    public string Error { get; set; }
+    bool _showPass;
+    public string Error { get; set; } = "";
     public string TxtType = "password"; 
  
     public void ShowPassword() 
@@ -66,7 +66,7 @@
     public async Task ExecuteLogin()
     {
         ShowAuthError = false;
-        var result = await AuthenticationService.Login(_userForAuthentication);
+        var result = await AuthenticationService.Login(userForAuthentication: _userForAuthentication);
         if (!result.IsAuthSuccessful)
         {
             Error = result.ErrorMessage;
@@ -74,7 +74,7 @@
         }
         else
         {
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo(uri: "/");
         }
     }
 }

@@ -5,18 +5,18 @@ namespace AccReporting.Shared.ContextModels
     public class CompanyDetail
     {
         [Key]
-        public int ID { get; set; }
+        public int Id { get; set; }
 
-        [MaxLength(30)]
+        [MaxLength(length: 30)]
         public string? Name { get; set; }
 
-        [MaxLength(30)]
+        [MaxLength(length: 30)]
         public string? DbName { get; set; }
 
-        [MaxLength(150)]
+        [MaxLength(length: 150)]
         public string? Address { get; set; }
 
-        [MaxLength(15)]
+        [MaxLength(length: 15)]
         public string? Phone { get; set; }
         public bool Approved { get; set; }
         public ICollection<CompanyAccount>? CompanyUsers { get; set; }

@@ -1,6 +1,4 @@
-﻿using AccReporting.Shared.ContextModels;
-
-using Duende.IdentityServer.EntityFramework.Options;
+﻿using Duende.IdentityServer.EntityFramework.Options;
 
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Identity;
@@ -13,13 +11,13 @@ namespace AccReporting.Server.Data
     {
         public ApplicationDbContext(
             DbContextOptions<ApplicationDbContext> options,
-            IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
+            IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options: options, operationalStoreOptions: operationalStoreOptions)
         {
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder);
+            base.OnModelCreating(builder: builder);
 
             builder.Entity<IdentityRole>().HasData(new IdentityRole { Name = "User", NormalizedName = "USER", Id = Guid.NewGuid().ToString(), ConcurrencyStamp = Guid.NewGuid().ToString() });
             //builder.Entity<IdentityRole>().HasData(new IdentityRole { Name = "CompanyAdmin", NormalizedName = "COMPANYADMIN", Id = Guid.NewGuid().ToString(), ConcurrencyStamp = Guid.NewGuid().ToString() });

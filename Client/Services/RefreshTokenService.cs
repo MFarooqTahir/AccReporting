@@ -20,15 +20,15 @@ namespace AccReporting.Client.Services
             if (user is not null)
             {
                 var claims = user.Claims.ToList();
-                var exp1 = user.FindFirst(c => c.Type.Equals("exp"));
+                var exp1 = user.FindFirst(match: c => c.Type.Equals(value: "exp"));
                 if (exp1 is not null)
                 {
                     var exp = exp1.Value;
-                    var expTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(exp));
+                    var expTime = DateTimeOffset.FromUnixTimeSeconds(seconds: Convert.ToInt64(value: exp));
 
-                    var timeUTC = DateTime.UtcNow;
+                    var timeUtc = DateTime.UtcNow;
 
-                    var diff = expTime - timeUTC;
+                    var diff = expTime - timeUtc;
                     if (diff.TotalMinutes <= 2)
                         return await _authService.RefreshToken();
 

@@ -23,13 +23,13 @@ namespace AccReporting.Client.Services
         public async Task InterceptBeforeHttpAsync(object sender, HttpClientInterceptorEventArgs e)
         {
             var absPath = e.Request?.RequestUri?.AbsolutePath;
-            if (!string.IsNullOrWhiteSpace(absPath) && !absPath.Contains("token") && !absPath.Contains("auth"))
+            if (!string.IsNullOrWhiteSpace(value: absPath) && !absPath.Contains(value: "token") && !absPath.Contains(value: "auth"))
             {
                 var token = await _refreshTokenService.TryRefreshToken();
 
-                if (!string.IsNullOrEmpty(token))
+                if (!string.IsNullOrEmpty(value: token))
                 {
-                    e.Request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+                    e.Request.Headers.Authorization = new AuthenticationHeaderValue(scheme: "bearer", parameter: token);
                 }
             }
         }

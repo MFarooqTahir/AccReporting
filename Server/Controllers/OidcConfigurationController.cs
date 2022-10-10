@@ -15,11 +15,11 @@ namespace AccReporting.Server.Controllers
 
         public IClientRequestParametersProvider ClientRequestParametersProvider { get; }
 
-        [HttpGet("_configuration/{clientId}")]
+        [HttpGet(template: "_configuration/{clientId}")]
         public IActionResult GetClientRequestParameters([FromRoute] string clientId)
         {
-            var parameters = ClientRequestParametersProvider.GetClientParameters(HttpContext, clientId);
-            return Ok(parameters);
+            var parameters = ClientRequestParametersProvider.GetClientParameters(context: HttpContext, clientId: clientId);
+            return Ok(value: parameters);
         }
     }
 }

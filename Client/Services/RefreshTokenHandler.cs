@@ -19,19 +19,19 @@ namespace AccReporting.Client.Services
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var absPath = request.RequestUri.AbsolutePath;
-            if (!absPath.Contains("token", StringComparison.InvariantCultureIgnoreCase) && !absPath.Contains("auth", StringComparison.InvariantCultureIgnoreCase))
+            if (!absPath.Contains(value: "token", comparisonType: StringComparison.InvariantCultureIgnoreCase) && !absPath.Contains(value: "auth", comparisonType: StringComparison.InvariantCultureIgnoreCase))
             {
                 await _refreshTokenService.TryRefreshToken();
 
-                var token = await _localStorage.GetItemAsync<string>("authToken");
+                var token = await _localStorage.GetItemAsync<string>(key: "authToken");
 
-                if (!string.IsNullOrEmpty(token))
+                if (!string.IsNullOrEmpty(value: token))
                 {
-                    request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+                    request.Headers.Authorization = new AuthenticationHeaderValue(scheme: "bearer", parameter: token);
                 }
             }
 
-            return await base.SendAsync(request, cancellationToken);
+            return await base.SendAsync(request: request, cancellationToken: cancellationToken);
         }
     }
 }

@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Ozone Technologies Softwares</title>
+    <title>@ViewData[index: "Title"] - Ozone Technologies Softwares</title>
 
     <environment include="Development">
         <link rel="stylesheet" href="~/Identity/lib/bootstrap/dist/css/bootstrap.css" />
@@ -32,17 +32,17 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                     @{
-                        var result = Engine.FindView(ViewContext, "_LoginPartial", isMainPage: false);
+                        var result = Engine.FindView(context: ViewContext, viewName: "_LoginPartial", isMainPage: false);
                     }
                     @if (result.Success)
                     {
-                        await Html.RenderPartialAsync("_LoginPartial");
+                        await Html.RenderPartialAsync(partialViewName: "_LoginPartial");
                     }
                     else
                     {
-                        throw new InvalidOperationException("The default Identity UI layout requires a partial view '_LoginPartial' " +
+                        throw new InvalidOperationException(message: "The default Identity UI layout requires a partial view '_LoginPartial' " +
                             "usually located at '/Pages/_LoginPartial' or at '/Views/Shared/_LoginPartial' to work. Based on your configuration " +
-                            $"we have looked at it in the following locations: {System.Environment.NewLine}{string.Join(System.Environment.NewLine, result.SearchedLocations)}.");
+                            $"we have looked at it in the following locations: {System.Environment.NewLine}{string.Join(separator: System.Environment.NewLine, values: result.SearchedLocations)}.");
                     }
                 </div>
             </div>
@@ -59,9 +59,9 @@
         <div class="container">
         &copy; 2022 - Ozone Technologies Softwares
             @{
-                var foundPrivacy = Url.Page("/Privacy", new { area = "" });
+                var foundPrivacy = Url.Page(pageName: "/Privacy", values: new { area = "" });
             }
-            @if (foundPrivacy != null)
+            @if (foundPrivacy is not null)
             {
                 <a asp-area="" asp-page="/Privacy">Privacy</a>
             }
@@ -89,6 +89,6 @@
         <script src="~/Identity/js/site.js" asp-append-version="true"></script>
     </environment>
 
-    @await RenderSectionAsync("Scripts", required: false)
+    @await RenderSectionAsync(name: "Scripts", required: false)
 </body>
 </html>

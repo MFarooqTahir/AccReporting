@@ -8,16 +8,16 @@ namespace AccReporting.Server.Services
     public static class MemoryCacheExtensions
     {
         private static readonly Func<MemoryCache, object> GetEntriesCollection = Delegate.CreateDelegate(
-            typeof(Func<MemoryCache, object>),
-            typeof(MemoryCache).GetProperty("EntriesCollection", BindingFlags.NonPublic | BindingFlags.Instance).GetGetMethod(true),
+            type: typeof(Func<MemoryCache, object>),
+            method: typeof(MemoryCache).GetProperty(name: "EntriesCollection", bindingAttr: BindingFlags.NonPublic | BindingFlags.Instance).GetGetMethod(nonPublic: true),
             throwOnBindFailure: true) as Func<MemoryCache, object>;
 
         public static IEnumerable<string> GetKeysForDb(this IMemoryCache memoryCache, string prefix)
         {
-            var en = ((IDictionary)GetEntriesCollection((MemoryCache)memoryCache)).Keys;
-            return en.Cast<string>().Where(x => x.StartsWith(prefix));
+            var en = ((IDictionary)GetEntriesCollection(arg: (MemoryCache)memoryCache)).Keys;
+            return en.Cast<string>().Where(predicate: x => x.StartsWith(value: prefix));
         }
         public static IEnumerable<T> GetKeys<T>(this IMemoryCache memoryCache, string prefix) =>
-            GetKeysForDb(memoryCache, prefix).OfType<T>();
+            GetKeysForDb(memoryCache: memoryCache, prefix: prefix).OfType<T>();
     }
 }

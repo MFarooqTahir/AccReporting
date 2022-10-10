@@ -5,20 +5,19 @@
         public InvSummGridModel()
         {
         }
-
-        public InvSummGridModel(int? invNo, string type, double? amount, double? netAmount, string name)
+        public InvSummGridModel(int? invNo, double? amount, double? netAmount, string name, string pcode)
         {
             InvNo = invNo;
-            Type = type;
             Amount = amount;
             NetAmount = netAmount;
             Name = name;
+            PCode = pcode;
         }
 
         public int? InvNo { get; set; }
 
         public string Name { get; set; }
-        public string Type { get; set; }
+        public string PCode { get; set; }
 
         public double? Amount { get; set; }
         public double? NetAmount { get; set; }

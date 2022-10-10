@@ -1,37 +1,29 @@
 ﻿@inherits LayoutComponentBase
-@inject IJSRuntime JS
-@inject ILocalStorageService LocalStorage
-@inject HttpClient client
 @using AccReporting.Client.Services
-@using Syncfusion.Blazor.Navigations
-<SfSidebar ID="Sidebar" Type="SidebarType.Over" Width="300px" DockSize="65px" ShowBackdrop="true" EnableGestures="true" EnableDock="true" @ref="Sidebar" @bind-IsOpen="SidebarToggle">
-    <div class="sidebar" style="position:fixed;z-index:1200">
-        <div class="topnav navbar navbar-dark">
-            <button class="navbar-toggler me-4" @onclick="ToggleNavMenu" />
-            <a class="navbar-brand me-auto" href="">Ozone Technologies</a>
-        </div>
-        @*<div @onmouseover="MouseIn" @onmouseout="MouseOut">
-        <NavMenu />
-        </div> *@
-        <NavMenu />
-    </div>
+<SfSidebar Type="SidebarType.Auto" @bind-IsOpen="SidebarToggle" Width="300px" EnableGestures="true">
+    <ChildContent>
+        <div style="text-align: center;" class="mt-3">
+            <a style="color:white;" class="navbar-brand" href="">Ozone Technologies</a>
+        </div><NavMenu />
+    </ChildContent>
 </SfSidebar>
-
 <div class="main">
-    <nav class="navbar navbar-expand navbar-light bg-light border-bottom box-shadow mb-3">
-        @if (!SidebarToggle)
-        {
-            <div class="ms-3 d-none d-md-block">
-                Ozone Technologies Softwares
-            </div>
-        }
+    <nav class="navbar navbar-expand navbar-dark bg-dark border-bottom box-shadow mb-3">
+        <button class="navbar-toggler ms-3 bg-dark" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+       @if(!SidebarToggle){
+            <div class="ms-3 d-none d-md-block" style="color:white">
+                Ozone Technologies Software
+           </div>
+       }
         <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
 
             <LoginDisplay />
         </div>
     </nav>
 
-    <div class="content px-4">
+    <div class="content px-6">
             @Body
     </div>
 </div>
@@ -41,13 +33,13 @@
     private Task<AuthenticationState> AuthenticationStateTask { get; set; } = null!;
 
 
-    SfSidebar Sidebar;
-    public bool SidebarToggle = false;
-    public bool SidebarToggleFixed = false;
+    public bool SidebarToggle = true;
+    public bool SidebarToggleFixed = true;
+
     [Inject]
-    public IAuthenticationService AuthenticationService { get; set; }
+    public IAuthenticationService AuthenticationService { get; set; } = null!;
     [Inject]
-    public NavigationManager NavigationManager { get; set; }
+    public NavigationManager NavigationManager { get; set; } = null!;
     //protected override async Task OnAfterRenderAsync(bool firstRender)
     //{
     //    if(firstRender)
@@ -56,6 +48,18 @@
     //    await InvokeAsync(StateHasChanged);
     //    }
     //}
+    private void MouseIn(MouseEventArgs args)
+    {
+        SidebarToggle = true;
+        SidebarToggleFixed = true;
+        StateHasChanged();
+    }
+    private void MouseOut(MouseEventArgs args)
+    {
+        SidebarToggle = false;
+        SidebarToggleFixed = false;
+        StateHasChanged();
+    }
     public void ToggleNavMenu()
     {
         SidebarToggle = !SidebarToggle;
@@ -69,7 +73,7 @@
         min-width: 300px;
     }
 
-    .navbar-toggler {
+  /*  .navbar-toggler {
         display: inline-block;
         border: none;
         width: 24px;
@@ -81,7 +85,7 @@
         transform-origin: left;
         color: #ffffff;
     }
-
+*/
 
     /* Content area styles */
     .title {
@@ -89,7 +93,7 @@
     }
 
     /* Sidebar styles */
-    .e-sidebar .e-icons::before {
+    .e-sidebar .e-icons:before {
         font-size: 25px;
     }
 
@@ -101,29 +105,29 @@
         display: none;
     }
     /* dockbar icon Style */
-    .e-sidebar .home::before {
+    .e-sidebar .home:before {
         content: '\e102';
     }
 
-    .e-sidebar .profile::before {
+    .e-sidebar .profile:before {
         content: '\e10c';
     }
 
-    .e-sidebar .info::before {
+    .e-sidebar .info:before {
         content: '\e11b';
     }
 
-    .e-sidebar .settings::before {
+    .e-sidebar .settings:before {
         content: '\e10b';
     }
 
-    .e-sidebar .expand::before,
-    .e-sidebar.e-right.e-open .expand::before {
+    .e-sidebar .expand:before,
+    .e-sidebar.e-right.e-open .expand:before {
         content: '\e10f';
     }
 
-    .e-sidebar.e-open .expand::before,
-    .e-sidebar.e-right .expand::before {
+    .e-sidebar.e-open .expand:before,
+    .e-sidebar.e-right .expand:before {
         content: '\e10e';
     }
 

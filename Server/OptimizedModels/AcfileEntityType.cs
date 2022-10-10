@@ -98,7 +98,7 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(Acfile).GetProperty("Gst", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(Acfile).GetField("<Gst>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true,
-                maxLength: 20);
+                maxLength: 100);
             gst.AddAnnotation("Relational:ColumnName", "GST");
 
             var opBal = runtimeEntityType.AddProperty(
@@ -121,6 +121,10 @@ namespace AccReporting.Server.OptimizedModels
                 new[] { idpr });
             runtimeEntityType.SetPrimaryKey(key);
             key.AddAnnotation("Relational:Name", "PK__Acfile__B87C5B5F3831C82B");
+
+            var index = runtimeEntityType.AddIndex(
+                new[] { actCode });
+            index.AddAnnotation("Relational:Name", "ActCodeIndex");
 
             return runtimeEntityType;
         }

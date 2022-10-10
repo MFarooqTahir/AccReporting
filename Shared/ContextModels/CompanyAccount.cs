@@ -7,24 +7,24 @@ namespace AccReporting.Shared.ContextModels
     public class CompanyAccount
     {
         [Key]
-        public int ID { get; set; }
+        public int Id { get; set; }
 
-        [MaxLength(20)]
+        [MaxLength(length: 20)]
         public string? CompRole { get; set; }
 
-        [MaxLength(15)]
+        [MaxLength(length: 15)]
         public string? AcNumber { get; set; }
 
-        [DefaultValue(false)]
+        [DefaultValue(value: false)]
         public bool IsSelected { get; set; }
 
-        [ForeignKey(nameof(User))]
-        public string UserID { get; set; }
+        [ForeignKey(name: nameof(User))]
+        public string UserId { get; set; }
 
         public ApplicationUser? User { get; set; }
 
-        [ForeignKey(nameof(Company))]
-        public int? CompanyID { get; set; }
+        [ForeignKey(name: nameof(Company))]
+        public int? CompanyId { get; set; }
 
         public CompanyDetail? Company { get; set; }
     }
