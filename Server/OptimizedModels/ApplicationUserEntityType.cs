@@ -33,8 +33,8 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(IdentityUser<string>).GetProperty("AccessFailedCount", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(IdentityUser<string>).GetField("<AccessFailedCount>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
 
-            var companyDetailID = runtimeEntityType.AddProperty(
-                "CompanyDetailID",
+            var companyDetailId = runtimeEntityType.AddProperty(
+                "CompanyDetailId",
                 typeof(int?),
                 nullable: true);
 
@@ -149,7 +149,7 @@ namespace AccReporting.Server.OptimizedModels
             runtimeEntityType.SetPrimaryKey(key);
 
             var index = runtimeEntityType.AddIndex(
-                new[] { companyDetailID });
+                new[] { companyDetailId });
 
             var index0 = runtimeEntityType.AddIndex(
                 new[] { normalizedEmail });
@@ -165,8 +165,8 @@ namespace AccReporting.Server.OptimizedModels
 
         public static RuntimeForeignKey CreateForeignKey1(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
-            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("CompanyDetailID")! },
-                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ID")! })!,
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("CompanyDetailId")! },
+                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("Id")! })!,
                 principalEntityType);
 
             var currentSelectedUsers = principalEntityType.AddNavigation("CurrentSelectedUsers",

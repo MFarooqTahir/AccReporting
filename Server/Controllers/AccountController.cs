@@ -240,15 +240,13 @@ namespace AccReporting.Server.Controllers
                     .OrderBy(keySelector: x => x.CompRole)
                     .Select(selector: x => new { ID = x.Id, CompID = x.Company!.Id, x.Company.Name, x.AcNumber, x.CompRole, x.IsSelected })
                     .ToListAsync(cancellationToken: ct);
-                var ret = retx
+                return retx
                     .Select(selector: x =>
                     new CompaniesListDto(id: _hash.Encode(number: x.ID), compId: _hash.Encode(number: x.CompID), name: x.Name!, accountNo: x.AcNumber, role: x.CompRole!, isSelected: x.IsSelected));
-
-                return ret;
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(message: "Error in getting user, {Message}", ex.Message);
+                _logger.LogInformation(message: "Error in getting user, {Message} {Stack}", ex.Message, ex.StackTrace);
                 return new List<CompaniesListDto>();
             }
         }

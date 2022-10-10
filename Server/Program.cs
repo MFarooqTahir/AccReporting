@@ -1,5 +1,4 @@
 global using AccReporting.Shared.ContextModels;
-using AccReporting.Server;
 using AccReporting.Server.Data;
 using AccReporting.Server.DbContexts;
 using AccReporting.Server.OptimizedModels;
@@ -9,7 +8,6 @@ using HashidsNet;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -37,7 +35,6 @@ var connectionString1 = builder.Configuration.GetConnectionString(name: "NoDb");
 var connectionString2 = builder.Configuration.GetConnectionString(name: "test");
 
 builder.Services.AddSingleton<IHashids>(implementationInstance: new Hashids(salt: "OzoneTechnologies softwares avax", minHashLength: 6));
-builder.Services.AddTransient<IEmailSender, EmailService>();
 builder.Services.AddDbContext<ApplicationDbContext>(optionsAction: options =>
 {
     options.UseMySql(connectionString: connectionString, serverVersion: ServerVersion.AutoDetect(connectionString: connectionString));

@@ -18,11 +18,11 @@ namespace AccReporting.Server.OptimizedModels
                 typeof(CompanyDetail),
                 baseEntityType);
 
-            var iD = runtimeEntityType.AddProperty(
-                "ID",
+            var id = runtimeEntityType.AddProperty(
+                "Id",
                 typeof(int),
-                propertyInfo: typeof(CompanyDetail).GetProperty("ID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(CompanyDetail).GetField("<ID>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyInfo: typeof(CompanyDetail).GetProperty("Id", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(CompanyDetail).GetField("<Id>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 valueGenerated: ValueGenerated.OnAdd,
                 afterSaveBehavior: PropertySaveBehavior.Throw);
 
@@ -65,7 +65,7 @@ namespace AccReporting.Server.OptimizedModels
                 maxLength: 15);
 
             var key = runtimeEntityType.AddKey(
-                new[] { iD });
+                new[] { id });
             runtimeEntityType.SetPrimaryKey(key);
 
             return runtimeEntityType;

@@ -3,6 +3,7 @@ using System;
 using AccReporting.Server.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AccReporting.Server.Migrations.AccountInfoDb
 {
     [DbContext(typeof(AccountInfoDbContext))]
-    partial class AccountInfoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221010150229_changes")]
+    partial class changes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -483,7 +485,7 @@ namespace AccReporting.Server.Migrations.AccountInfoDb
                     b.HasIndex("ActCode")
                         .HasDatabaseName("ActCodeIndex");
 
-                    b.ToTable("Trans", (string)null);
+                    b.ToTable("Trans");
                 });
 #pragma warning restore 612, 618
         }

@@ -10,7 +10,7 @@
                 font-size: 28px;
             }
         </style>
-        <h3 class="text-center">Sales Report @Type</h3>
+        <h3 class="text-center">Sales Report</h3>
 
         <SfTab @bind-SelectedItem="@SelectedItemIndex" HeaderPlacement="HeaderPosition.Top" LoadOn="ContentLoad.Dynamic" OverflowMode="@OverflowMode.Scrollable">
             <TabItems>
@@ -75,7 +75,7 @@
 </AuthorizeView>
 @code {
     public SfGrid<InvSummGridModel> DefaultGrid = new();
-    string? _type = "None";
+    string? _type = "";
     [Parameter]
     [SupplyParameterFromQuery(Name = "Type")]
     public string? Type

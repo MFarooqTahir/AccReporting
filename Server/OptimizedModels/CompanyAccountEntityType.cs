@@ -20,11 +20,11 @@ namespace AccReporting.Server.OptimizedModels
                 typeof(CompanyAccount),
                 baseEntityType);
 
-            var iD = runtimeEntityType.AddProperty(
-                "ID",
+            var id = runtimeEntityType.AddProperty(
+                "Id",
                 typeof(int),
-                propertyInfo: typeof(CompanyAccount).GetProperty("ID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(CompanyAccount).GetField("<ID>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyInfo: typeof(CompanyAccount).GetProperty("Id", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(CompanyAccount).GetField("<Id>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 valueGenerated: ValueGenerated.OnAdd,
                 afterSaveBehavior: PropertySaveBehavior.Throw);
 
@@ -44,11 +44,11 @@ namespace AccReporting.Server.OptimizedModels
                 nullable: true,
                 maxLength: 20);
 
-            var companyID = runtimeEntityType.AddProperty(
-                "CompanyID",
+            var companyId = runtimeEntityType.AddProperty(
+                "CompanyId",
                 typeof(int?),
-                propertyInfo: typeof(CompanyAccount).GetProperty("CompanyID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(CompanyAccount).GetField("<CompanyID>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyInfo: typeof(CompanyAccount).GetProperty("CompanyId", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(CompanyAccount).GetField("<CompanyId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
 
             var isSelected = runtimeEntityType.AddProperty(
@@ -57,29 +57,29 @@ namespace AccReporting.Server.OptimizedModels
                 propertyInfo: typeof(CompanyAccount).GetProperty("IsSelected", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(CompanyAccount).GetField("<IsSelected>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
 
-            var userID = runtimeEntityType.AddProperty(
-                "UserID",
+            var userId = runtimeEntityType.AddProperty(
+                "UserId",
                 typeof(string),
-                propertyInfo: typeof(CompanyAccount).GetProperty("UserID", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(CompanyAccount).GetField("<UserID>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+                propertyInfo: typeof(CompanyAccount).GetProperty("UserId", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(CompanyAccount).GetField("<UserId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
 
             var key = runtimeEntityType.AddKey(
-                new[] { iD });
+                new[] { id });
             runtimeEntityType.SetPrimaryKey(key);
 
             var index = runtimeEntityType.AddIndex(
-                new[] { companyID });
+                new[] { companyId });
 
             var index0 = runtimeEntityType.AddIndex(
-                new[] { userID });
+                new[] { userId });
 
             return runtimeEntityType;
         }
 
         public static RuntimeForeignKey CreateForeignKey1(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
-            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("CompanyID")! },
-                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("ID")! })!,
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("CompanyId")! },
+                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("Id")! })!,
                 principalEntityType);
 
             var company = declaringEntityType.AddNavigation("Company",
@@ -101,7 +101,7 @@ namespace AccReporting.Server.OptimizedModels
 
         public static RuntimeForeignKey CreateForeignKey2(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
-            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("UserID")! },
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("UserId")! },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("Id")! })!,
                 principalEntityType,
                 deleteBehavior: DeleteBehavior.Cascade,
