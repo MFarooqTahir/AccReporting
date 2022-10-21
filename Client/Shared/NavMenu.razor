@@ -51,50 +51,50 @@
     List<TreeData> LocalData = new(){new TreeData
     {
         Id = "1",
-        Name = "Sales Report",
+        Name = "Report",
         HasChild = true,
         Expanded = false,
-        navigateUrl="/SalesReport",
+        navigateUrl="/",
     },new TreeData
     {
         Id = "2",
         Pid = "1",
-        Name = "Sales",
-        navigateUrl="/SalesReport",
+        Name = "Sales Invoice",
+        navigateUrl="/Reports",
     },new TreeData
     {
         Id = "3",
         Pid = "1",
-        Name = "Purchase",
-        navigateUrl="/SalesReport?Type=Purchase",
+        Name = "Purchase Invoice",
+        navigateUrl="/Reports?Type=Purchase",
     }
         ,new TreeData
         {
             Id = "4",
             Pid = "1",
-            Name = "Return",
-            navigateUrl="/SalesReport?Type=Return",
+            Name = "Return Invoice",
+            navigateUrl="/Reports?Type=Return",
         }
         ,new TreeData
         {
             Id = "5",
             Pid = "1",
             Name = "Estimate",
-            navigateUrl="/SalesReport?Type=Estimate",
+            navigateUrl="/Reports?Type=Estimate",
         }
         ,new TreeData
         {
             Id = "6",
             Pid = "1",
-            Name = "Purchase Return",
-            navigateUrl="/SalesReport?Type=PurchaseReturn",
+            Name = "Purchase Return Invoice",
+            navigateUrl="/Reports?Type=PurchaseReturn",
         }
         ,new TreeData
         {
             Id = "7",
             Pid = "1",
-            Name = "Cash",
-            navigateUrl="/SalesReport?Type=Cash",
+            Name = "Cash Invoice",
+            navigateUrl="/Reports?Type=Cash",
         }
     };
     class TreeData

@@ -39,21 +39,33 @@ namespace AccReporting.Server.Controllers
             try
             {
                 var userId = User.FindFirstValue(claimType: ClaimTypes.NameIdentifier);
-                var adminCompany = await _context.CompanyAccounts.AsNoTracking().Where(predicate: x => x.Company!.Approved && x.IsSelected && x.UserId == userId && x.CompRole == "Admin")
+                var adminCompany = await _context.CompanyAccounts.Where(predicate: x => x.Company!.Approved && x.IsSelected && x.UserId == userId && x.CompRole == "Admin")
                     .Select(selector: x => x.Company)
                     .SingleAsync(cancellationToken: ct);
-                var user = await _context.Users.AsNoTracking().FirstAsync(predicate: x => x.Email == model.UserEmail, cancellationToken: ct);
+                if (adminCompany is null)
+                {
+                    _logger.LogError("Error: Admin company not found");
+                    return false;
+                }
+                var user = await _context.Users.FirstAsync(predicate: x => x.Email == model.UserEmail, cancellationToken: ct);
+                if (user is null)
+                {
+                    _logger.LogError("Error: user account not found");
+                    return false;
+                }
                 var exists = await _context.CompanyAccounts.FirstOrDefaultAsync(predicate: x => x.CompanyId == adminCompany!.Id && x.UserId == user.Id, cancellationToken: ct);
                 if (exists is null || exists.Id == 0)
                 {
                     var newAccount = new CompanyAccount()
                     {
-                        Company = adminCompany,
-                        CompRole = nameof(User),
-                        User = user,
+                        CompRole = "User",
                         AcNumber = model.AcCode
                     };
-                    await _context.AddAsync(entity: newAccount, cancellationToken: ct);
+                    user!.Companies ??= new List<CompanyAccount>();
+                    user.Companies.Add(newAccount);
+                    adminCompany!.CompanyUsers ??= new List<CompanyAccount>();
+                    adminCompany.CompanyUsers.Add(newAccount);
+                    //await _context.AddAsync(entity: newAccount, cancellationToken: ct);
                 }
                 else
                 {
@@ -65,7 +77,7 @@ namespace AccReporting.Server.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(message: "Data Error: {Message}", ex.Message);
+                _logger.LogError(message: "Data Error: {Message}", ex.Message);
                 return false;
             }
         }

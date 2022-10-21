@@ -7,8 +7,10 @@
 {
     <h3 class="text-center">No records</h3>
 }
-<SfGrid RowRenderingMode="RowDirection.Vertical" TValue="InvSummGridModel" AllowTextWrap="true" ID="Grid" DataSource="@SalesReportList" AllowPaging="true" AllowSelection="true" AllowFiltering="true" AllowResizing="true" AllowGrouping="true" AllowSorting="true">
-    <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.FilterBar"></GridFilterSettings>
+<SfGrid RowRenderingMode="RowDirection.Vertical"
+TValue="InvSummGridModel" AllowTextWrap="true" ID="Grid" DataSource="@SalesReportList" AllowPaging="true" 
+AllowSelection="true" AllowFiltering="true" AllowResizing="true" AllowGrouping="true" AllowSorting="true">
+    <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.FilterBar" Mode="FilterBarMode.Immediate"></GridFilterSettings>
     <GridEvents CommandClicked="OnCommandClicked" TValue="InvSummGridModel"></GridEvents>
     <GridPageSettings PageSize="10"></GridPageSettings>
     <GridSelectionSettings CheckboxMode="CheckboxSelectionType.Default" Mode="SelectionMode.Row" CheckboxOnly="true"></GridSelectionSettings>

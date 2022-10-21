@@ -1,4 +1,4 @@
-﻿@page "/SalesReport"
+﻿@page "/Reports"
 @using AccReporting.Client.Components
 @using AccReporting.Client.Services
 <AuthorizeView>
@@ -10,72 +10,40 @@
                 font-size: 28px;
             }
         </style>
-        <h3 class="text-center">Sales Report</h3>
-
-        <SfTab @bind-SelectedItem="@SelectedItemIndex" HeaderPlacement="HeaderPosition.Top" LoadOn="ContentLoad.Dynamic" OverflowMode="@OverflowMode.Scrollable">
-            <TabItems>
-                <TabItem>
-                    <ChildContent>
-                        <TabHeader Text="Sales"></TabHeader> @*Replace your required header1 text here *@
-                    </ChildContent>
-                    <ContentTemplate>
-                        <SalesReportGrid Type="S"></SalesReportGrid>
-                    </ContentTemplate>
-                </TabItem>
-                
-                <TabItem>
-                    @*Replace your required tab1 boby content here *@
-                    <ChildContent>
-                        <TabHeader Text="Purchase"></TabHeader> @*Replace your required header1 text here *@
-                    </ChildContent>
-                    <ContentTemplate>
-                        <SalesReportGrid Type="P"></SalesReportGrid>
-                    </ContentTemplate>
-                </TabItem>
-                <TabItem>
-                    @*Replace your required tab2 boby content here *@
-                    <ChildContent>
-                        <TabHeader Text="Return"></TabHeader> @*Replace your required header2 text here *@
-                    </ChildContent>
-                    <ContentTemplate>
-                        <SalesReportGrid Type="R"></SalesReportGrid>
-                    </ContentTemplate>
-                </TabItem>
-                <TabItem>
-                    @*Replace your required tab2 boby content here *@
-                    <ChildContent>
-                        <TabHeader Text="Estimate"></TabHeader> @*Replace your required header2 text here *@
-                    </ChildContent>
-                    <ContentTemplate>
-                        <SalesReportGrid Type="E"></SalesReportGrid>
-                    </ContentTemplate>
-                </TabItem>
-                <TabItem>
-                    @*Replace your required tab2 boby content here *@
-                    <ChildContent>
-                        <TabHeader Text="@_typesAll[key: "Q"]"></TabHeader> @*Replace your required header2 text here *@
-                    </ChildContent>
-                    <ContentTemplate>
-                        <SalesReportGrid Type="Q"></SalesReportGrid>
-                    </ContentTemplate>
-                </TabItem>
-                <TabItem>
-                    @*Replace your required tab2 boby content here *@
-                    <ChildContent>
-                        <TabHeader Text="@_typesAll[key: "C"]"></TabHeader> @*Replace your required header2 text here *@
-                    </ChildContent>
-                    <ContentTemplate>
-                        <SalesReportGrid Type="C"></SalesReportGrid>
-                    </ContentTemplate>
-                </TabItem>
-            </TabItems>
-        </SfTab>
+        <h3 class="text-center">@title</h3>
+        @if(SelectedItemIndex==0){
+            <SalesReportGrid Type="S"></SalesReportGrid>
+        }
+        else if (SelectedItemIndex == 1)
+        {
+                 <SalesReportGrid Type="P"></SalesReportGrid>
+        }
+        else if (SelectedItemIndex == 2)
+        {
+            <SalesReportGrid Type="R"></SalesReportGrid>
+        }
+        else if (SelectedItemIndex == 3)
+        {
+            <SalesReportGrid Type="E"></SalesReportGrid>
+        }
+        else if (SelectedItemIndex == 4)
+        {
+            <SalesReportGrid Type="Q"></SalesReportGrid>
+        }
+        else if (SelectedItemIndex == 5)
+        {
+            <SalesReportGrid Type="C"></SalesReportGrid>
+        }
+        else{
+            
+            <h3>There was an error</h3>
+        }
 
     </Authorized>
 </AuthorizeView>
 @code {
     public SfGrid<InvSummGridModel> DefaultGrid = new();
-    string? _type = "";
+    string? _type = "",title="";
     [Parameter]
     [SupplyParameterFromQuery(Name = "Type")]
     public string? Type
@@ -83,14 +51,14 @@
         get => _type;
         set 
         { 
-            SelectedItemIndex = value switch
+            (SelectedItemIndex,title) = value switch
             {
-                "Purchase"=>1,
-                "Return"=>2,
-                "Estimate"=>3,
-                "PurchaseReturn"=>4,
-                "Cash"=>5,
-                _ =>0,
+                "Purchase"=>(1,"Purchase Invoice Report"),
+                "Return"=>(2,"Return Invoice Report"),
+                "Estimate"=>(3,"Estimate Report"),
+                "PurchaseReturn"=>(4,"Purchase Return Invoice Report"),
+                "Cash"=>(5,"Cash Invoice Report"),
+                "Sale" or "" or _ =>(0,"Sales Invoice Report"),
                 };
             _type = value;
 
