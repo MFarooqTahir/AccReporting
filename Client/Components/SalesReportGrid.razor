@@ -10,7 +10,7 @@
 <SfGrid RowRenderingMode="RowDirection.Vertical"
 TValue="InvSummGridModel" AllowTextWrap="true" ID="Grid" DataSource="@SalesReportList" AllowPaging="true" 
 AllowSelection="true" AllowFiltering="true" AllowResizing="true" AllowGrouping="true" AllowSorting="true">
-    <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.FilterBar" Mode="FilterBarMode.Immediate"></GridFilterSettings>
+    <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.FilterBar" ShowFilterBarStatus="true" Mode="FilterBarMode.Immediate" ImmediateModeDelay="50"></GridFilterSettings>
     <GridEvents CommandClicked="OnCommandClicked" TValue="InvSummGridModel"></GridEvents>
     <GridPageSettings PageSize="10"></GridPageSettings>
     <GridSelectionSettings CheckboxMode="CheckboxSelectionType.Default" Mode="SelectionMode.Row" CheckboxOnly="true"></GridSelectionSettings>
@@ -32,7 +32,7 @@ AllowSelection="true" AllowFiltering="true" AllowResizing="true" AllowGrouping="
                 }
             </Template>
         </GridColumn>
-        <GridColumn HeaderText="Discount %" Width="95" AllowEditing="false">
+        <GridColumn HeaderText="Discount %" Width="95" AllowFiltering="false" AllowEditing="false">
             <Template Context="ctx">
                 @{
                     var curr = ctx as InvSummGridModel;

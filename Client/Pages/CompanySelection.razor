@@ -17,10 +17,10 @@
             <div class="col">
                 @if (CurrentAccount?.Role == "Admin")
                 {
-                    <SfButton CssClass="bg-success" OnClick="@OnUploadclick" IconCss="syncfusion-blazor-icons syncfusion-blazor-icon-fileupload"></SfButton>
-                    <SfButton CssClass="bg-success" OnClick="@ShowUsers" IconCss="e-icons e-user">Users</SfButton>
+                    <SfButton CssClass="bg-success mx-1" OnClick="@OnUploadclick" IconCss="syncfusion-blazor-icons syncfusion-blazor-icon-fileupload"></SfButton>
+                    <SfButton CssClass="bg-success mx-1" OnClick="@ShowUsers" IconCss="e-icons e-user">Users</SfButton>
                 }
-                <SfButton CssClass="bg-success" OnClick="@AddNewCompany" IconCss="e-icons e-plus">Add</SfButton>
+                <SfButton CssClass="bg-success mx-1" OnClick="@AddNewCompany" IconCss="e-icons e-plus">Add</SfButton>
             </div>
         </div>
 

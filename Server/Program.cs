@@ -25,6 +25,7 @@ var culture = new CultureInfo(name: "hi-IN");
 culture.NumberFormat.CurrencySymbol = "Rs.";
 CultureInfo.DefaultThreadCurrentCulture = culture;
 CultureInfo.DefaultThreadCurrentUICulture = culture;
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(builder.Configuration.GetValue<string>("SyncfusionLicenseKey"));
 
 builder.Host.UseSerilog(configureLogger: (ctx, lc) => lc
     .WriteTo.Console()

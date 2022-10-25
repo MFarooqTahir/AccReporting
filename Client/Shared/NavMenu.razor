@@ -9,6 +9,7 @@
 
     <AuthorizeView>
         <Authorized>
+
             <div class="separator"></div>
             <div class="scroller">
                 <ul class="nav flex-column">
@@ -20,15 +21,17 @@
                     </li>
 
                 </ul>
-               
-                <SfTreeView CssClass="tempx" TValue="TreeData">
-                    <TreeViewFieldsSettings Id="Id" NavigateUrl="navigateUrl" Text="Name" ParentID="Pid" HasChildren="HasChild" Expanded="Expanded" DataSource="@LocalData"></TreeViewFieldsSettings>
+                @if (IsSidebarOpen)
+                {
+                    <SfTreeView CssClass="tempx" TValue="TreeData">
+                        <TreeViewFieldsSettings Id="Id" NavigateUrl="navigateUrl" Text="Name" ParentID="Pid" HasChildren="HasChild" Expanded="Expanded" DataSource="@LocalData"></TreeViewFieldsSettings>
                      <TreeViewTemplates TValue="TreeData">
                                 <NodeTemplate  Context="cont">
                                     <div class="mx-auto"><span class="syncfusion-blazor-icons syncfusion-blazor-icon-pdfviewer tempx" aria-hidden="true"></span><span class="displayText" style="color:white;margin-left: 5px">@cont.Name</span>
                                     </div> </NodeTemplate>
                             </TreeViewTemplates>
                 </SfTreeView>
+            }
             </div>
         </Authorized>
     </AuthorizeView>
@@ -48,6 +51,9 @@
 </style>
 @code
 {
+    [Parameter]
+    public bool IsSidebarOpen{ get; set; }
+
     List<TreeData> LocalData = new(){new TreeData
     {
         Id = "1",

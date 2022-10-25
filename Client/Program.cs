@@ -1,25 +1,24 @@
 using AccReporting.Client;
 using AccReporting.Client.Classes;
 using AccReporting.Client.Services;
-
+using Syncfusion.Blazor;
 using Blazored.LocalStorage;
 
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
-using Syncfusion.Blazor;
-
 using System.Globalization;
 using System.Net.Http.Headers;
 
 using Toolbelt.Blazor.Extensions.DependencyInjection;
+using Syncfusion.Blazor.Internal;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args: args);
 builder.RootComponents.Add<App>(selector: "#app");
 builder.RootComponents.Add<HeadOutlet>(selector: "head::after");
 builder.Services.AddSyncfusionBlazor();
-//Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(builder.Configuration.GetValue<string>("SyncfusionLicenseKey"));
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(builder.Configuration.GetValue<string>("SyncfusionLicenseKey"));
 
 builder.Services.AddHttpClient(name: "AccReporting.ServerAPI", configureClient: client => client.BaseAddress = new Uri(uriString: builder.HostEnvironment.BaseAddress))
     .ConfigureHttpClient(configureClient: x => x.DefaultRequestHeaders.Accept
